@@ -1,5 +1,5 @@
 # melogram
-share songs variations and iterations to people
+share songs variations and versions to people
 
 ## License
 
