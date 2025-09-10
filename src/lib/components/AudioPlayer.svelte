@@ -71,3 +71,6 @@
   <slot name="empty">Pas d’audio pour cette version.</slot>
 {/if}
 
+<style lang="stylus">
+  
+</style>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../app.css';
+	import '../global.styl';
 	import favicon from '$lib/assets/favicon.svg';
 
 	let { children } = $props();
@@ -9,8 +10,19 @@
 	<link rel="icon" href={favicon} />
     <!-- Google Fonts: moved from CSS @import to prevent import errors -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Seaweed+Script&family=Sora:wght@100..800&family=Tiny5&display=swap" rel="stylesheet">
 </svelte:head>
 
-{@render children?.()}
+<main>
+    {@render children?.()}
+</main>
+
+<style lang="stylus">
+    main
+        display flex
+        flex-direction column
+        align-items center
+        text-align center
+        min-height 90vh
+        justify-content center
+</style>
