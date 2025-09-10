@@ -49,7 +49,7 @@
       {#if track.description}<p>{track.description}</p>{/if}
     </header>
 
-    <div>
+    <div class="tabs">
       <button>Featured</button>
       <button>Historique</button>
     </div>
@@ -97,3 +97,14 @@
     </section>
   </section>
 {/if}
+
+<style lang="stylus">
+  h1
+    font-family "Seaweed Script"
+    font-size 2rem
+
+  .tabs
+    display flex
+    gap 2rem
+    justify-content center
+</style>

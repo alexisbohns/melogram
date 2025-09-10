@@ -5,7 +5,3 @@
 @theme {
   --font-sans: "Tiny5", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
-
-body {
-    background: white;
-}
