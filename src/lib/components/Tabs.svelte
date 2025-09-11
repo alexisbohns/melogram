@@ -78,6 +78,7 @@
   gap 2rem
   justify-content center
   margin 1rem 0
+  font-family var(--font-captions)
 
 .tabs > button
   appearance none

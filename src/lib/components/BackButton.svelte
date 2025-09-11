@@ -1,6 +1,4 @@
 <script lang="ts">
-  import Icon from '$lib/components/Icon.svelte'
-  import { icons } from '$lib/icons'
   export let href: string | null = null
   export let label = 'Retour'
   function go() {
@@ -10,10 +8,19 @@
 </script>
 
 <button
-  class="hover:text-black/50 cursor-pointer"
+  class="button-back"
   on:click|preventDefault={go}
   aria-label={label}
 >
-  <Icon icon={icons.arrowLeft} size={14} />
-  <span style="margin-left: .5rem">{label}</span>
+  {label}
 </button>
+
+<style lang="stylus">
+  .button-back
+    cursor pointer
+    font-family var(--font-captions)
+    opacity 0.5
+
+    &:hover
+      opacity 1
+</style>

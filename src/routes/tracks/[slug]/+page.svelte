@@ -37,6 +37,8 @@
   import Icon from '$lib/components/Icon.svelte'
   import { icons } from '$lib/icons'
   import Tabs from '$lib/components/Tabs.svelte'
+  import TrackHeader from '$lib/components/TrackHeader.svelte'
+  import TrackVersionItem from '$lib/components/TrackVersionItem.svelte'
   let tab: 'featured' | 'history' = 'featured'
 </script>
 
@@ -46,12 +48,7 @@
   <p>Introuvable.</p>
 {:else}
   <section>
-    <header>
-        <BackButton/>
-      <h1>{track.name}</h1>
-      {#if track.cover_url}<img src={track.cover_url} alt={track.name} class="track-cover" />{/if}
-      {#if track.description}<p>{track.description}</p>{/if}
-    </header>
+    <TrackHeader {track} />
 
     <Tabs
       items={[
@@ -85,23 +82,9 @@
         {#if older.length === 0}
           <p>Aucune autre version.</p>
         {:else}
-          <ul>
+          <ul class="track-versions-timeline">
             {#each older as v}
-              <li>
-                <div>
-                  <div>{v.name}</div>
-                  <div>{formatDateTime(v.created_at)}</div>
-                </div>
-                <div>
-                  {#if v.resource_url}
-                    <WavePlayer src={v.resource_url} height={48} />
-                  {/if}
-                  <button aria-label="Commentaires" class="comment_btn">
-                    <Icon icon={icons.comment} size={14} label="comment"/>
-                    <span>Commentaires</span>
-                  </button>
-                </div>
-              </li>
+              <TrackVersionItem version={v} />
             {/each}
           </ul>
         {/if}
@@ -111,25 +94,6 @@
 {/if}
 
 <style lang="stylus">
-  h1
-    font-family "Seaweed Script"
-    font-size 2rem
-
   // tabs styles moved to Tabs.svelte
-
-  .track-cover
-    width 100%
-    max-width 200px
-    border-radius 0.5rem
-
-  .comment_btn
-    display inline-flex
-    align-items center
-    gap .4rem
-    padding .25rem .5rem
-    border 1px solid rgba(0,0,0,.08)
-    border-radius .375rem
-    background #f8fafc
-    &:hover
-      background #f1f5f9
+  
 </style>
