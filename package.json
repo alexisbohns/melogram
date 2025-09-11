@@ -33,7 +33,11 @@
 		"vite": "^7.0.4"
 	},
 	"dependencies": {
+		"@fortawesome/fontawesome-svg-core": "^7.0.1",
+		"@fortawesome/free-regular-svg-icons": "^7.0.1",
+		"@fortawesome/free-solid-svg-icons": "^7.0.1",
 		"@supabase/supabase-js": "^2.57.2",
+		"svelte-fa": "^4.0.4",
 		"wavesurfer.js": "^7.10.1"
 	}
 }

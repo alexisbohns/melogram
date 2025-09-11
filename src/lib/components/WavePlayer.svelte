@@ -7,14 +7,17 @@
   export let progressColor: string = '#111827' // gray-900
   export let cursorColor: string = '#6b7280' // gray-500
   export let barWidth: number | null = 2
-  export let barGap: number | null = 1
-  export let barRadius: number | null = 2
+  export let barGap: number | null = 2
+  export let barRadius: number | null = 4
   export let autoplay: boolean = false
 
   let containerEl: HTMLDivElement | null = null
   let ws: any | null = null
   let isReady = false
   let isPlaying = false
+
+  import Icon from '$lib/components/Icon.svelte'
+  import { icons } from '$lib/icons'
 
   async function init() {
     if (typeof window === 'undefined' || !containerEl || !src) return
@@ -62,17 +65,22 @@
 
         ctx.stroke()
         ctx.closePath()
-      }
+      },
     })
 
-    ws.on('ready', () => {
-      isReady = true
-      if (autoplay) ws?.play?.()
-    })
+    const markReady = () => { isReady = true }
+    ws.on('ready', markReady)
+    ws.on('decode', markReady)
+    ws.on('error', () => { isReady = false })
 
     ws.on('play', () => (isPlaying = true))
     ws.on('pause', () => (isPlaying = false))
     ws.on('finish', () => (isPlaying = false))
+
+    ws.on('ready', () => {
+      isReady = true
+      if (autoplay) ws?.play?.()
+    });
   }
 
   function destroy() {
@@ -91,23 +99,28 @@
 
   $: if (ws && src) {
     // reload when src changes
+    isReady = false
     ws.load?.(src)
   }
 
   function toggle() {
     if (!ws) return
-    ws.isPlaying() ? ws.pause() : ws.play()
+    const playing = typeof ws.isPlaying === 'function' ? ws.isPlaying() : !!ws.isPlaying
+    if (playing) ws.pause()
+    else ws.play()
+    // reflect UI immediately in case events are delayed
+    isPlaying = !playing
   }
 </script>
 
 {#if src}
   <div class="waveplayer">
     <div class="waveplayer_wave" bind:this={containerEl}></div>
-    <button class="waveplayer_control" on:click={toggle} disabled={!isReady} aria-label={isPlaying ? 'Pause' : 'Play'}>
+    <button class="waveplayer_control" on:click={toggle} disabled={!isReady} aria-label={isPlaying ? 'Pause' : 'Play'} aria-pressed={isPlaying}>
       {#if isPlaying}
-        Pause
+        <Icon icon={icons.pause} size={18} label="pause" />
       {:else}
-        Play
+        <Icon icon={icons.play} size={18} label="play" />
       {/if}
     </button>
   </div>

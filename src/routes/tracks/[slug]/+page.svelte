@@ -34,6 +34,8 @@
 
   import BackButton from '$lib/components/BackButton.svelte'
   import WavePlayer from '$lib/components/WavePlayer.svelte'
+  import Icon from '$lib/components/Icon.svelte'
+  import { icons } from '$lib/icons'
 </script>
 
 {#if error}
@@ -88,7 +90,10 @@
                   <WavePlayer src={v.resource_url} height={48} />
                 {/if}
                 <!-- version sheet trigger -->
-                <button>Commentaires</button>
+                <button aria-label="Commentaires" class="comment_btn">
+                  <Icon icon={icons.comment} size={14} label="comment"/>
+                  <span>Commentaires</span>
+                </button>
               </div>
             </li>
           {/each}
@@ -108,4 +113,14 @@
     gap 2rem
     justify-content center
     
+  .comment_btn
+    display inline-flex
+    align-items center
+    gap .4rem
+    padding .25rem .5rem
+    border 1px solid rgba(0,0,0,.08)
+    border-radius .375rem
+    background #f8fafc
+    &:hover
+      background #f1f5f9
 </style>
