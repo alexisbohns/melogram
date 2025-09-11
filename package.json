@@ -33,6 +33,7 @@
 		"vite": "^7.0.4"
 	},
 	"dependencies": {
-		"@supabase/supabase-js": "^2.57.2"
+		"@supabase/supabase-js": "^2.57.2",
+		"wavesurfer.js": "^7.10.1"
 	}
 }

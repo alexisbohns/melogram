@@ -33,7 +33,7 @@
   $: older = sorted.slice(1)
 
   import BackButton from '$lib/components/BackButton.svelte'
-  import AudioPlayer from '$lib/components/AudioPlayer.svelte'
+  import WavePlayer from '$lib/components/WavePlayer.svelte'
 </script>
 
 {#if error}
@@ -61,7 +61,7 @@
         <div>
           <p>Slug: {featured.name}</p>
           {#if featured.resource_url}
-            <AudioPlayer src={featured.resource_url} />
+            <WavePlayer src={featured.resource_url} />
           {:else}
             <p>Pas d’audio pour cette version.</p>
           {/if}
@@ -85,7 +85,7 @@
               </div>
               <div>
                 {#if v.resource_url}
-                  <AudioPlayer src={v.resource_url} />
+                  <WavePlayer src={v.resource_url} height={48} />
                 {/if}
                 <!-- version sheet trigger -->
                 <button>Commentaires</button>
@@ -107,4 +107,5 @@
     display flex
     gap 2rem
     justify-content center
+    
 </style>
