@@ -36,6 +36,7 @@
   import WavePlayer from '$lib/components/WavePlayer.svelte'
   import Icon from '$lib/components/Icon.svelte'
   import { icons } from '$lib/icons'
+  let tab: 'featured' | 'history' = 'featured'
 </script>
 
 {#if error}
@@ -51,55 +52,68 @@
       {#if track.description}<p>{track.description}</p>{/if}
     </header>
 
-    <div class="tabs">
-      <button>Featured</button>
-      <button>Historique</button>
+    <div class="tabs" role="tablist" aria-label="Versions">
+      <button
+        role="tab"
+        class:active={tab === 'featured'}
+        aria-selected={tab === 'featured'}
+        tabindex={tab === 'featured' ? 0 : -1}
+        on:click={() => (tab = 'featured')}
+      >Mise en avant</button>
+      <button
+        role="tab"
+        class:active={tab === 'history'}
+        aria-selected={tab === 'history'}
+        tabindex={tab === 'history' ? 0 : -1}
+        on:click={() => (tab = 'history')}
+      >Historique</button>
     </div>
 
-    <!-- featured -->
-    {#if featured}
-      <article>
-        <h2>Version mise en avant</h2>
-        <div>
-          <p>Slug: {featured.name}</p>
-          {#if featured.resource_url}
-            <WavePlayer src={featured.resource_url} />
-          {:else}
-            <p>Pas d’audio pour cette version.</p>
-          {/if}
-          <!-- comments tbd -->
-        </div>
-      </article>
-    {/if}
-
-    <!-- history -->
-    <section>
-      <h3>Versions antérieures</h3>
-      {#if older.length === 0}
-        <p>Aucune autre version.</p>
+    {#if tab === 'featured'}
+      {#if featured}
+        <article>
+          <h2>Version mise en avant</h2>
+          <div>
+            <p>Slug: {featured.name}</p>
+            {#if featured.resource_url}
+              <WavePlayer src={featured.resource_url} />
+            {:else}
+              <p>Pas d’audio pour cette version.</p>
+            {/if}
+            <!-- comments tbd -->
+          </div>
+        </article>
       {:else}
-        <ul>
-          {#each older as v}
-            <li>
-              <div>
-                <div>{v.name}</div>
-                <div>{formatDateTime(v.created_at)}</div>
-              </div>
-              <div>
-                {#if v.resource_url}
-                  <WavePlayer src={v.resource_url} height={48} />
-                {/if}
-                <!-- version sheet trigger -->
-                <button aria-label="Commentaires" class="comment_btn">
-                  <Icon icon={icons.comment} size={14} label="comment"/>
-                  <span>Commentaires</span>
-                </button>
-              </div>
-            </li>
-          {/each}
-        </ul>
+        <p>Aucune version en avant.</p>
       {/if}
-    </section>
+    {:else}
+      <section>
+        <h3>Versions antérieures</h3>
+        {#if older.length === 0}
+          <p>Aucune autre version.</p>
+        {:else}
+          <ul>
+            {#each older as v}
+              <li>
+                <div>
+                  <div>{v.name}</div>
+                  <div>{formatDateTime(v.created_at)}</div>
+                </div>
+                <div>
+                  {#if v.resource_url}
+                    <WavePlayer src={v.resource_url} height={48} />
+                  {/if}
+                  <button aria-label="Commentaires" class="comment_btn">
+                    <Icon icon={icons.comment} size={14} label="comment"/>
+                    <span>Commentaires</span>
+                  </button>
+                </div>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      </section>
+    {/if}
   </section>
 {/if}
 
@@ -112,7 +126,37 @@
     display flex
     gap 2rem
     justify-content center
-    
+    margin 1rem 0
+
+  .tabs > button
+    appearance none
+    background transparent
+    opacity 0.5
+    border none
+    padding .5rem 1rem
+    border-bottom 2px solid transparent
+    cursor pointer
+    display flex
+    flex-direction column
+    align-items center
+
+    &::after
+      content "•"
+      opacity 0
+
+    &:hover
+      opacity 0.8
+
+      &::after
+        opacity 0.5
+
+  .tabs > button.active, .tabs > button[aria-selected="true"]
+    opacity 1
+
+    &::after
+      content "•"
+      opacity 1
+
   .comment_btn
     display inline-flex
     align-items center

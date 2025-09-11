@@ -23,6 +23,4 @@
         flex-direction column
         align-items center
         text-align center
-        min-height 90vh
-        justify-content center
 </style>
