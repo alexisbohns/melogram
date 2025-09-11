@@ -102,14 +102,14 @@
 
 {#if src}
   <div class="waveplayer">
-    <button class="waveplayer_btn" on:click={toggle} disabled={!isReady} aria-label={isPlaying ? 'Pause' : 'Play'}>
+    <div class="waveplayer_wave" bind:this={containerEl}></div>
+    <button class="waveplayer_control" on:click={toggle} disabled={!isReady} aria-label={isPlaying ? 'Pause' : 'Play'}>
       {#if isPlaying}
-        ❚❚
+        Pause
       {:else}
-        ►
+        Play
       {/if}
     </button>
-    <div class="waveplayer_wave" bind:this={containerEl}></div>
   </div>
 {:else}
   <slot name="empty">Pas d’audio pour cette version.</slot>
@@ -118,11 +118,12 @@
 <style lang="stylus">
 .waveplayer
   display flex
+  flex-direction column
   align-items center
   gap .75rem
   width 100%
 
-.waveplayer_btn
+.waveplayer_control
   appearance none
   border none
   background #f3f4f6
@@ -140,5 +141,6 @@
     cursor default
 
 .waveplayer_wave
+  align-self stretch
   flex 1
 </style>
