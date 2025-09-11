@@ -66,8 +66,11 @@
 </svelte:head>
 
 {#if src}
-  <audio bind:this={audioEl} controls playsinline preload={preload} src={src} />
+  <audio bind:this={audioEl} controls playsinline preload={preload} src={src}></audio>
 {:else}
   <slot name="empty">Pas d’audio pour cette version.</slot>
 {/if}
 
+<style lang="stylus">
+
+</style>
