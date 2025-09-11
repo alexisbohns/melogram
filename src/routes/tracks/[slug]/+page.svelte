@@ -62,7 +62,6 @@
     {#if tab === 'featured'}
       {#if featured}
         <article>
-          <h2>Version mise en avant</h2>
           <div>
             <p>Slug: {featured.name}</p>
             {#if featured.resource_url}
@@ -78,7 +77,6 @@
       {/if}
     {:else}
       <section>
-        <h3>Versions antérieures</h3>
         {#if older.length === 0}
           <p>Aucune autre version.</p>
         {:else}
