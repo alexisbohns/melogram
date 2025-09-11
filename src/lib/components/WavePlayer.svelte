@@ -3,9 +3,9 @@
 
   export let src: string | null | undefined
   export let height: number = 64
-  export let waveColor: string = '#9ca3af' // gray-400
-  export let progressColor: string = '#111827' // gray-900
-  export let cursorColor: string = '#6b7280' // gray-500
+  export let waveColor: string = '#8f8572' // gray-400
+  export let progressColor: string = 'white' // gray-900
+  export let cursorColor: string = '#a1a6a1' // gray-500
   export let barWidth: number | null = 2
   export let barGap: number | null = 2
   export let barRadius: number | null = 4
@@ -119,8 +119,10 @@
     <button class="waveplayer_control" on:click={toggle} disabled={!isReady} aria-label={isPlaying ? 'Pause' : 'Play'} aria-pressed={isPlaying}>
       {#if isPlaying}
         <Icon icon={icons.pause} size={18} label="pause" />
+        <span>Pause</span>
       {:else}
         <Icon icon={icons.play} size={18} label="play" />
+        <span>Play</span>
       {/if}
     </button>
   </div>
@@ -137,21 +139,31 @@
   width 100%
 
 .waveplayer_control
+  font-family var(--font-captions)
   appearance none
   border none
-  background #f3f4f6
-  color #111827
-  width 2.25rem
-  height 2.25rem
-  border-radius 999px
-  display inline-flex
+  background rgba(255,255,255,0.7)
+  color black
+  border-radius 0.25rem
+  padding 0.5rem 1rem
+  display flex
+  gap 0.5rem
   align-items center
   justify-content center
   font-weight bold
   cursor pointer
+  mix-blend-mode: plus-lighter
+  border-bottom 2px solid rgba(255,255,255,0.8)
+  width 100px
+
   &:disabled
     opacity .5
     cursor default
+
+  &:active
+    transform translate(0, 2px)
+    opacity 0.8
+    border-bottom none
 
 .waveplayer_wave
   align-self stretch

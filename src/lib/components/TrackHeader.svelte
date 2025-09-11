@@ -36,6 +36,8 @@
   h1
     font-family var(--font-headings)
     font-size 2rem
+    color rgba(255,255,255,0.6)
+    mix-blend-mode plus-lighter
 
   img
     width 100%
@@ -43,5 +45,6 @@
     border-radius .5rem
 
   .track-description
-    opacity 0.6
+    opacity 0.4
+    mix-blend-mode plus-lighter
 </style>

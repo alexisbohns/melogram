@@ -87,6 +87,7 @@
   padding .5rem 1rem
   cursor pointer
   opacity 0.5
+  mix-blend-mode plus-lighter
 
   display flex
   flex-direction column
@@ -97,14 +98,14 @@
     opacity 0
 
   &:hover
-    opacity 0.8
+    opacity 0.6
 
     &::after
-      opacity 0.8
+      opacity 0.3
 
 .tabs > button.active, .tabs > button[aria-selected="true"]
-  opacity 1
+  opacity 0.8
 
   &::after
-    opacity 1
+    opacity 0.8
 </style>
