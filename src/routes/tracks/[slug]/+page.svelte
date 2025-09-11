@@ -36,6 +36,7 @@
   import WavePlayer from '$lib/components/WavePlayer.svelte'
   import Icon from '$lib/components/Icon.svelte'
   import { icons } from '$lib/icons'
+  import Tabs from '$lib/components/Tabs.svelte'
   let tab: 'featured' | 'history' = 'featured'
 </script>
 
@@ -48,26 +49,18 @@
     <header>
         <BackButton/>
       <h1>{track.name}</h1>
-      {#if track.cover_url}<img src={track.cover_url} alt={track.name} />{/if}
+      {#if track.cover_url}<img src={track.cover_url} alt={track.name} class="track-cover" />{/if}
       {#if track.description}<p>{track.description}</p>{/if}
     </header>
 
-    <div class="tabs" role="tablist" aria-label="Versions">
-      <button
-        role="tab"
-        class:active={tab === 'featured'}
-        aria-selected={tab === 'featured'}
-        tabindex={tab === 'featured' ? 0 : -1}
-        on:click={() => (tab = 'featured')}
-      >Mise en avant</button>
-      <button
-        role="tab"
-        class:active={tab === 'history'}
-        aria-selected={tab === 'history'}
-        tabindex={tab === 'history' ? 0 : -1}
-        on:click={() => (tab = 'history')}
-      >Historique</button>
-    </div>
+    <Tabs
+      items={[
+        { id: 'featured', label: 'Mise en avant' },
+        { id: 'history', label: 'Historique' }
+      ]}
+      bind:value={tab}
+      ariaLabel="Versions"
+    />
 
     {#if tab === 'featured'}
       {#if featured}
@@ -122,40 +115,12 @@
     font-family "Seaweed Script"
     font-size 2rem
 
-  .tabs
-    display flex
-    gap 2rem
-    justify-content center
-    margin 1rem 0
+  // tabs styles moved to Tabs.svelte
 
-  .tabs > button
-    appearance none
-    background transparent
-    opacity 0.5
-    border none
-    padding .5rem 1rem
-    border-bottom 2px solid transparent
-    cursor pointer
-    display flex
-    flex-direction column
-    align-items center
-
-    &::after
-      content "•"
-      opacity 0
-
-    &:hover
-      opacity 0.8
-
-      &::after
-        opacity 0.5
-
-  .tabs > button.active, .tabs > button[aria-selected="true"]
-    opacity 1
-
-    &::after
-      content "•"
-      opacity 1
+  .track-cover
+    width 100%
+    max-width 200px
+    border-radius 0.5rem
 
   .comment_btn
     display inline-flex
