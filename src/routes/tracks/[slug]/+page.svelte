@@ -3,7 +3,7 @@
     id: string
     name: string
     resource_url?: string | null
-    created_at: string
+    release_date: string
   }
 
   type Track = {
@@ -27,7 +27,7 @@
   const formatDateTime = (iso: string) => new Date(iso).toLocaleString()
 
   $: sorted = (versions ?? []).slice().sort((a, b) =>
-    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    new Date(b.release_date).getTime() - new Date(a.release_date).getTime()
   )
   $: featured = sorted[0]
   $: older = sorted.slice(1)

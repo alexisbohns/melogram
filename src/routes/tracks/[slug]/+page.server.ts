@@ -31,12 +31,12 @@ export const load: PageServerLoad = async ({ params }) => {
     return { track, versions: [], error: null }
   }
 
-  // 3) Fetch the versions themselves, ordered by created_at desc
+  // 3) Fetch the versions themselves, ordered by release_date desc
   const { data: versions, error: verErr } = await supabase
     .from('versions')
-    .select('id, name, resource_url, created_at')
+    .select('id, name, resource_url, release_date')
     .in('id', versionIds)
-    .order('created_at', { ascending: false })
+    .order('release_date', { ascending: false })
 
   return { track, versions: versions ?? [], error: verErr?.message ?? null }
 }

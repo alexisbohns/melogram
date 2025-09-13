@@ -3,7 +3,7 @@
     id: string
     name: string
     resource_url?: string | null
-    created_at: string
+    release_date: string
   }
 </script>
 
@@ -22,7 +22,7 @@
 <li class="track-version-item">
   <div class="track-version-item_meta">
     <div class="name">{version.name}</div>
-    <div class="date">{formatDateTime(version.created_at)}</div>
+    <div class="date">{formatDateTime(version.release_date)}</div>
   </div>
   <div class="track-version-item_actions">
     {#if version.resource_url}
