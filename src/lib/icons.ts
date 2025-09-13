@@ -5,8 +5,16 @@ import {
   faHouse,
   faArrowLeft,
   faComment,
-  faHeart
+  faHeart as fasHeart,
+  faThumbsUp as fasThumbsUp,
+  faSquareMinus as fasSquareMinus,
 } from '@fortawesome/free-solid-svg-icons'
+
+import {
+  faHeart as farHeart,
+  faThumbsUp as farThumbsUp,
+  faSquareMinus as farSquareMinus
+} from '@fortawesome/free-regular-svg-icons'
 
 export type { IconDefinition }
 
@@ -16,6 +24,10 @@ export const icons = {
   home: faHouse as IconDefinition,
   arrowLeft: faArrowLeft as IconDefinition,
   comment: faComment as IconDefinition,
-  heart: faHeart as IconDefinition
+  heart: fasHeart as IconDefinition,
+  heartRegular: farHeart as IconDefinition,
+  thumbsUp: fasThumbsUp as IconDefinition,
+  thumbsUpRegular: farThumbsUp as IconDefinition,
+  squareMinus: fasSquareMinus as IconDefinition,
+  squareMinusRegular: farSquareMinus as IconDefinition
 }
-

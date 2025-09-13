@@ -3,6 +3,7 @@
 
   export let src: string | null | undefined
   export let height: number = 64
+  export let version_id: string
   export let waveColor: string = '#8f8572' // gray-400
   export let progressColor: string = 'white' // gray-900
   export let cursorColor: string = '#a1a6a1' // gray-500
@@ -16,6 +17,7 @@
   let isReady = false
   let isPlaying = false
 
+  import Reactions from '$lib/components/Reactions.svelte'
   import Icon from '$lib/components/Icon.svelte'
   import { icons } from '$lib/icons'
   import { t } from '$lib/i18n/i18n'
@@ -116,16 +118,19 @@
 
 {#if src}
   <div class="waveplayer">
-    <div class="waveplayer_wave" bind:this={containerEl}></div>
-    <button class="waveplayer_control" on:click={toggle} disabled={!isReady} aria-label={isPlaying ? $t('common.pause') : $t('common.play')} aria-pressed={isPlaying}>
-      {#if isPlaying}
-        <Icon icon={icons.pause} size={18} label={$t('common.pause')} />
-        <span>{$t('common.pause')}</span>
-      {:else}
-        <Icon icon={icons.play} size={18} label={$t('common.play')} />
-        <span>{$t('common.play')}</span>
-      {/if}
-    </button>
+    <div class="waveplayer-wave" bind:this={containerEl}></div>
+    <div class="waveplayer-actions">
+      <button class="waveplayer-control" on:click={toggle} disabled={!isReady} aria-label={isPlaying ? $t('common.pause') : $t('common.play')} aria-pressed={isPlaying}>
+        {#if isPlaying}
+          <Icon icon={icons.pause} size={18} label={$t('common.pause')} />
+          <span>{$t('common.pause')}</span>
+        {:else}
+          <Icon icon={icons.play} size={18} label={$t('common.play')} />
+          <span>{$t('common.play')}</span>
+        {/if}
+      </button>
+      <Reactions targetType="version" targetId={version_id} />
+    </div>
   </div>
 {:else}
   <slot name="empty">{$t('audio.no_audio')}</slot>
@@ -138,8 +143,16 @@
   align-items center
   gap .75rem
   width 100%
+  border 1px solid rgba(255, 255, 255, 0.2)
+  border-radius 1rem
+  padding 1rem
 
-.waveplayer_control
+.waveplayer-actions
+  display flex
+  align-self stretch
+  justify-content space-between
+
+.waveplayer-control
   font-family var(--font-captions)
   appearance none
   border none
@@ -166,7 +179,7 @@
     opacity 0.8
     border-bottom none
 
-.waveplayer_wave
+.waveplayer-wave
   align-self stretch
   flex 1
 </style>

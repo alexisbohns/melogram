@@ -66,7 +66,7 @@
           <div>
             <p>{$t('tracks.slug_label')}: {featured.name}</p>
             {#if featured.resource_url}
-              <WavePlayer src={featured.resource_url} />
+              <WavePlayer src={featured.resource_url} version_id={featured.id} />
             {:else}
               <p>{$t('audio.no_audio')}</p>
             {/if}
