@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
+  import { t } from '$lib/i18n/i18n'
   export let data
   const { tracks, error } = data
 
@@ -10,12 +11,12 @@
 
 <section>
   <header>
-    <h1>Morceaux</h1>
+    <h1>{$t('tracks.title')}</h1>
     {#if error}<p class="text-red-600">{error}</p>{/if}
   </header>
 
   {#if tracks.length === 0}
-    <p>Aucun morceau.</p>
+    <p>{$t('tracks.none')}</p>
   {:else}
     <div class="tracks_list">
       {#each tracks as t}

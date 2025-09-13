@@ -14,6 +14,7 @@
   import WavePlayer from '$lib/components/WavePlayer.svelte'
   import Icon from '$lib/components/Icon.svelte'
   import { icons } from '$lib/icons'
+  import { t } from '$lib/i18n/i18n'
 
   const formatDateTime = (iso: string) => new Date(iso).toLocaleString()
 </script>
@@ -27,9 +28,9 @@
     {#if version.resource_url}
       <WavePlayer src={version.resource_url} height={waveHeight} />
     {/if}
-    <button aria-label="Commentaires" class="comment_btn">
+    <button aria-label={$t('common.comments')} class="comment_btn">
       <Icon icon={icons.comment} size={14} label="comment" />
-      <span>Commentaires</span>
+      <span>{$t('common.comments')}</span>
     </button>
   </div>
 </li>
@@ -66,4 +67,3 @@
   &:hover
     background #f1f5f9
 </style>
-

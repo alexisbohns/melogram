@@ -68,7 +68,10 @@
 {#if src}
   <audio bind:this={audioEl} controls playsinline preload={preload} src={src}></audio>
 {:else}
-  <slot name="empty">Pas d’audio pour cette version.</slot>
+  <script lang="ts">
+    import { t } from '$lib/i18n/i18n'
+  </script>
+  <slot name="empty">{$t('audio.no_audio')}</slot>
 {/if}
 
 <style lang="stylus">

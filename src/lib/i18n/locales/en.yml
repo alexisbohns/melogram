@@ -1,0 +1,19 @@
+common:
+  back: Back
+  comments: Comments
+  versions: Versions
+  featured: Featured
+  history: History
+  play: Play
+  pause: Pause
+tracks:
+  title: Tracks
+  none: No tracks.
+  not_found: Not found.
+  featured_title: Featured version
+  no_featured: No featured version.
+  history_title: Previous versions
+  no_other_versions: No other versions.
+  slug_label: Slug
+audio:
+  no_audio: No audio for this version.

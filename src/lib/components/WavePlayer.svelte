@@ -18,6 +18,7 @@
 
   import Icon from '$lib/components/Icon.svelte'
   import { icons } from '$lib/icons'
+  import { t } from '$lib/i18n/i18n'
 
   async function init() {
     if (typeof window === 'undefined' || !containerEl || !src) return
@@ -116,18 +117,18 @@
 {#if src}
   <div class="waveplayer">
     <div class="waveplayer_wave" bind:this={containerEl}></div>
-    <button class="waveplayer_control" on:click={toggle} disabled={!isReady} aria-label={isPlaying ? 'Pause' : 'Play'} aria-pressed={isPlaying}>
+    <button class="waveplayer_control" on:click={toggle} disabled={!isReady} aria-label={isPlaying ? $t('common.pause') : $t('common.play')} aria-pressed={isPlaying}>
       {#if isPlaying}
-        <Icon icon={icons.pause} size={18} label="pause" />
-        <span>Pause</span>
+        <Icon icon={icons.pause} size={18} label={$t('common.pause')} />
+        <span>{$t('common.pause')}</span>
       {:else}
-        <Icon icon={icons.play} size={18} label="play" />
-        <span>Play</span>
+        <Icon icon={icons.play} size={18} label={$t('common.play')} />
+        <span>{$t('common.play')}</span>
       {/if}
     </button>
   </div>
 {:else}
-  <slot name="empty">Pas d’audio pour cette version.</slot>
+  <slot name="empty">{$t('audio.no_audio')}</slot>
 {/if}
 
 <style lang="stylus">

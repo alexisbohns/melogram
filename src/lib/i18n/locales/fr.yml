@@ -1,0 +1,19 @@
+common:
+  back: Retour
+  comments: Commentaires
+  versions: Versions
+  featured: Mise en avant
+  history: Historique
+  play: Lire
+  pause: Pause
+tracks:
+  title: Morceaux
+  none: Aucun morceau.
+  not_found: Introuvable.
+  featured_title: Version mise en avant
+  no_featured: Aucune version en avant.
+  history_title: Versions antérieures
+  no_other_versions: Aucune autre version.
+  slug_label: Slug
+audio:
+  no_audio: Pas d’audio pour cette version.
