@@ -6,6 +6,10 @@ common:
   history: Historique
   play: Lire
   pause: Pause
+  neutral: Neutre
+  love: Aimé
+  thumbs_up: Liké
+  latest: La plus récente
 tracks:
   title: Morceaux
   none: Aucun morceau.
@@ -15,5 +19,6 @@ tracks:
   history_title: Versions antérieures
   no_other_versions: Aucune autre version.
   slug_label: Slug
+  upcoming: Morceaux à venir
 audio:
   no_audio: Pas d’audio pour cette version.

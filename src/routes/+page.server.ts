@@ -9,10 +9,11 @@ export const load: PageServerLoad = async () => {
       id,
       slug,
       name,
+      description,
       cover_url,
       created_at,
-      track_versions!inner(
-        versions(release_date)
+      track_versions(
+        versions(id, name, resource_url, release_date)
       )
     `)
 

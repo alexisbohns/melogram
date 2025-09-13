@@ -140,10 +140,10 @@
 .waveplayer
   display flex
   flex-direction column
-  align-items center
   gap .75rem
   width 100%
-  border 1px solid rgba(255, 255, 255, 0.2)
+  border 1px solid rgba(255, 255, 255, 0.1)
+  border-bottom-width 3px
   border-radius 1rem
   padding 1rem
 
@@ -156,7 +156,7 @@
   font-family var(--font-captions)
   appearance none
   border none
-  background rgba(255,255,255,0.7)
+  background rgba(255,255,255,0.6)
   color black
   border-radius 0.25rem
   padding 0.5rem 1rem
@@ -167,7 +167,7 @@
   font-weight bold
   cursor pointer
   mix-blend-mode: plus-lighter
-  border-bottom 2px solid rgba(255,255,255,0.8)
+  border-bottom 3px solid rgba(0,0,0,0.2)
   width 100px
 
   &:disabled
@@ -177,7 +177,6 @@
   &:active
     transform translate(0, 2px)
     opacity 0.8
-    border-bottom none
 
 .waveplayer-wave
   align-self stretch

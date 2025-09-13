@@ -21,10 +21,8 @@
     main
         display flex
         flex-direction column
-        align-items center
-        text-align center
         padding 1rem
         width 100%
-        max-width 700px
+        max-width 600px
         margin 0 auto
 </style>
