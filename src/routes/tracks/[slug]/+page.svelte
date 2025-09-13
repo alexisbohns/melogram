@@ -39,46 +39,47 @@
   import Tabs from '$lib/components/Tabs.svelte'
   import TrackHeader from '$lib/components/TrackHeader.svelte'
   import TrackVersionItem from '$lib/components/TrackVersionItem.svelte'
+  import { t } from '$lib/i18n/i18n'
   let tab: 'featured' | 'history' = 'featured'
 </script>
 
 {#if error}
   <p class="text-red-600">{error}</p>
 {:else if !track}
-  <p>Introuvable.</p>
+  <p>{$t('tracks.not_found')}</p>
 {:else}
   <section>
     <TrackHeader {track} />
 
     <Tabs
       items={[
-        { id: 'featured', label: 'Mise en avant' },
-        { id: 'history', label: 'Historique' }
+        { id: 'featured', label: $t('common.featured') },
+        { id: 'history', label: $t('common.history') }
       ]}
       bind:value={tab}
-      ariaLabel="Versions"
+      ariaLabel={$t('common.versions')}
     />
 
     {#if tab === 'featured'}
       {#if featured}
         <article>
           <div>
-            <p>Slug: {featured.name}</p>
+            <p>{$t('tracks.slug_label')}: {featured.name}</p>
             {#if featured.resource_url}
               <WavePlayer src={featured.resource_url} />
             {:else}
-              <p>Pas d’audio pour cette version.</p>
+              <p>{$t('audio.no_audio')}</p>
             {/if}
             <!-- comments tbd -->
           </div>
         </article>
       {:else}
-        <p>Aucune version en avant.</p>
+        <p>{$t('tracks.no_featured')}</p>
       {/if}
     {:else}
       <section>
         {#if older.length === 0}
-          <p>Aucune autre version.</p>
+          <p>{$t('tracks.no_other_versions')}</p>
         {:else}
           <ul class="track-versions-timeline">
             {#each older as v}
