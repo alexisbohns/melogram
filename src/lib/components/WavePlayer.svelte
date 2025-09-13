@@ -141,7 +141,6 @@
   display flex
   flex-direction column
   gap .75rem
-  width 100%
   border 1px solid rgba(255, 255, 255, 0.1)
   border-bottom-width 3px
   border-radius 1rem

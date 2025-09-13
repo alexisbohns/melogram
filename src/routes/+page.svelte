@@ -80,12 +80,13 @@
             font-size 2rem
 
           &_date
+            font-family var(--font-captions)
             display flex
             align-items center
             justify-content flex-end
             gap 0.125rem
             opacity 0.25
-            font-size 0.6rem
+            font-size 0.8rem
             padding 0 1rem
       
     &-upcoming
