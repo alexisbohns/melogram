@@ -22,7 +22,7 @@
 </script>
 
 <h1>Morceaux</h1>
-{#if error}<p class="text-red-600">{error}</p>{/if}
+{#if error}<p class="error">{error}</p>{/if}
 {#if tracks.length === 0}
   <p>Aucun morceau.</p>
 {:else}
@@ -80,12 +80,13 @@
             font-size 2rem
 
           &_date
+            font-family var(--font-captions)
             display flex
             align-items center
             justify-content flex-end
             gap 0.125rem
             opacity 0.25
-            font-size 0.6rem
+            font-size 0.8rem
             padding 0 1rem
       
     &-upcoming
@@ -110,5 +111,8 @@
       gap 1rem
       color white
       mix-blend-mode plus-lighter
+
+  .error
+    color #dc2626
 
 </style>

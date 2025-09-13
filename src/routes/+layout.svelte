@@ -1,6 +1,5 @@
 <script lang="ts">
-	import '../app.css';
-	import '../global.styl';
+    import '../global.styl';
 	import favicon from '$lib/assets/favicon.svg';
 
 	let { children } = $props();
@@ -22,7 +21,6 @@
         display flex
         flex-direction column
         padding 1rem
-        width 100%
         max-width 600px
         margin 0 auto
 </style>

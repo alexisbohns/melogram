@@ -44,7 +44,7 @@
 </script>
 
 {#if error}
-  <p class="text-red-600">{error}</p>
+  <p class="error">{error}</p>
 {:else if !track}
   <p>{$t('tracks.not_found')}</p>
 {:else}
@@ -94,5 +94,6 @@
 
 <style lang="stylus">
   // tabs styles moved to Tabs.svelte
-  
+  .error
+    color #dc2626
 </style>

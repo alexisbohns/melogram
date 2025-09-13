@@ -12,7 +12,7 @@
 <section>
   <header>
     <h1>{$t('tracks.title')}</h1>
-    {#if error}<p class="text-red-600">{error}</p>{/if}
+    {#if error}<p class="error">{error}</p>{/if}
   </header>
 
   {#if tracks.length === 0}
@@ -50,4 +50,7 @@
       &_date
         opacity 0.25
         font-size 1rem
+
+  .error
+    color #dc2626
 </style>

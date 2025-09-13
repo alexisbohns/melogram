@@ -1,7 +1,10 @@
 :root
     --font-headings: "Seaweed Script", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-captions: "Tiny5", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-default: "Sora", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     box-sizing border-box
+    padding 0
+    margin 0
 
 body
     min-height 100vh
@@ -11,3 +14,25 @@ body
     background-position center
     background-attachment fixed
     color white
+
+    font-family var(--font-default)
+
+h1, h2, h3, h4, h5, h6, p {
+    margin 0
+}
+
+button, a {
+    appearance button
+    font inherit
+    font-feature-settings inherit
+    font-variation-settings inherit
+    letter-spacing inherit
+    color inherit
+    padding inherit
+    outline inherit
+    opacity inherit
+    background-color inherit
+    border-radius inherit
+    border inherit
+    text-decoration: inherit
+}
