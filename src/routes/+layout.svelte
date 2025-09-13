@@ -24,4 +24,7 @@
         align-items center
         text-align center
         padding 1rem
+        width 100%
+        max-width 700px
+        margin 0 auto
 </style>
