@@ -10,12 +10,7 @@
 <script lang="ts">
   export let version: Version
   export let waveHeight: number = 48
-
   import WavePlayer from '$lib/components/WavePlayer.svelte'
-  import Reactions from '$lib/components/Reactions.svelte'
-  import Icon from '$lib/components/Icon.svelte'
-  import { icons } from '$lib/icons'
-  import { t } from '$lib/i18n/i18n'
 
   const formatDateTime = (iso: string) => new Date(iso).toLocaleString()
 </script>
