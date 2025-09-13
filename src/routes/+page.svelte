@@ -1,11 +1,6 @@
 <script lang="ts">
-  import { goto } from '$app/navigation'
   export let data
   const { tracks, error } = data
-
-  function openTrack(slug: string) {
-    goto(`/tracks/${slug}`)
-  }
 </script>
 
 <section>
@@ -21,7 +16,9 @@
       {#each tracks as t}
         <a href={`/tracks/${t.slug}`} class="track_item">
           <div class="track_item_name">{t.name}</div>
-          <div class="track_item_date">{new Date(t.created_at).toLocaleDateString()}</div>
+          <div class="track_item_date">
+            Dernière version : {t.latest_release ? new Date(t.latest_release).toLocaleDateString() : '—'}
+          </div>
         </a>
       {/each}
     </div>
