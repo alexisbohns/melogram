@@ -18,6 +18,15 @@
 
   $: hasTrack = $current !== null
   $: progress = $duration > 0 ? ($time / $duration) * 100 : 0
+
+  function fmtTime(totalSeconds: number) {
+    const s = Math.max(0, Math.floor(totalSeconds || 0))
+    const m = Math.floor(s / 60)
+    const sec = s % 60
+    return `${m}:${sec.toString().padStart(2, '0')}`
+  }
+  $: formattedCurrent = fmtTime($time)
+  $: formattedRemaining = `-${fmtTime(Math.max(0, $duration - $time))}`
 </script>
 
 {#if hasTrack}
@@ -31,9 +40,11 @@
           <Icon icon={icons.play} size={16} label={$t('common.play')} />
         {/if}
       </button>
+      <span class="timecode current">{formattedCurrent}</span>
       <div class="timeline">
         <div class="timeline-progress" style={`width:${progress}%`}></div>
       </div>
+      <span class="timecode remaining">{formattedRemaining}</span>
     </div>
   </div>
 {/if}
@@ -57,6 +68,13 @@
   display flex
   align-items center
   gap .75rem
+
+.timecode
+  font-variant-numeric tabular-nums
+  font-size .9rem
+  opacity .8
+  min-width 4ch
+  text-align center
 
 .global-player-wave
   height 56px
