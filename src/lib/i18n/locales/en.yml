@@ -20,5 +20,6 @@ tracks:
   no_other_versions: No other versions.
   slug_label: Slug
   upcoming: Upcoming tracks
+  latests: Latests tracks
 audio:
   no_audio: No audio for this version.

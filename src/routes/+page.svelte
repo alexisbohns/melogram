@@ -27,11 +27,13 @@
   <p>Aucun morceau.</p>
 {:else}
   <section class="tracks-latests">
+    <h2 style="margin-top: 2rem;">{$t('tracks.latests')}</h2>
     <div class="tracks_list">
       {#each withVersions as track}
         <div class="track_item">
           <a href={`/tracks/${track.slug}`} class="track_item_link">
             <div class="track_item_name">{track.name}</div>
+            <div class="track_item_description">{track.description}</div>
           </a>
           {#if latestVersion(track)?.resource_url}
           <div class="track_item_player">
@@ -64,6 +66,19 @@
 {/if}
 
 <style lang="stylus">
+  h1, h2
+    font-family var(--font-captions)
+    text-align center
+    color rgba(255,255,255,0.6)
+    mix-blend-mode plus-lighter
+
+  h1
+    font-size 1rem
+    margin-bottom 2rem
+
+  h2
+    font-size 1.5rem
+    margin 2rem 0
   .tracks
     &-latests
       .track
@@ -77,7 +92,14 @@
 
           &_name
             font-family "Seaweed Script"
-            font-size 2rem
+            font-size 1.5rem
+            color rgba(255,255,255,0.7)
+            mix-blend-mode plus-lighter
+
+          &_description
+            opacity 0.3
+            font-size 0.8rem
+            font-weight 300            
 
           &_date
             font-family var(--font-captions)
@@ -109,8 +131,6 @@
       display flex
       flex-direction column
       gap 1rem
-      color white
-      mix-blend-mode plus-lighter
 
   .error
     color #dc2626
