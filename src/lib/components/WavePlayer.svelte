@@ -2,15 +2,7 @@
   import { onDestroy, onMount } from 'svelte'
 
   export let src: string | null | undefined
-  export let height: number = 64
   export let version_id: string
-  export let waveColor: string = '#8f8572' // gray-400
-  export let progressColor: string = 'white' // gray-900
-  export let cursorColor: string = '#a1a6a1' // gray-500
-  export let barWidth: number | null = 2
-  export let barGap: number | null = 2
-  export let barRadius: number | null = 4
-  export let autoplay: boolean = false
 
   let isReady = false
   let isPlaying = false
@@ -19,12 +11,19 @@
   import Icon from '$lib/components/Icon.svelte'
   import { icons } from '$lib/icons'
   import { t } from '$lib/i18n/i18n'
-  import { load as playerLoad, toggle as playerToggle, isReady as gIsReady, isPlaying as gIsPlaying, current as gCurrent } from '$lib/player/player'
+  import { load as playerLoad, toggle as playerToggle, isReady as gIsReady, isPlaying as gIsPlaying, current as gCurrent, duration as gDuration } from '$lib/player/player'
 
   onMount(() => {})
 
   $: isReady = $gIsReady
   $: isPlaying = $gIsPlaying && ($gCurrent?.src === src)
+
+  function fmtTime(totalSeconds: number) {
+    const s = Math.max(0, Math.floor(totalSeconds || 0))
+    const m = Math.floor(s / 60)
+    const sec = s % 60
+    return `${m}:${sec.toString().padStart(2, '0')}`
+  }
 
   async function toggle() {
     if (!src) return
@@ -64,6 +63,8 @@
   display flex
   align-self stretch
   justify-content space-between
+  gap .75rem
+  align-items center
 
 .waveplayer-control
   font-family var(--font-captions)
@@ -92,7 +93,4 @@
   &:active
     transform translate(0, 2px)
     opacity 0.8
-
-.waveplayer-wave
-  display none
 </style>
