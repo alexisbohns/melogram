@@ -89,15 +89,15 @@
 
 <div class="reactions">
   <button on:click={() => vote('love')} class="reactions-item">
-    <Icon icon={clicked.love ? icons.heart : icons.heartRegular} size={18} label={$t('common.love')} />
+    <Icon icon={clicked.love ? icons.heart : icons.heartRegular} size={16} label={$t('common.love')} />
     <span class="reactions-item-label">{counts.love}</span>
   </button>
   <button on:click={() => vote('thumbs_up')} class="reactions-item">
-    <Icon icon={clicked.thumbs_up ? icons.thumbsUp : icons.thumbsUpRegular} size={18} label={$t('common.love')} />
+    <Icon icon={clicked.thumbs_up ? icons.thumbsUp : icons.thumbsUpRegular} size={16} label={$t('common.love')} />
     <span class="reactions-item-label">{counts.thumbs_up}</span>
   </button>
   <button on:click={() => vote('neutral')} class="reactions-item">
-    <Icon icon={clicked.neutral ? icons.squareMinus : icons.squareMinusRegular} size={18} label={$t('common.neutral')} />
+    <Icon icon={clicked.neutral ? icons.squareMinus : icons.squareMinusRegular} size={16} label={$t('common.neutral')} />
     <span class="reactions-item-label">{counts.neutral}</span>
   </button>
 </div>
@@ -108,10 +108,22 @@
     gap 1rem
     
     &-item
+      color rgba(255,255,255,0.6)
       display flex
       align-items center
       gap 0.5rem
+      transition all ease-out 0.1s
+      cursor pointer
+
+      &:hover
+        opacity 0.5
+        transform scale(110%)
+
+      &:active
+        transform scale(90%)
 
       &-label
+        font-family var(--font-captions)
         opacity 0.5
+      
 </style>
