@@ -30,6 +30,7 @@
 </script>
 
 {#if hasTrack}
+<div class="global-player-wrapper">
   <div class="global-player" role="complementary" aria-label="{$t('audio.player')}">
     <div class="global-player-wave" bind:this={containerEl}></div>
     <div class="global-player-controls">
@@ -47,22 +48,29 @@
       <span class="timecode remaining">{formattedRemaining}</span>
     </div>
   </div>
+</div>
 {/if}
 
 <style lang="stylus">
-.global-player
+.global-player-wrapper
   position fixed
   left 0
   right 0
   bottom 0
-  padding .5rem 1rem
-  background rgba(0,0,0,0.6)
-  backdrop-filter blur(6px)
-  border-top 1px solid rgba(255,255,255,0.1)
-  display flex
-  flex-direction column
-  gap .5rem
   z-index 100
+  padding 1rem
+  max-width 600px
+  margin auto
+
+.global-player
+  padding 1rem
+  border-radius 1rem
+  background rgba(255,255,255,0.1)
+  backdrop-filter blur(6px)
+  border 1px solid rgba(255,255,255,0.1)
+  border-bottom-width 3px
+  gap .5rem
+  flex-direction column
 
 .global-player-controls
   display flex
@@ -80,13 +88,23 @@
   height 56px
 
 .control
+  font-family var(--font-captions)
   appearance none
   border none
-  background rgba(255,255,255,0.8)
+  background rgba(255,255,255,0.6)
   color black
-  border-radius .25rem
-  padding .5rem
+  border-radius 0.25rem
+  padding 0.5rem 0.75rem
+  display flex
+  gap 0.5rem
+  align-items center
+  justify-content center
+  font-weight bold
   cursor pointer
+  mix-blend-mode: plus-lighter
+  border-bottom 3px solid rgba(0,0,0,0.2)
+  transition all ease-out 0.25s
+  line-height 100%
 
   &:disabled
     opacity .5

@@ -84,7 +84,6 @@
   border-bottom 3px solid rgba(0,0,0,0.2)
   transition all ease-out 0.25s
   line-height 100%
-  // width 100px
 
   &:disabled
     opacity .5
