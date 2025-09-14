@@ -32,6 +32,7 @@
 {#if hasTrack}
 <div class="global-player-wrapper">
   <div class="global-player" role="complementary" aria-label="{$t('audio.player')}">
+    <div class="global-player-title">{$current?.title}</div>
     <div class="global-player-wave" bind:this={containerEl}></div>
     <div class="global-player-controls">
       <button class="control" on:click={toggle} disabled={!$isReady} aria-label={$isPlaying ? $t('common.pause') : $t('common.play')} aria-pressed={$isPlaying}>
@@ -72,6 +73,14 @@
   gap .5rem
   flex-direction column
 
+.global-player-title
+  font-family var(--font-captions)
+  font-size 1rem
+  color rgba(255,255,255,0.9)
+  white-space nowrap
+  overflow hidden
+  text-overflow ellipsis
+
 .global-player-controls
   display flex
   align-items center
@@ -79,6 +88,7 @@
 
 .timecode
   font-variant-numeric tabular-nums
+  font-family var(--font-captions)
   font-size .9rem
   opacity .8
   min-width 4ch

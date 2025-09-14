@@ -3,6 +3,7 @@ import { readable, writable, get } from 'svelte/store'
 export type PlayerSource = {
   src: string
   versionId?: string
+  title?: string
 }
 
 type InternalState = {

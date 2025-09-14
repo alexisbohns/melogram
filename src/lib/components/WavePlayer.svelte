@@ -3,6 +3,7 @@
 
   export let src: string | null | undefined
   export let version_id: string
+  export let title: string | undefined
 
   let isReady = false
   let isPlaying = false
@@ -17,6 +18,7 @@
 
   $: isReady = $gIsReady
   $: isPlaying = $gIsPlaying && ($gCurrent?.src === src)
+  $: localDuration = ($gCurrent?.src === src) ? $gDuration : 0
 
   function fmtTime(totalSeconds: number) {
     const s = Math.max(0, Math.floor(totalSeconds || 0))
@@ -28,7 +30,7 @@
   async function toggle() {
     if (!src) return
     if ($gCurrent?.src !== src) {
-      await playerLoad({ src, versionId: version_id }, true)
+      await playerLoad({ src, versionId: version_id, title }, true)
     } else {
       playerToggle()
     }
