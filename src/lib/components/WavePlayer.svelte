@@ -122,11 +122,10 @@
     <div class="waveplayer-actions">
       <button class="waveplayer-control" on:click={toggle} disabled={!isReady} aria-label={isPlaying ? $t('common.pause') : $t('common.play')} aria-pressed={isPlaying}>
         {#if isPlaying}
-          <Icon icon={icons.pause} size={18} label={$t('common.pause')} />
+          <Icon icon={icons.pause} size={16} label={$t('common.pause')} />
           <span>{$t('common.pause')}</span>
         {:else}
-          <Icon icon={icons.play} size={18} label={$t('common.play')} />
-          <span>{$t('common.play')}</span>
+          <Icon icon={icons.play} size={16} label={$t('common.play')} />
         {/if}
       </button>
       <Reactions targetType="version" targetId={version_id} />
@@ -145,6 +144,7 @@
   border-bottom-width 3px
   border-radius 1rem
   padding 1rem
+  background rgba(255,255,255,0.05)
 
 .waveplayer-actions
   display flex
@@ -158,7 +158,7 @@
   background rgba(255,255,255,0.6)
   color black
   border-radius 0.25rem
-  padding 0.5rem 1rem
+  padding 0.5rem 0.75rem
   display flex
   gap 0.5rem
   align-items center
@@ -167,7 +167,9 @@
   cursor pointer
   mix-blend-mode: plus-lighter
   border-bottom 3px solid rgba(0,0,0,0.2)
-  width 100px
+  transition all ease-out 0.25s
+  line-height 100%
+  // width 100px
 
   &:disabled
     opacity .5
