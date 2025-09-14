@@ -20,5 +20,6 @@ tracks:
   no_other_versions: Aucune autre version.
   slug_label: Slug
   upcoming: Morceaux à venir
+  latests: Dernières sorties  
 audio:
   no_audio: Pas d’audio pour cette version.
