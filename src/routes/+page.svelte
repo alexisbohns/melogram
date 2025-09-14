@@ -37,7 +37,7 @@
           </a>
           {#if latestVersion(track)?.resource_url}
           <div class="track_item_player">
-            <WavePlayer src={latestVersion(track).resource_url} version_id={latestVersion(track).id} height={56} />
+            <WavePlayer src={latestVersion(track).resource_url} version_id={latestVersion(track).id} />
           </div>
           <div class="track_item_date">
             <Icon icon={icons.clockRotateLeft} size={12} label={$t('common.latest')} />
