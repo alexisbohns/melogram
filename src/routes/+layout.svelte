@@ -1,6 +1,7 @@
 <script lang="ts">
     import '../global.styl';
 	import favicon from '$lib/assets/favicon.svg';
+    import GlobalPlayer from '$lib/components/GlobalPlayer.svelte'
 
 	let { children } = $props();
 </script>
@@ -14,6 +15,7 @@
 
 <main>
     {@render children?.()}
+    <GlobalPlayer />
 </main>
 
 <style lang="stylus">
