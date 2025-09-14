@@ -15,6 +15,7 @@ type InternalState = {
 
 let ws: any | null = null
 let containerEl: HTMLElement | null = null
+let pending: { source: PlayerSource; autoplay: boolean } | null = null
 
 const state = writable<InternalState>({
   current: null,
@@ -58,8 +59,18 @@ export function attach(el: HTMLElement) {
     try { ws?.destroy?.() } catch {}
     ws = null
     ensureWaveSurfer().then(() => {
+      if (pending) {
+        const { source, autoplay } = pending
+        pending = null
+        performLoad(source, autoplay)
+        return
+      }
       const cur = get(state).current
-      if (cur?.src) ws?.load?.(cur.src)
+      if (cur?.src) {
+        // resume current; if previously playing, autoplay
+        const wasPlaying = get(state).isPlaying
+        performLoad(cur, wasPlaying)
+      }
     })
   }
 }
@@ -73,14 +84,10 @@ export function detach() {
 
 export async function load(source: PlayerSource, autoplay = false) {
   state.update((s) => ({ ...s, current: source, isReady: false }))
+  pending = { source, autoplay }
   const w = await ensureWaveSurfer()
   if (!w) return
-  w.load?.(source.src)
-  if (autoplay) {
-    // wait until ready then play
-    const onReady = () => { w.play?.(); w.un('ready', onReady) }
-    w.on('ready', onReady)
-  }
+  performLoad(source, autoplay)
 }
 
 export function toggle() {
@@ -118,3 +125,12 @@ export const duration = readable<number>(0, (set) => {
   return () => unsub()
 })
 
+function performLoad(source: PlayerSource, autoplay: boolean) {
+  if (!ws) return
+  // Register playback before loading to avoid race with fast-ready
+  if (autoplay) {
+    const onReady = () => { ws?.play?.(); ws?.un?.('ready', onReady) }
+    ws.on('ready', onReady)
+  }
+  ws.load?.(source.src)
+}
