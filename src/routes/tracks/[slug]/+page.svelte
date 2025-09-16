@@ -58,7 +58,7 @@
     {#if tab === 'timeline'}
       <TrackTimeline {track} versions={sorted} />
     {:else if tab === 'versions'}
-      <TrackVersions versions={sorted} />
+      <TrackVersions {track} versions={sorted} />
     {:else}
       <TrackLyrics {track} />
     {/if}

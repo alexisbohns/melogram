@@ -3,7 +3,7 @@
   import type { Version } from '$lib/components/TrackVersionItem.svelte'
   import { t } from '$lib/i18n/i18n'
 
-  type Track = { id: string; name: string }
+  type Track = { id: string; name: string; slug?: string }
 
   export let track: Track
   export let versions: Version[] = []
@@ -15,7 +15,7 @@
   {:else}
     <ul class="track-versions-timeline">
       {#each versions as v}
-        <TrackVersionItem version={v} />
+        <TrackVersionItem version={v} trackTitle={track.name} trackSlug={track.slug} />
       {/each}
     </ul>
   {/if}
@@ -30,4 +30,3 @@
   flex-direction column
   gap 1rem
 </style>
-

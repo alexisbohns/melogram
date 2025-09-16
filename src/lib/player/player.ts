@@ -4,6 +4,7 @@ export type PlayerSource = {
   src: string
   versionId?: string
   title?: string
+  trackSlug?: string
 }
 
 type InternalState = {

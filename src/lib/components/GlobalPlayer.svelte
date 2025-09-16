@@ -32,7 +32,13 @@
 {#if hasTrack}
 <div class="global-player-wrapper">
   <div class="global-player" role="complementary" aria-label="{$t('audio.player')}">
-    <div class="global-player-title">{$current?.title}</div>
+    <div class="global-player-title">
+      {#if $current?.trackSlug}
+        <a href={`/tracks/${$current.trackSlug}`} class="title-link">{$current?.title}</a>
+      {:else}
+        {$current?.title}
+      {/if}
+    </div>
     <div class="global-player-wave" bind:this={containerEl}></div>
     <div class="global-player-controls">
       <button class="control" on:click={toggle} disabled={!$isReady} aria-label={$isPlaying ? $t('common.pause') : $t('common.play')} aria-pressed={$isPlaying}>
@@ -80,6 +86,12 @@
   white-space nowrap
   overflow hidden
   text-overflow ellipsis
+
+.global-player-title .title-link
+  color inherit
+  text-decoration none
+  &:hover
+    text-decoration underline
 
 .global-player-controls
   display flex
