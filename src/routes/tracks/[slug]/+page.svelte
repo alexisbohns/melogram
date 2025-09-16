@@ -13,6 +13,7 @@
     description?: string | null
     cover_url?: string | null
     created_at: string
+    lyrics?: string | null
   }
 
   export let data: {
@@ -23,24 +24,17 @@
 
   const { track, versions, error } = data
 
-  // avoid inline `new Date(...)` in markup and to keep SSR-safe formatting
-  const formatDateTime = (iso: string) => new Date(iso).toLocaleString()
-
   $: sorted = (versions ?? []).slice().sort((a, b) =>
     new Date(b.release_date).getTime() - new Date(a.release_date).getTime()
   )
-  $: featured = sorted[0]
-  $: older = sorted.slice(1)
 
-  import BackButton from '$lib/components/BackButton.svelte'
-  import WavePlayer from '$lib/components/WavePlayer.svelte'
-  import Icon from '$lib/components/Icon.svelte'
-  import { icons } from '$lib/icons'
   import Tabs from '$lib/components/Tabs.svelte'
   import TrackHeader from '$lib/components/TrackHeader.svelte'
-  import TrackVersionItem from '$lib/components/TrackVersionItem.svelte'
   import { t } from '$lib/i18n/i18n'
-  let tab: 'featured' | 'history' = 'featured'
+  import TrackTimeline from '$lib/components/TrackTimeline.svelte'
+  import TrackVersions from '$lib/components/TrackVersions.svelte'
+  import TrackLyrics from '$lib/components/TrackLyrics.svelte'
+  let tab: 'timeline' | 'versions' | 'lyrics' = 'timeline'
 </script>
 
 {#if error}
@@ -53,41 +47,20 @@
 
     <Tabs
       items={[
-        { id: 'featured', label: $t('common.featured') },
-        { id: 'history', label: $t('common.history') }
+        { id: 'timeline', label: $t('common.timeline') },
+        { id: 'versions', label: $t('common.versions') },
+        { id: 'lyrics', label: $t('common.lyrics') }
       ]}
       bind:value={tab}
       ariaLabel={$t('common.versions')}
     />
 
-    {#if tab === 'featured'}
-      {#if featured}
-        <article>
-          <div>
-            <p>{$t('tracks.slug_label')}: {featured.name}</p>
-            {#if featured.resource_url}
-              <WavePlayer src={featured.resource_url} version_id={featured.id} title={track.name} />
-            {:else}
-              <p>{$t('audio.no_audio')}</p>
-            {/if}
-            <!-- comments tbd -->
-          </div>
-        </article>
-      {:else}
-        <p>{$t('tracks.no_featured')}</p>
-      {/if}
+    {#if tab === 'timeline'}
+      <TrackTimeline {track} versions={sorted} />
+    {:else if tab === 'versions'}
+      <TrackVersions {track} versions={sorted} />
     {:else}
-      <section>
-        {#if older.length === 0}
-          <p>{$t('tracks.no_other_versions')}</p>
-        {:else}
-          <ul class="track-versions-timeline">
-            {#each older as v}
-              <TrackVersionItem version={v} />
-            {/each}
-          </ul>
-        {/if}
-      </section>
+      <TrackLyrics {track} />
     {/if}
   </section>
 {/if}

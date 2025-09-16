@@ -4,6 +4,8 @@ common:
   versions: Versions
   featured: Featured
   history: History
+  timeline: Timeline
+  lyrics: Lyrics
   play: Play
   pause: Pause
   neutral: Neutral
@@ -18,6 +20,7 @@ tracks:
   no_featured: No featured version.
   history_title: Previous versions
   no_other_versions: No other versions.
+  no_versions: No versions yet.
   slug_label: Slug
   upcoming: Upcoming tracks
   latests: Latests tracks

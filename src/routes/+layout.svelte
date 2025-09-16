@@ -22,7 +22,7 @@
     main
         display flex
         flex-direction column
-        padding 1rem
+        padding 1rem 1rem 10rem 1rem
         max-width 600px
         margin 0 auto
 </style>

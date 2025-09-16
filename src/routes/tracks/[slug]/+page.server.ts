@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ params }) => {
   // 1) Fetch the track by slug
   const { data: track, error: trackErr } = await supabase
     .from('tracks')
-    .select('id, slug, name, description, cover_url, created_at')
+    .select('id, slug, name, description, cover_url, created_at, lyrics')
     .eq('slug', slug)
     .single()
 

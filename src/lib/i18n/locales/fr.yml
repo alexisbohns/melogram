@@ -4,6 +4,8 @@ common:
   versions: Versions
   featured: Mise en avant
   history: Historique
+  timeline: Chronologie
+  lyrics: Paroles
   play: Lire
   pause: Pause
   neutral: Neutre
@@ -18,6 +20,7 @@ tracks:
   no_featured: Aucune version en avant.
   history_title: Versions antérieures
   no_other_versions: Aucune autre version.
+  no_versions: Aucune version pour le moment.
   slug_label: Slug
   upcoming: Morceaux à venir
   latests: Dernières sorties  
