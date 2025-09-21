@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { t } from '$lib/i18n/i18n'
 
   export let src: string | null | undefined
   export let preload: 'none' | 'metadata' | 'auto' = 'metadata'
@@ -68,9 +69,6 @@
 {#if src}
   <audio bind:this={audioEl} controls playsinline preload={preload} src={src}></audio>
 {:else}
-  <script lang="ts">
-    import { t } from '$lib/i18n/i18n'
-  </script>
   <slot name="empty">{$t('audio.no_audio')}</slot>
 {/if}
 
