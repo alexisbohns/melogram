@@ -13,7 +13,7 @@ export const load: PageServerLoad = async () => {
       cover_url,
       created_at,
       track_versions(
-        versions(id, name, resource_url, release_date)
+        versions(id, name, resource_url, release_date, status)
       )
     `)
 

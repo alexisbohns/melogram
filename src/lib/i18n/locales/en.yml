@@ -24,6 +24,12 @@ tracks:
   slug_label: Slug
   upcoming: Upcoming tracks
   latests: Latests tracks
+  status:
+    raw: Raw
+    draft: Draft
+    prototype: Prototype
+    demo: Demo
+    final: Final
 audio:
   no_audio: No audio for this version.
   player: Player
