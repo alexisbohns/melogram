@@ -30,20 +30,30 @@
     <h2 style="margin-top: 2rem;">{$t('tracks.latests')}</h2>
     <div class="tracks_list">
       {#each withVersions as track}
+        {@const version = latestVersion(track)}
         <div class="track_item">
           <a href={`/tracks/${track.slug}`} class="track_item_link">
-            <div class="track_item_name">{track.name}</div>
+            <div class="track_item_header">
+              <div class="track_item_name">{track.name}</div>
+              <div class="track_item_meta">
+                <div class="track_item_date">
+                  <Icon icon={icons.clockRotateLeft} size={12} label={$t('common.latest')} />
+                  <span>
+                    {track.latest_release ? new Date(track.latest_release).toLocaleDateString() : '—'}
+                  </span>
+                </div>
+                {#if version?.status}
+                  <span class={`track_item_status track_item_status_${version.status}`}>
+                    {$t(`tracks.status.${version.status}`)}
+                  </span>
+                {/if}
+              </div>
+            </div>
             <div class="track_item_description">{track.description}</div>
           </a>
-          {#if latestVersion(track)?.resource_url}
+          {#if version?.resource_url}
           <div class="track_item_player">
-            <WavePlayer src={latestVersion(track).resource_url} version_id={latestVersion(track).id} title={track.name} track_slug={track.slug} />
-          </div>
-          <div class="track_item_date">
-            <Icon icon={icons.clockRotateLeft} size={12} label={$t('common.latest')} />
-            <span>
-              {track.latest_release ? new Date(track.latest_release).toLocaleDateString() : '—'}
-            </span>
+            <WavePlayer src={version.resource_url} version_id={version.id} title={track.name} track_slug={track.slug} />
           </div>
           {/if}
         </div>
@@ -90,11 +100,43 @@
           & a.track_item_link:hover
             opacity 0.5
 
+          &_header
+            display flex
+            justify-content space-between
+            align-items center
+
           &_name
             font-family "Seaweed Script"
-            font-size 1.5rem
+            font-size 1.75rem
             color rgba(255,255,255,0.7)
             mix-blend-mode plus-lighter
+
+          &_meta
+            display flex
+            align-items center
+            gap 0.25rem
+
+          &_status
+            font-family var(--font-captions)
+            text-transform uppercase
+            font-size 0.6rem
+            letter-spacing 0.05em
+            padding 0.15rem 0.5rem
+            border-radius 9999px
+            background rgba(255,255,255,0.08)
+            color rgba(255,255,255,0.7)
+
+            &_draft
+              background rgba(tomato,0.2)
+              color rgba(tomato, 0.5)
+
+            &_prototype
+              background rgba(khaki,0.2)
+              color rgba(khaki,0.5)
+
+            &_demo
+              background rgba(darkseagreen,0.2)
+              color rgba(darkseagreen,0.6)
 
           &_description
             opacity 0.3
@@ -107,9 +149,13 @@
             align-items center
             justify-content flex-end
             gap 0.125rem
-            opacity 0.25
+            opacity 0.3
             font-size 0.8rem
-            padding 0 1rem
+          
+          &_player
+            border-top 1px solid rgba(255,255,255,0.1)
+            // border-bottom 1px solid rgba(255,255,255,0.1)
+            padding 0.5rem 0
       
     &-upcoming
       .track
@@ -130,7 +176,7 @@
   .tracks_list
       display flex
       flex-direction column
-      gap 1rem
+      gap 3rem
 
   .error
     color #dc2626

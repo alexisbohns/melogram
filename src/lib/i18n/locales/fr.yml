@@ -24,6 +24,12 @@ tracks:
   slug_label: Slug
   upcoming: Morceaux à venir
   latests: Dernières sorties  
+  status:
+    raw: Brut
+    draft: Brouillon
+    prototype: Prototype
+    demo: Démo
+    final: Finale
 audio:
   no_audio: Pas d’audio pour cette version.
   player: Lecteur
