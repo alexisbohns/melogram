@@ -5,6 +5,7 @@ export type PlayerSource = {
   versionId?: string
   title?: string
   trackSlug?: string
+  coverUrl?: string
 }
 
 type InternalState = {
@@ -26,6 +27,79 @@ const state = writable<InternalState>({
   duration: 0,
   time: 0
 })
+
+type NavigatorWithMediaSession = Navigator & { mediaSession?: MediaSession }
+type WindowWithMediaMetadata = Window & { MediaMetadata?: typeof MediaMetadata }
+
+let mediaSessionHandlersConfigured = false
+
+function getMediaSession(): MediaSession | null {
+  if (typeof navigator === 'undefined') return null
+  const nav = navigator as NavigatorWithMediaSession
+  return nav.mediaSession ?? null
+}
+
+function ensureMediaSessionHandlers(): MediaSession | null {
+  const session = getMediaSession()
+  if (!session) return null
+  if (!mediaSessionHandlersConfigured) {
+    const safeSet = (action: any, handler: any) => {
+      try { session.setActionHandler(action, handler) } catch {}
+    }
+    safeSet('play', () => { play(); syncPlaybackState('playing') })
+    safeSet('pause', () => { pause(); syncPlaybackState('paused') })
+    safeSet('stop', () => { pause(); syncPlaybackState('none') })
+    safeSet('seekto', (details: any) => {
+      const seekTime = typeof (details as any)?.seekTime === 'number' ? (details as any).seekTime : null
+      if (seekTime === null) return
+      ws?.setTime?.(seekTime)
+      state.update((s) => ({ ...s, time: seekTime }))
+      syncPositionState()
+    })
+    mediaSessionHandlersConfigured = true
+  }
+  return session
+}
+
+type PlaybackState = 'none' | 'paused' | 'playing'
+
+function syncPlaybackState(state: PlaybackState) {
+  const session = ensureMediaSessionHandlers()
+  if (!session) return
+  try { session.playbackState = state } catch {}
+}
+
+function syncMediaSessionMetadata(source: PlayerSource | null) {
+  const session = ensureMediaSessionHandlers()
+  if (!session) return
+  const w = typeof window !== 'undefined' ? (window as WindowWithMediaMetadata) : null
+  if (!w?.MediaMetadata) return
+  if (!source) {
+    session.metadata = null
+    return
+  }
+  const artwork = source.coverUrl ? [{ src: source.coverUrl }] : undefined
+  session.metadata = new w.MediaMetadata({
+    title: source.title ?? '',
+    artist: 'Bohns',
+    album: 'Melogram',
+    artwork
+  })
+}
+
+function syncPositionState() {
+  const session = ensureMediaSessionHandlers()
+  if (!session || typeof session.setPositionState !== 'function') return
+  const snapshot = get(state)
+  const playbackRate = typeof ws?.getPlaybackRate === 'function' ? ws.getPlaybackRate() : 1
+  try {
+    session.setPositionState({
+      duration: snapshot.duration || 0,
+      position: snapshot.time || 0,
+      playbackRate: Number.isFinite(playbackRate) ? playbackRate : 1
+    })
+  } catch {}
+}
 
 async function ensureWaveSurfer() {
   if (typeof window === 'undefined') return null
@@ -73,13 +147,37 @@ async function ensureWaveSurfer() {
         ctx.closePath()
       },
     })
-    ws.on('ready', () => state.update((s) => ({ ...s, isReady: true, duration: ws.getDuration?.() || 0 })))
-    ws.on('decode', () => state.update((s) => ({ ...s, isReady: true, duration: ws.getDuration?.() || 0 })))
-    ws.on('error', () => state.update((s) => ({ ...s, isReady: false })))
-    ws.on('play', () => state.update((s) => ({ ...s, isPlaying: true })))
-    ws.on('pause', () => state.update((s) => ({ ...s, isPlaying: false })))
-    ws.on('finish', () => state.update((s) => ({ ...s, isPlaying: false, time: 0 })))
-    ws.on('timeupdate', (t: number) => state.update((s) => ({ ...s, time: t })))
+    ws.on('ready', () => {
+      state.update((s) => ({ ...s, isReady: true, duration: ws.getDuration?.() || 0 }))
+      syncPositionState()
+    })
+    ws.on('decode', () => {
+      state.update((s) => ({ ...s, isReady: true, duration: ws.getDuration?.() || 0 }))
+      syncPositionState()
+    })
+    ws.on('error', () => {
+      state.update((s) => ({ ...s, isReady: false }))
+      syncPlaybackState('none')
+    })
+    ws.on('play', () => {
+      state.update((s) => ({ ...s, isPlaying: true }))
+      syncPlaybackState('playing')
+      syncPositionState()
+    })
+    ws.on('pause', () => {
+      state.update((s) => ({ ...s, isPlaying: false }))
+      syncPlaybackState('paused')
+      syncPositionState()
+    })
+    ws.on('finish', () => {
+      state.update((s) => ({ ...s, isPlaying: false, time: 0 }))
+      syncPlaybackState('paused')
+      syncPositionState()
+    })
+    ws.on('timeupdate', (t: number) => {
+      state.update((s) => ({ ...s, time: t }))
+      syncPositionState()
+    })
   }
   return ws
 }
@@ -96,6 +194,9 @@ export function attach(el: HTMLElement) {
         const { source, autoplay } = pending
         pending = null
         performLoad(source, autoplay)
+        syncMediaSessionMetadata(source)
+        syncPlaybackState('paused')
+        syncPositionState()
         return
       }
       const cur = get(state).current
@@ -103,6 +204,9 @@ export function attach(el: HTMLElement) {
         // resume current; if previously playing, autoplay
         const wasPlaying = get(state).isPlaying
         performLoad(cur, wasPlaying)
+        syncMediaSessionMetadata(cur)
+        syncPlaybackState('paused')
+        syncPositionState()
       }
     })
   }
@@ -113,10 +217,15 @@ export function detach() {
   try { ws?.destroy?.() } catch {}
   ws = null
   state.update((s) => ({ ...s, isReady: false, isPlaying: false }))
+  syncPlaybackState('none')
+  syncPositionState()
 }
 
 export async function load(source: PlayerSource, autoplay = false) {
-  state.update((s) => ({ ...s, current: source, isReady: false }))
+  state.update((s) => ({ ...s, current: source, isReady: false, time: 0 }))
+  syncMediaSessionMetadata(source)
+  syncPlaybackState('paused')
+  syncPositionState()
   pending = { source, autoplay }
   const w = await ensureWaveSurfer()
   if (!w) return

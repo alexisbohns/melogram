@@ -53,7 +53,13 @@
           </a>
           {#if version?.resource_url}
           <div class="track_item_player">
-            <WavePlayer src={version.resource_url} version_id={version.id} title={track.name} track_slug={track.slug} />
+            <WavePlayer
+              src={version.resource_url}
+              version_id={version.id}
+              title={track.name}
+              track_slug={track.slug}
+              coverUrl={track.cover_url}
+            />
           </div>
           {/if}
         </div>

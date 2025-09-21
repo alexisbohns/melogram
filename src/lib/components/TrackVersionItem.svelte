@@ -9,7 +9,6 @@
 
 <script lang="ts">
   export let version: Version
-  export let waveHeight: number = 48
   export let trackTitle: string | undefined
   export let trackSlug: string | undefined
   import WavePlayer from '$lib/components/WavePlayer.svelte'
@@ -24,7 +23,7 @@
   </div>
   {#if version.resource_url}
     <div class="track-version-player">
-      <WavePlayer src={version.resource_url} height={waveHeight} version_id={version.id} title={trackTitle} track_slug={trackSlug} />
+      <WavePlayer src={version.resource_url} version_id={version.id} title={trackTitle} track_slug={trackSlug} />
     </div>
   {/if}
 </li>
