@@ -34,7 +34,7 @@ export const load: PageServerLoad = async ({ params }) => {
   // 3) Fetch the versions themselves, ordered by release_date desc
   const { data: versions, error: verErr } = await supabase
     .from('versions')
-    .select('id, name, resource_url, release_date, description')
+    .select('id, name, resource_url, release_date, status, description')
     .in('id', versionIds)
     .order('release_date', { ascending: false })
 
