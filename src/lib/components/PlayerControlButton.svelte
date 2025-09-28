@@ -55,6 +55,7 @@
   &.playing
     background var(--primary)
     padding-left 0
+    opacity 1
 
   &:disabled
     opacity .5
