@@ -56,6 +56,8 @@
     background var(--primary)
     padding-left 0
     opacity 1
+    mix-blend-mode unset
+    color var(--background)
 
   &:disabled
     opacity .5

@@ -35,7 +35,8 @@
             left 0
             width 100vw
             height 95vh
-            background-image url('../lib/assets/bg_mobile.webp')
+            background url('../lib/assets/bg_mobile.webp')
+            opacity 0.7
             background-size contain
             background-position left center
             background-repeat repeat-y

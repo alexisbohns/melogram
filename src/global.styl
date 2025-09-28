@@ -2,14 +2,15 @@
     --font-headings: "Tiny5", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-captions: "Tiny5", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-default: "Sora", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    --primary: #AF7A6D
+    --primary: #694873
+    --background #18131b
     box-sizing border-box
     padding 0
     margin 0
 
 body
     min-height 100vh
-    background-color #222023
+    background-color var(--background)
     padding 0
     color white
     font-family var(--font-default)
@@ -20,6 +21,7 @@ body
         background-position top center
         background-attachment fixed
         background-repeat no-repeat
+        background-blend-mode difference
 
 h1, h2, h3, h4, h5, h6, p {
     margin 0
