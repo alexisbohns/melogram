@@ -34,7 +34,7 @@
   font-family var(--font-captions)
   appearance none
   border none
-  background rgba(255,255,255,0.6)
+  background var(--primary)
   color black
   border-radius 5rem
   width 2rem
@@ -53,7 +53,7 @@
   padding-left 0.125rem
 
   &.playing
-    background var(--primary)
+    background var(--tertiary)
     padding-left 0
     opacity 1
     mix-blend-mode unset

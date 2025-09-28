@@ -36,7 +36,6 @@
   h1
     font-family var(--font-headings)
     font-size 2rem
-    color rgba(255,255,255,0.6)
 
   img
     width 100%

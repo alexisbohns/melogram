@@ -78,7 +78,7 @@
 .global-player-title
   font-family var(--font-captions)
   font-size 1rem
-  color rgba(255,255,255,0.9)
+  color var(--default)
   white-space nowrap
   overflow hidden
   text-overflow ellipsis

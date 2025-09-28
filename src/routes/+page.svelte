@@ -85,7 +85,6 @@
   h1, h2
     font-family var(--font-captions)
     text-align center
-    color rgba(255,255,255,0.6)
 
   h1
     font-size 1rem
@@ -102,8 +101,14 @@
           flex-direction column
           gap 0.5rem
 
-          & a.track_item_link:hover
-            opacity 0.5
+          & a.track_item_link
+            transition all ease-out 0.25s
+            display flex
+            flex-direction column
+            gap .5rem
+
+            &:hover
+              opacity 0.5
 
           &_header
             display flex
@@ -113,7 +118,6 @@
           &_name
             font-family var(--font-captions)
             font-size 1rem
-            color rgba(255,255,255,0.7)
 
           &_meta
             display flex
@@ -127,8 +131,8 @@
             letter-spacing 0.05em
             padding 0.15rem 0.5rem
             border-radius 9999px
-            background rgba(255,255,255,0.08)
-            color rgba(255,255,255,0.7)
+            background var(--primary)
+            color var(--tertiary)
 
             &_draft
               background rgba(tomato,0.2)
@@ -143,9 +147,10 @@
               color rgba(darkseagreen,0.6)
 
           &_description
-            opacity 0.3
+            opacity 0.4
             font-size 0.8rem
-            font-weight 300            
+            font-weight 300   
+            line-height 150%         
 
           &_date
             font-family var(--font-captions)
@@ -157,15 +162,15 @@
             font-size 0.8rem
           
           &_player
-            border-top 1px solid rgba(255,255,255,0.1)
-            // border-bottom 1px solid rgba(255,255,255,0.1)
-            padding 0.5rem 0
+            border-top 1px solid rgba(255,255,255,0.05)
+            padding .5rem 0
       
     &-upcoming
       .track
         &_item
           display flex
           flex-direction column
+          gap .25rem
           text-align left
 
           &_name

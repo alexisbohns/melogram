@@ -108,7 +108,9 @@
     gap 1rem
     
     &-item
-      color rgba(255,255,255,0.6)
+      color var(--tertiary)
+      opacity 0.5
+      mix-blend-mode plus-lighter
       display flex
       align-items center
       gap 0.5rem
@@ -117,6 +119,7 @@
 
       &:hover
         opacity 0.5
+        color var(--primary)
         transform scale(110%)
 
       &:active
