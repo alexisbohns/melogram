@@ -5,7 +5,7 @@
   import { t } from '$lib/i18n/i18n'
   import Icon from '$lib/components/Icon.svelte'
   import { icons } from '$lib/icons'
-  import WavePlayer from '$lib/components/WavePlayer.svelte'
+  import TrackVersionFooter from '$lib/components/TrackVersionFooter.svelte'
 
   function latestVersion(track: any) {
     const list = Array.isArray(track?.track_versions)
@@ -53,7 +53,7 @@
           </a>
           {#if version?.resource_url}
           <div class="track_item_player">
-            <WavePlayer
+            <TrackVersionFooter
               src={version.resource_url}
               version_id={version.id}
               title={track.name}

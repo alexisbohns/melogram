@@ -39,8 +39,8 @@
 </script>
 
 {#if src}
-  <div class="waveplayer">
-    <div class="waveplayer-actions">
+  <div class="track_footer">
+    <div class="track_footer-actions">
       <PlayerControlButton on:click={toggle} disabled={!isReady && $gCurrent?.src === src} isPlaying={isPlaying} />
       <Reactions targetType="version" targetId={version_id} />
     </div>
@@ -50,12 +50,12 @@
 {/if}
 
 <style lang="stylus">
-.waveplayer
+.track_footer
   display flex
   flex-direction column
   gap .5rem
 
-.waveplayer-actions
+.track_footer-actions
   display flex
   align-self stretch
   justify-content space-between

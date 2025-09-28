@@ -11,7 +11,7 @@
   export let version: Version
   export let trackTitle: string | undefined
   export let trackSlug: string | undefined
-  import WavePlayer from '$lib/components/WavePlayer.svelte'
+  import TrackVersionFooter from '$lib/components/TrackVersionFooter.svelte'
 
   const formatDateTime = (iso: string) => new Date(iso).toLocaleString()
 </script>
@@ -23,7 +23,7 @@
   </div>
   {#if version.resource_url}
     <div class="track-version-player">
-      <WavePlayer src={version.resource_url} version_id={version.id} title={trackTitle} track_slug={trackSlug} />
+      <TrackVersionFooter src={version.resource_url} version_id={version.id} title={trackTitle} track_slug={trackSlug} />
     </div>
   {/if}
 </li>
