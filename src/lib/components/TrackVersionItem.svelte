@@ -4,6 +4,7 @@
     name: string
     resource_url?: string | null
     release_date: string
+    description: string | null
   }
 </script>
 
@@ -12,15 +13,15 @@
   export let trackTitle: string | undefined
   export let trackSlug: string | undefined
   import TrackVersionFooter from '$lib/components/TrackVersionFooter.svelte'
+  import TrackItemHeader from '$lib/components/TrackItemHeader.svelte'
 
-  const formatDateTime = (iso: string) => new Date(iso).toLocaleString()
+  const formatDateTime = (iso: string) => new Date(iso).toLocaleDateString()
+  $: releaseDate = formatDateTime(version.release_date)
 </script>
 
 <li class="track-version-item">
-  <div class="track-version-item_meta">
-    <div class="name">{version.name}</div>
-    <div class="date">{formatDateTime(version.release_date)}</div>
-  </div>
+  <TrackItemHeader title={version.name} dateValue={releaseDate} />
+  <div class="track-version-description">{version.description}</div>
   {#if version.resource_url}
     <div class="track-version-player">
       <TrackVersionFooter src={version.resource_url} version_id={version.id} title={trackTitle} track_slug={trackSlug} />
@@ -29,16 +30,16 @@
 </li>
 
 <style lang="stylus">
-.track-version-item
-  display flex
-  flex-direction column
-  gap .5rem
-  padding .5rem 0
+.track-version
+  &-item
+    display flex
+    flex-direction column
+    gap .5rem
+    padding .5rem 0
+  &-description
+    opacity 0.4
+    font-size 0.8rem
+    font-weight 300   
+    line-height 150%  
 
-.track-version-item_meta .name
-  font-weight 600
-
-.track-version-item_meta .date
-  opacity .6
-  font-size .85rem
 </style>
