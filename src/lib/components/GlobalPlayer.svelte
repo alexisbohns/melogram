@@ -65,19 +65,23 @@
   right 0
   bottom 0
   z-index 100
-  padding 1rem
-  max-width 600px
+  padding 0 1rem
+  max-width 700px
   margin auto
+    
 
 .global-player
   padding 1rem
   border-radius 1rem
-  background rgba(255,255,255,0.1)
-  backdrop-filter blur(6px)
-  border 1px solid rgba(255,255,255,0.1)
-  border-bottom-width 3px
-  gap .5rem
+  background rgba(0,0,0,0.4)
+  backdrop-filter blur(10px)
+  border 1px solid rgba(0,0,0,0.1)
+  display flex
   flex-direction column
+  gap 0.5rem
+
+  @media screen and (min-width: 768px)
+    border-radius 1rem 1rem 0 0
 
 .global-player-title
   font-family var(--font-captions)

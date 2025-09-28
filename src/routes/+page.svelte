@@ -86,7 +86,6 @@
     font-family var(--font-captions)
     text-align center
     color rgba(255,255,255,0.6)
-    mix-blend-mode plus-lighter
 
   h1
     font-size 1rem
@@ -112,10 +111,9 @@
             align-items center
 
           &_name
-            font-family "Seaweed Script"
-            font-size 1.75rem
+            font-family var(--font-captions)
+            font-size 1rem
             color rgba(255,255,255,0.7)
-            mix-blend-mode plus-lighter
 
           &_meta
             display flex

@@ -44,8 +44,8 @@
         opacity 0.5
 
       &_name
-        font-family "Seaweed Script"
-        font-size 2rem
+        font-family var(--font-captions)
+        font-size 1.5rem
 
       &_date
         opacity 0.25

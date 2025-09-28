@@ -1,5 +1,5 @@
 :root
-    --font-headings: "Seaweed Script", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-headings: "Tiny5", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-captions: "Tiny5", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-default: "Sora", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     box-sizing border-box
@@ -8,25 +8,17 @@
 
 body
     min-height 100vh
-    background radial-gradient(circle farthest-corner at 100% 0%, #535d4c66 0%, #ffffff00 50%), radial-gradient(circle farthest-corner at 0% 100%, #4e2a0966 0%, #ffffff00 50%), radial-gradient(circle farthest-corner at 100% 100%, #9f6c6566 0%, #ffffff00 85%), radial-gradient(circle farthest-corner at 0% 0%, #9f6c6566 0%, #ffffff00 50%), linear-gradient(to top, #382c2066 0% 100%, #ffffff00 100%)
-    background-color #231818
-    background-size cover
-    background-position center
-    background-repeat no-repeat
-    background-attachment fixed
+    background-color #222023
+    padding 0
     color white
     font-family var(--font-default)
 
-    &::after
-        content ""
-        position fixed
-        background url('https://previews.123rf.com/images/rioabajorio/rioabajorio1908/rioabajorio190800186/129078477-seamless-pixel-pattern-gray-scale-pixel-background-vector-illustration-for-your-graphic-design.jpg')
-        background-size 200px
-        background-repeat repeat
-        inset 0
-        opacity 0.1
-        mix-blend-mode overlay
-        pointer-events: none
+    @media screen and (min-width: 768px)
+        background-image url('./lib/assets/bg_desk.webp')
+        background-size 100% auto
+        background-position top center
+        background-attachment fixed
+        background-repeat no-repeat
 
 h1, h2, h3, h4, h5, h6, p {
     margin 0
