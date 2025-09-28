@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
-  import Icon from '$lib/components/Icon.svelte'
-  import { icons } from '$lib/icons'
+  import PlayerControlButton from '$lib/components/PlayerControlButton.svelte'
   import { t } from '$lib/i18n/i18n'
   import { attach, detach, current, isPlaying, isReady, toggle, time, duration } from '$lib/player/player'
 
@@ -17,7 +16,6 @@
   onDestroy(() => detach())
 
   $: hasTrack = $current !== null
-  $: progress = $duration > 0 ? ($time / $duration) * 100 : 0
 
   function fmtTime(totalSeconds: number) {
     const s = Math.max(0, Math.floor(totalSeconds || 0))
@@ -39,19 +37,10 @@
         {$current?.title}
       {/if}
     </div>
-    <div class="global-player-wave" bind:this={containerEl}></div>
     <div class="global-player-controls">
-      <button class="control" on:click={toggle} disabled={!$isReady} aria-label={$isPlaying ? $t('common.pause') : $t('common.play')} aria-pressed={$isPlaying}>
-        {#if $isPlaying}
-          <Icon icon={icons.pause} size={16} label={$t('common.pause')} />
-        {:else}
-          <Icon icon={icons.play} size={16} label={$t('common.play')} />
-        {/if}
-      </button>
+      <PlayerControlButton on:click={toggle} disabled={!$isReady} isPlaying={$isPlaying} />
       <span class="timecode current">{formattedCurrent}</span>
-      <div class="timeline">
-        <div class="timeline-progress" style={`width:${progress}%`}></div>
-      </div>
+      <div class="global-player-wave" bind:this={containerEl}></div>
       <span class="timecode remaining">{formattedRemaining}</span>
     </div>
   </div>
@@ -66,23 +55,30 @@
   bottom 0
   z-index 100
   padding 1rem
-  max-width 600px
+  max-width 700px
   margin auto
+
+  @media screen and (min-width: 768px)
+    padding-bottom 0
+    
 
 .global-player
   padding 1rem
   border-radius 1rem
-  background rgba(255,255,255,0.1)
-  backdrop-filter blur(6px)
-  border 1px solid rgba(255,255,255,0.1)
-  border-bottom-width 3px
-  gap .5rem
+  background rgba(0,0,0,0.4)
+  backdrop-filter blur(10px)
+  border 1px solid rgba(0,0,0,0.1)
+  display flex
   flex-direction column
+  gap 0.5rem
+
+  @media screen and (min-width: 768px)
+    border-radius 1rem 1rem 0 0
 
 .global-player-title
   font-family var(--font-captions)
   font-size 1rem
-  color rgba(255,255,255,0.9)
+  color var(--default)
   white-space nowrap
   overflow hidden
   text-overflow ellipsis
@@ -107,43 +103,6 @@
   text-align center
 
 .global-player-wave
-  height 56px
+  width 100%
 
-.control
-  font-family var(--font-captions)
-  appearance none
-  border none
-  background rgba(255,255,255,0.6)
-  color black
-  border-radius 0.25rem
-  padding 0.5rem 0.75rem
-  display flex
-  gap 0.5rem
-  align-items center
-  justify-content center
-  font-weight bold
-  cursor pointer
-  mix-blend-mode: plus-lighter
-  border-bottom 3px solid rgba(0,0,0,0.2)
-  transition all ease-out 0.25s
-  line-height 100%
-
-  &:disabled
-    opacity .5
-    cursor default
-
-.timeline
-  position relative
-  flex 1
-  height 4px
-  background rgba(255,255,255,0.2)
-  border-radius 2px
-
-.timeline-progress
-  position absolute
-  left 0
-  top 0
-  bottom 0
-  background white
-  border-radius 2px
 </style>

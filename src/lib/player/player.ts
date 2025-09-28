@@ -108,10 +108,10 @@ async function ensureWaveSurfer() {
     const WaveSurfer = mod.default
     ws = WaveSurfer.create({
       container: containerEl,
-      height: 50,
-      waveColor: 'darkgrey',
-      progressColor: 'white',
-      cursorColor: '#a1a6a1',
+      height: 32,
+      waveColor: '#674771',
+      progressColor: '#DBCDE0',
+      cursorColor: '#674771',
       barWidth: 2,
       barGap: 2,
       barRadius: 0,

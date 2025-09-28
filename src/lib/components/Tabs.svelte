@@ -87,7 +87,6 @@
   padding .5rem 1rem
   cursor pointer
   opacity 0.5
-  mix-blend-mode plus-lighter
 
   display flex
   flex-direction column

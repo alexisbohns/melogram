@@ -18,6 +18,8 @@
     <GlobalPlayer />
 </main>
 
+<div class="fkg_bg"></div>
+
 <style lang="stylus">
     main
         display flex
@@ -25,5 +27,18 @@
         padding 1rem 1rem 10rem 1rem
         max-width 600px
         margin 0 auto
+    @media screen and (max-width: 768px)
+        .fkg_bg
+            position fixed
+            z-index -100
+            top 0
+            left 0
+            width 100vw
+            height 95vh
+            background url('../lib/assets/bg_mobile.webp')
+            opacity 0.7
+            background-size contain
+            background-position left center
+            background-repeat repeat-y
 </style>
 
