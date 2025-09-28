@@ -3,9 +3,9 @@
   const { tracks, error } = data
 
   import { t } from '$lib/i18n/i18n'
-  import Icon from '$lib/components/Icon.svelte'
   import { icons } from '$lib/icons'
-  import WavePlayer from '$lib/components/WavePlayer.svelte'
+  import TrackVersionFooter from '$lib/components/TrackVersionFooter.svelte'
+  import TrackItemHeader from '$lib/components/TrackItemHeader.svelte'
 
   function latestVersion(track: any) {
     const list = Array.isArray(track?.track_versions)
@@ -33,27 +33,20 @@
         {@const version = latestVersion(track)}
         <div class="track_item">
           <a href={`/tracks/${track.slug}`} class="track_item_link">
-            <div class="track_item_header">
-              <div class="track_item_name">{track.name}</div>
-              <div class="track_item_meta">
-                <div class="track_item_date">
-                  <Icon icon={icons.clockRotateLeft} size={12} label={$t('common.latest')} />
-                  <span>
-                    {track.latest_release ? new Date(track.latest_release).toLocaleDateString() : '—'}
-                  </span>
-                </div>
-                {#if version?.status}
-                  <span class={`track_item_status track_item_status_${version.status}`}>
-                    {$t(`tracks.status.${version.status}`)}
-                  </span>
-                {/if}
-              </div>
-            </div>
+            <TrackItemHeader
+              title={track.name}
+              dateValue={track.latest_release
+                ? new Date(track.latest_release).toLocaleDateString()
+                : '—'}
+              icon={icons.clockRotateLeft}
+              statusVariant={version?.status ?? null}
+              statusText={version?.status ? $t(`tracks.status.${version.status}`) : null}
+            />
             <div class="track_item_description">{track.description}</div>
           </a>
           {#if version?.resource_url}
           <div class="track_item_player">
-            <WavePlayer
+            <TrackVersionFooter
               src={version.resource_url}
               version_id={version.id}
               title={track.name}
@@ -110,57 +103,12 @@
             &:hover
               opacity 0.5
 
-          &_header
-            display flex
-            justify-content space-between
-            align-items center
-
-          &_name
-            font-family var(--font-captions)
-            font-size 1rem
-
-          &_meta
-            display flex
-            align-items center
-            gap 0.25rem
-
-          &_status
-            font-family var(--font-captions)
-            text-transform uppercase
-            font-size 0.6rem
-            letter-spacing 0.05em
-            padding 0.15rem 0.5rem
-            border-radius 9999px
-            background var(--primary)
-            color var(--tertiary)
-
-            &_draft
-              background rgba(tomato,0.2)
-              color rgba(tomato, 0.5)
-
-            &_prototype
-              background rgba(khaki,0.2)
-              color rgba(khaki,0.5)
-
-            &_demo
-              background rgba(darkseagreen,0.2)
-              color rgba(darkseagreen,0.6)
-
           &_description
             opacity 0.4
             font-size 0.8rem
             font-weight 300   
             line-height 150%         
 
-          &_date
-            font-family var(--font-captions)
-            display flex
-            align-items center
-            justify-content flex-end
-            gap 0.125rem
-            opacity 0.3
-            font-size 0.8rem
-          
           &_player
             border-top 1px solid rgba(255,255,255,0.05)
             padding .5rem 0
