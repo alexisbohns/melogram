@@ -4,6 +4,8 @@
     name: string
     resource_url?: string | null
     release_date: string
+    description: string | null
+    status: string | null
   }
 
   type Track = {

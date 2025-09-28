@@ -3,7 +3,13 @@
   import type { Version } from '$lib/components/TrackVersionItem.svelte'
   import { t } from '$lib/i18n/i18n'
 
-  type Track = { id: string; name: string; slug?: string }
+  type Track = {
+    id: string
+    name: string
+    slug?: string
+    description?: string | null
+    cover_url?: string | null
+  }
   export let versions: Version[] = []
   export let track: Track | undefined
 </script>
@@ -14,7 +20,14 @@
   {:else}
     <ul class="track-versions-list">
       {#each versions as v}
-        <TrackVersionItem version={v} trackTitle={track?.name} trackSlug={track?.slug} />
+        <TrackVersionItem
+          version={v}
+          trackTitle={track?.name}
+          trackSlug={track?.slug}
+          trackDescription={track?.description}
+          trackCoverUrl={track?.cover_url}
+          descriptionMode="version"
+        />
       {/each}
     </ul>
   {/if}
