@@ -17,7 +17,6 @@
   onDestroy(() => detach())
 
   $: hasTrack = $current !== null
-  $: progress = $duration > 0 ? ($time / $duration) * 100 : 0
 
   function fmtTime(totalSeconds: number) {
     const s = Math.max(0, Math.floor(totalSeconds || 0))
@@ -39,7 +38,6 @@
         {$current?.title}
       {/if}
     </div>
-    <div class="global-player-wave" bind:this={containerEl}></div>
     <div class="global-player-controls">
       <button class="control" on:click={toggle} disabled={!$isReady} aria-label={$isPlaying ? $t('common.pause') : $t('common.play')} aria-pressed={$isPlaying}>
         {#if $isPlaying}
@@ -49,9 +47,7 @@
         {/if}
       </button>
       <span class="timecode current">{formattedCurrent}</span>
-      <div class="timeline">
-        <div class="timeline-progress" style={`width:${progress}%`}></div>
-      </div>
+      <div class="global-player-wave" bind:this={containerEl}></div>
       <span class="timecode remaining">{formattedRemaining}</span>
     </div>
   </div>
@@ -65,9 +61,12 @@
   right 0
   bottom 0
   z-index 100
-  padding 0 1rem
+  padding 1rem
   max-width 700px
   margin auto
+
+  @media screen and (min-width: 768px)
+    padding-bottom 0
     
 
 .global-player
@@ -111,7 +110,7 @@
   text-align center
 
 .global-player-wave
-  height 56px
+  width 100%
 
 .control
   font-family var(--font-captions)
@@ -135,19 +134,4 @@
   &:disabled
     opacity .5
     cursor default
-
-.timeline
-  position relative
-  flex 1
-  height 4px
-  background rgba(255,255,255,0.2)
-  border-radius 2px
-
-.timeline-progress
-  position absolute
-  left 0
-  top 0
-  bottom 0
-  background white
-  border-radius 2px
 </style>
