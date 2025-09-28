@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
-  import Icon from '$lib/components/Icon.svelte'
-  import { icons } from '$lib/icons'
+  import PlayerControlButton from '$lib/components/PlayerControlButton.svelte'
   import { t } from '$lib/i18n/i18n'
   import { attach, detach, current, isPlaying, isReady, toggle, time, duration } from '$lib/player/player'
 
@@ -39,13 +38,7 @@
       {/if}
     </div>
     <div class="global-player-controls">
-      <button class="control" on:click={toggle} disabled={!$isReady} aria-label={$isPlaying ? $t('common.pause') : $t('common.play')} aria-pressed={$isPlaying}>
-        {#if $isPlaying}
-          <Icon icon={icons.pause} size={16} label={$t('common.pause')} />
-        {:else}
-          <Icon icon={icons.play} size={16} label={$t('common.play')} />
-        {/if}
-      </button>
+      <PlayerControlButton on:click={toggle} disabled={!$isReady} isPlaying={$isPlaying} />
       <span class="timecode current">{formattedCurrent}</span>
       <div class="global-player-wave" bind:this={containerEl}></div>
       <span class="timecode remaining">{formattedRemaining}</span>
@@ -112,26 +105,4 @@
 .global-player-wave
   width 100%
 
-.control
-  font-family var(--font-captions)
-  appearance none
-  border none
-  background rgba(255,255,255,0.6)
-  color black
-  border-radius 0.25rem
-  padding 0.5rem 0.75rem
-  display flex
-  gap 0.5rem
-  align-items center
-  justify-content center
-  font-weight bold
-  cursor pointer
-  mix-blend-mode: plus-lighter
-  border-bottom 3px solid rgba(0,0,0,0.2)
-  transition all ease-out 0.25s
-  line-height 100%
-
-  &:disabled
-    opacity .5
-    cursor default
 </style>
