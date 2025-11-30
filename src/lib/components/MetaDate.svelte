@@ -20,11 +20,10 @@
 
 <style lang="stylus">
 .track_item_date
-  font-family var(--font-captions)
   display flex
   align-items center
   justify-content flex-end
   gap 0.125rem
   opacity 0.3
-  font-size 0.8rem
+  font-size 0.6rem
 </style>
