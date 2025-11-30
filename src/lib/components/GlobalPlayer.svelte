@@ -10,8 +10,15 @@
 		isReady,
 		toggle,
 		time,
-		duration
+		duration,
+		queue,
+		repeatMode,
+		next,
+		previous,
+		setRepeat
 	} from '$lib/player/player';
+	import Icon from '$lib/components/Icon.svelte';
+	import { icons } from '$lib/icons';
 
 	let containerEl: HTMLDivElement | null = null;
 
@@ -25,6 +32,7 @@
 	onDestroy(() => detach());
 
 	$: hasTrack = $current !== null;
+	$: hasQueue = ($queue?.length ?? 0) > 0;
 
 	function fmtTime(totalSeconds: number) {
 		const s = Math.max(0, Math.floor(totalSeconds || 0));
@@ -34,6 +42,23 @@
 	}
 	$: formattedCurrent = fmtTime($time);
 	$: formattedRemaining = `-${fmtTime(Math.max(0, $duration - $time))}`;
+
+	function handleNext() {
+		next($isPlaying);
+	}
+
+	function handlePrevious() {
+		previous($isPlaying);
+	}
+
+	function cycleRepeat() {
+		if ($repeatMode === 'all') setRepeat('one');
+		else if ($repeatMode === 'one') setRepeat('none');
+		else setRepeat('all');
+	}
+
+	$: repeatLabel =
+		$repeatMode === 'all' ? 'Repeat all' : $repeatMode === 'one' ? 'Repeat one' : 'Repeat off';
 </script>
 
 {#if hasTrack}
@@ -47,10 +72,41 @@
 				{/if}
 			</div>
 			<div class="global-player-controls">
+				<button
+					type="button"
+					class="global-icon-button"
+					on:click={handlePrevious}
+					disabled={!hasQueue}
+					aria-label="Previous track"
+				>
+					<Icon icon={icons.backwardStep} size={14} label="Previous track" />
+				</button>
 				<PlayerControlButton on:click={toggle} disabled={!$isReady} isPlaying={$isPlaying} />
+				<button
+					type="button"
+					class="global-icon-button"
+					on:click={handleNext}
+					disabled={!hasQueue}
+					aria-label="Next track"
+				>
+					<Icon icon={icons.forwardStep} size={14} label="Next track" />
+				</button>
 				<span class="timecode current">{formattedCurrent}</span>
 				<div class="global-player-wave" bind:this={containerEl}></div>
 				<span class="timecode remaining">{formattedRemaining}</span>
+				<button
+					type="button"
+					class={`global-icon-button repeat ${$repeatMode == 'all' ? 'all' : ''} ${$repeatMode == 'one' ? 'one' : ''}`}
+					on:click={cycleRepeat}
+					aria-label={repeatLabel}
+					aria-pressed={$repeatMode !== 'none'}
+					title={repeatLabel}
+				>
+					<Icon icon={icons.repeat} size={14} label={repeatLabel} />
+					{#if $repeatMode === 'one'}
+						<span class="repeat-indicator">1</span>
+					{/if}
+				</button>
 			</div>
 		</div>
 	</div>
@@ -102,6 +158,51 @@
   display flex
   align-items center
   gap .75rem
+
+.global-icon-button
+  appearance none
+  border none
+  // background rgba(255,255,255,0.08)
+  color var(--default)
+  min-width 2rem
+  min-height 2rem
+  border-radius 50%
+  display inline-flex
+  align-items center
+  justify-content center
+  cursor pointer
+  transition all 0.2s ease-out
+
+  &:hover:enabled
+    background rgba(255,255,255,0.14)
+
+  &:active:enabled
+    transform translateY(1px)
+
+  &:disabled
+    opacity 0.4
+    cursor default
+
+.global-icon-button.repeat
+  position relative
+
+.global-icon-button.repeat.all
+  background var(--primary)
+  color var(--background)
+  transform rotate(180deg)
+
+.global-icon-button.repeat.one
+  background var(--tertiary)
+  color var(--background)
+  transform rotate(360deg)
+
+.repeat-indicator
+  position absolute
+  right 4px
+  bottom 4px
+  font-size 0.65rem
+  font-weight 700
+  line-height 1
 
 .timecode
   font-variant-numeric tabular-nums
