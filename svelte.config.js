@@ -7,7 +7,7 @@ import sveltePreprocess from 'svelte-preprocess';
 const config = {
 	// Consult https://svelte.dev/docs/kit/integrations
 	// for more information about preprocessors
-    preprocess: [vitePreprocess(), sveltePreprocess({ stylus: true }), mdsvex()],
+	preprocess: [vitePreprocess(), sveltePreprocess({ stylus: true }), mdsvex()],
 	kit: { adapter: adapter() },
 	extensions: ['.svelte', '.svx']
 };
