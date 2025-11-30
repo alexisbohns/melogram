@@ -33,7 +33,7 @@
         display flex
         flex-direction column
         align-items flex-start
-        padding 1rem 0
+        padding 1rem
         max-width 600px
         margin 0 auto
     main
@@ -44,6 +44,7 @@
         margin 0 auto
     .logo-link
         display flex
+        padding 0
         align-items center
         text-decoration none
         color inherit
