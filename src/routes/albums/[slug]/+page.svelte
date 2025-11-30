@@ -59,7 +59,7 @@
 			{:else}
 				{#if availableTracks.length > 0}
 					<section class="album-tracks-section">
-						<h3>{$t('tracks.available')}</h3>
+						<h2>{$t('tracks.available')}</h2>
 						<div class="album-tracks-list">
 							{#each availableTracks as track (track.track_id)}
 								<Track {track} variant="album" />
@@ -70,7 +70,7 @@
 
 				{#if upcomingTracks.length > 0}
 					<section class="album-tracks-section album-tracks-upcoming">
-						<h3>{$t('tracks.upcoming')}</h3>
+						<h2>{$t('tracks.upcoming')}</h2>
 						<div class="album-tracks-list">
 							{#each upcomingTracks as track (track.track_id)}
 								<Track {track} variant="album" muted />
@@ -139,7 +139,7 @@
 		flex-direction column
 		gap 2rem
 
-	h3
+	h2
 		font-family var(--font-captions)
 		letter-spacing 0.06em
 		font-size 1.5rem
