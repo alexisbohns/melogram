@@ -16,6 +16,7 @@
 	export let coverDisplay: 'none' | 'default' | 'large' = 'default';
 	export let latestResourceUrl: string | null = null;
 	export let latestVersionId: string | null = null;
+	export let showAlbumName = true;
 
 	let isReady = false;
 	let isPlaying = false;
@@ -47,7 +48,7 @@
 		<Cover cover_url={coverUrl} alt={trackName} display={coverDisplay} />
 		<div class="track-header-text">
 			<div class="track-title">{trackName}</div>
-			{#if albumName}
+			{#if albumName && showAlbumName}
 				{#if albumId}
 					<a class="track-album track-album-link" href={`/albums/${albumId}`}>
 						{albumName}

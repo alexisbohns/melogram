@@ -23,6 +23,7 @@ tracks:
   no_other_versions: No other versions.
   no_versions: No versions yet.
   slug_label: Slug
+  available: Available tracks
   upcoming: Upcoming tracks
   latests: Latests tracks
   status:
