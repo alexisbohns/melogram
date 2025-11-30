@@ -2,6 +2,7 @@
 	import Track from '$lib/components/Track/Track.svelte';
 	import { t } from '$lib/i18n/i18n';
 	import type { TrackOverview } from '$lib/types/tracks';
+	import SectionHeading from '$lib/components/SectionHeading.svelte';
 
 	export let data: { tracks: TrackOverview[]; error: string | null };
 
@@ -29,7 +30,7 @@
 	{:else if tracks.length > 0}
 		{#if availableTracks.length > 0}
 			<section class="tracks-section">
-				<h2>{$t('tracks.available')}</h2>
+				<SectionHeading>{$t('tracks.available')}</SectionHeading>
 				<div class="tracks-list">
 					{#each availableTracks as track (track.track_id)}
 						<Track {track} variant="featured" />
@@ -40,7 +41,7 @@
 
 		{#if upcomingTracks.length > 0}
 			<section class="tracks-section tracks-upcoming">
-				<h2>{$t('tracks.upcoming')}</h2>
+				<SectionHeading>{$t('tracks.upcoming')}</SectionHeading>
 				<div class="tracks-list">
 					{#each upcomingTracks as track (track.track_id)}
 						<Track {track} muted />
@@ -81,13 +82,6 @@
   &:first-of-type
     border-top none
     padding-top 0
-
-  h2
-    font-family var(--font-captions)
-    letter-spacing 0.05em
-    font-size 1.35rem
-    color var(--tertiary)
-    opacity 0.95
 
 .tracks-list
   display flex

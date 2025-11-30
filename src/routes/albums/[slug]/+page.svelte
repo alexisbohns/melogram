@@ -4,6 +4,7 @@
 	import type { Album } from '$lib/types/albums';
 	import type { TrackOverview } from '$lib/types/tracks';
 	import Track from '$lib/components/Track/Track.svelte';
+	import SectionHeading from '$lib/components/SectionHeading.svelte';
 
 	export let data: {
 		album: Album | null;
@@ -59,7 +60,7 @@
 			{:else}
 				{#if availableTracks.length > 0}
 					<section class="album-tracks-section">
-						<h2>{$t('tracks.available')}</h2>
+						<SectionHeading>{$t('tracks.available')}</SectionHeading>
 						<div class="album-tracks-list">
 							{#each availableTracks as track (track.track_id)}
 								<Track {track} variant="album" />
@@ -70,7 +71,7 @@
 
 				{#if upcomingTracks.length > 0}
 					<section class="album-tracks-section album-tracks-upcoming">
-						<h2>{$t('tracks.upcoming')}</h2>
+						<SectionHeading>{$t('tracks.upcoming')}</SectionHeading>
 						<div class="album-tracks-list">
 							{#each upcomingTracks as track (track.track_id)}
 								<Track {track} variant="album" muted />
@@ -138,23 +139,6 @@
 		display flex
 		flex-direction column
 		gap 2rem
-
-	h2
-		font-family var(--font-captions)
-		letter-spacing 0.06em
-		font-size 1.5rem
-		color var(--tertiary)
-		opacity 0.95
-		display inline-flex
-		align-items center
-		gap 1rem
-
-		&::after
-			content ''
-			height 2px
-			flex 1
-			opacity 0.1
-			background-color var(--tertiary)
 
 	.album-tracks-list
 		display flex

@@ -4,6 +4,7 @@
 	import { t } from '$lib/i18n/i18n';
 	import type { Album } from '$lib/types/albums';
 	import type { TrackOverview } from '$lib/types/tracks';
+	import SectionHeading from '$lib/components/SectionHeading.svelte';
 
 	export let data;
 	const {
@@ -28,9 +29,7 @@
 
 <section class="home-page">
 	<section class="latests">
-		<div class="section-heading">
-			<h2>{$t('tracks.latests')}</h2>
-		</div>
+		<SectionHeading>{$t('tracks.latests')}</SectionHeading>
 
 		{#if tracksError}<p class="error">{tracksError}</p>{/if}
 
@@ -51,9 +50,7 @@
 	</section>
 
 	<section class="collections">
-		<div class="section-heading">
-			<h2>{$t('albums.collection_title')}</h2>
-		</div>
+		<SectionHeading>{$t('albums.collection_title')}</SectionHeading>
 
 		<AlbumsList {albums} error={albumsError} />
 	</section>
@@ -69,17 +66,6 @@
   display flex
   flex-direction column
   gap 1.1rem
-
-.section-heading
-  display flex
-  flex-direction column
-  gap 0.35rem
-  margin-bottom 0.5rem
-
-.section-heading :global(h1), .section-heading :global(h2)
-  font-family var(--font-captions)
-  letter-spacing 0.05em
-  line-height 1.15
 
 .latests-list
   display flex
