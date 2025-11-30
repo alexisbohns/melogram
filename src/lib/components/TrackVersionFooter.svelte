@@ -14,12 +14,12 @@
 	import PlayerControlButton from '$lib/components/PlayerControlButton.svelte';
 	import { t } from '$lib/i18n/i18n';
 	import {
-		load as playerLoad,
 		toggle as playerToggle,
 		isReady as gIsReady,
 		isPlaying as gIsPlaying,
 		current as gCurrent,
-		duration as gDuration
+		duration as gDuration,
+		setQueue
 	} from '$lib/player/player';
 
 	onMount(() => {});
@@ -38,7 +38,7 @@
 	async function toggle() {
 		if (!src) return;
 		if ($gCurrent?.src !== src) {
-			await playerLoad({ src, versionId: version_id, title, trackId, coverUrl }, true);
+			await setQueue([{ src, versionId: version_id, title, trackId, coverUrl }], 0, true);
 		} else {
 			playerToggle();
 		}

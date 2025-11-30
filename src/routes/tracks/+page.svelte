@@ -10,6 +10,17 @@
 
 	$: availableTracks = tracks.filter((t) => Boolean(t.latest_version_id));
 	$: upcomingTracks = tracks.filter((t) => !t.latest_version_id);
+	$: playableTracks = tracks.filter((t) => Boolean(t.latest_resource_url));
+	$: playlist = playableTracks.map((t) => ({
+		src: t.latest_resource_url as string,
+		versionId: t.latest_version_id ?? undefined,
+		title: t.track_name,
+		trackId: t.track_id,
+		coverUrl: t.album_cover_url ?? undefined
+	}));
+	$: playlistIndexByTrackId = Object.fromEntries(
+		playlist.map((item, idx) => [item.trackId, idx])
+	) as Record<string, number>;
 </script>
 
 <svelte:head>
@@ -33,7 +44,12 @@
 				<SectionHeading>{$t('tracks.available')}</SectionHeading>
 				<div class="tracks-list">
 					{#each availableTracks as track (track.track_id)}
-						<Track {track} variant="featured" />
+						<Track
+							{track}
+							variant="featured"
+							{playlist}
+							playlistIndex={playlistIndexByTrackId[track.track_id] ?? null}
+						/>
 					{/each}
 				</div>
 			</section>

@@ -5,7 +5,9 @@
 		isPlaying as gIsPlaying,
 		isReady as gIsReady,
 		load as playerLoad,
-		toggle as playerToggle
+		toggle as playerToggle,
+		setQueue,
+		type PlayerSource
 	} from '$lib/player/player';
 	import Cover from './Cover.svelte';
 
@@ -18,6 +20,8 @@
 	export let latestResourceUrl: string | null = null;
 	export let latestVersionId: string | null = null;
 	export let showAlbumName = true;
+	export let playlist: PlayerSource[] | null = null;
+	export let playlistIndex: number | null = null;
 
 	let isReady = false;
 	let isPlaying = false;
@@ -28,16 +32,18 @@
 	async function toggle() {
 		if (!latestResourceUrl) return;
 		if ($gCurrent?.src !== latestResourceUrl) {
-			await playerLoad(
-				{
-					src: latestResourceUrl,
-					versionId: latestVersionId ?? undefined,
-					title: trackName,
-					trackId: trackId ?? undefined,
-					coverUrl: coverUrl ?? undefined
-				},
-				true
-			);
+			const source: PlayerSource = {
+				src: latestResourceUrl,
+				versionId: latestVersionId ?? undefined,
+				title: trackName,
+				trackId: trackId ?? undefined,
+				coverUrl: coverUrl ?? undefined
+			};
+			if (playlist && typeof playlistIndex === 'number' && playlistIndex >= 0) {
+				await setQueue(playlist, playlistIndex, true);
+			} else {
+				await playerLoad(source, true);
+			}
 		} else {
 			playerToggle();
 		}

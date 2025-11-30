@@ -3,10 +3,13 @@
 	import TrackFooter from './TrackFooter.svelte';
 	import TrackHeader from './TrackHeader.svelte';
 	import type { TrackOverview } from '$lib/types/tracks';
+	import type { PlayerSource } from '$lib/player/player';
 
 	export let track: TrackOverview;
 	export let variant: 'featured' | 'compact' | 'album' = 'compact';
 	export let muted = false;
+	export let playlist: PlayerSource[] | null = null;
+	export let playlistIndex: number | null = null;
 
 	let coverDisplay: 'none' | 'default' | 'large';
 	let showAlbumName: boolean;
@@ -29,6 +32,8 @@
 		{showAlbumName}
 		latestResourceUrl={track.latest_resource_url}
 		latestVersionId={track.latest_version_id}
+		{playlist}
+		{playlistIndex}
 	/>
 
 	<TrackItemBody description={track.track_description} display={showDescription} />

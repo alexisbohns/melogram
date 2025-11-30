@@ -8,12 +8,17 @@ export type PlayerSource = {
 	coverUrl?: string;
 };
 
+type RepeatMode = 'none' | 'one' | 'all';
+
 type InternalState = {
 	current: PlayerSource | null;
 	isReady: boolean;
 	isPlaying: boolean;
 	duration: number;
 	time: number;
+	queue: PlayerSource[];
+	queueIndex: number;
+	repeatMode: RepeatMode;
 };
 
 let ws: any | null = null;
@@ -25,7 +30,10 @@ const state = writable<InternalState>({
 	isReady: false,
 	isPlaying: false,
 	duration: 0,
-	time: 0
+	time: 0,
+	queue: [],
+	queueIndex: -1,
+	repeatMode: 'all'
 });
 
 type NavigatorWithMediaSession = Navigator & { mediaSession?: MediaSession };
@@ -59,6 +67,12 @@ function ensureMediaSessionHandlers(): MediaSession | null {
 		safeSet('stop', () => {
 			pause();
 			syncPlaybackState('none');
+		});
+		safeSet('previoustrack', () => {
+			previous(true);
+		});
+		safeSet('nexttrack', () => {
+			next(true);
 		});
 		safeSet('seekto', (details: any) => {
 			const seekTime =
@@ -183,11 +197,7 @@ async function ensureWaveSurfer() {
 			syncPlaybackState('paused');
 			syncPositionState();
 		});
-		ws.on('finish', () => {
-			state.update((s) => ({ ...s, isPlaying: false, time: 0 }));
-			syncPlaybackState('paused');
-			syncPositionState();
-		});
+		ws.on('finish', () => handleFinish());
 		ws.on('timeupdate', (t: number) => {
 			state.update((s) => ({ ...s, time: t }));
 			syncPositionState();
@@ -240,14 +250,7 @@ export function detach() {
 }
 
 export async function load(source: PlayerSource, autoplay = false) {
-	state.update((s) => ({ ...s, current: source, isReady: false, time: 0 }));
-	syncMediaSessionMetadata(source);
-	syncPlaybackState('paused');
-	syncPositionState();
-	pending = { source, autoplay };
-	const w = await ensureWaveSurfer();
-	if (!w) return;
-	performLoad(source, autoplay);
+	await setQueue([source], 0, autoplay);
 }
 
 export function toggle() {
@@ -289,6 +292,136 @@ export const duration = readable<number>(0, (set) => {
 	return () => unsub();
 });
 
+export const queue = readable<PlayerSource[]>([], (set) => {
+	const unsub = state.subscribe((s) => set(s.queue));
+	return () => unsub();
+});
+
+export const queueIndex = readable<number>(-1, (set) => {
+	const unsub = state.subscribe((s) => set(s.queueIndex));
+	return () => unsub();
+});
+
+export const repeatMode = readable<RepeatMode>('all', (set) => {
+	const unsub = state.subscribe((s) => set(s.repeatMode));
+	return () => unsub();
+});
+
+export async function setQueue(list: PlayerSource[], startIndex = 0, autoplay = false) {
+	if (!Array.isArray(list) || list.length === 0) return;
+	const boundedIndex = Math.min(Math.max(startIndex, 0), list.length - 1);
+	const source = list[boundedIndex];
+	state.update((s) => ({
+		...s,
+		current: source,
+		isReady: false,
+		duration: 0,
+		time: 0,
+		queue: list,
+		queueIndex: boundedIndex
+	}));
+	syncMediaSessionMetadata(source);
+	syncPlaybackState('paused');
+	syncPositionState();
+	pending = { source, autoplay };
+	const w = await ensureWaveSurfer();
+	if (!w) return;
+	performLoad(source, autoplay);
+}
+
+export function setRepeat(mode: RepeatMode) {
+	if (!['none', 'one', 'all'].includes(mode)) return;
+	state.update((s) => ({ ...s, repeatMode: mode as RepeatMode }));
+}
+
+export function next(autoplay = false) {
+	const snapshot = get(state);
+	const list = snapshot.queue ?? [];
+	if (list.length === 0) return false;
+	const isLast = snapshot.queueIndex >= list.length - 1;
+	let nextIndex: number | null = null;
+
+	if (!isLast) {
+		nextIndex = snapshot.queueIndex + 1;
+	} else if (snapshot.repeatMode === 'all') {
+		nextIndex = 0;
+	}
+
+	if (nextIndex === null) {
+		state.update((s) => ({ ...s, isPlaying: false, time: 0 }));
+		syncPlaybackState('paused');
+		syncPositionState();
+		return false;
+	}
+
+	const source = list[nextIndex];
+	state.update((s) => ({
+		...s,
+		current: source,
+		queueIndex: nextIndex,
+		isReady: false,
+		duration: 0,
+		time: 0
+	}));
+	syncMediaSessionMetadata(source);
+	syncPlaybackState('paused');
+	syncPositionState();
+	pending = { source, autoplay };
+	ensureWaveSurfer().then((w) => {
+		if (!w) return;
+		performLoad(source, autoplay);
+	});
+	return true;
+}
+
+export function previous(autoplay = false) {
+	const snapshot = get(state);
+	const list = snapshot.queue ?? [];
+	if (list.length === 0) return false;
+	// If we're a few seconds into the track, restart instead of skipping back
+	if (snapshot.time > 3) {
+		ws?.setTime?.(0);
+		if (autoplay) ws?.play?.();
+		state.update((s) => ({ ...s, time: 0 }));
+		syncPositionState();
+		return true;
+	}
+
+	let prevIndex: number | null = null;
+	if (snapshot.queueIndex > 0) {
+		prevIndex = snapshot.queueIndex - 1;
+	} else if (snapshot.repeatMode === 'all' && list.length > 1) {
+		prevIndex = list.length - 1;
+	}
+
+	if (prevIndex === null) {
+		ws?.setTime?.(0);
+		state.update((s) => ({ ...s, time: 0 }));
+		syncPositionState();
+		if (autoplay) ws?.play?.();
+		return false;
+	}
+
+	const source = list[prevIndex];
+	state.update((s) => ({
+		...s,
+		current: source,
+		queueIndex: prevIndex,
+		isReady: false,
+		duration: 0,
+		time: 0
+	}));
+	syncMediaSessionMetadata(source);
+	syncPlaybackState('paused');
+	syncPositionState();
+	pending = { source, autoplay };
+	ensureWaveSurfer().then((w) => {
+		if (!w) return;
+		performLoad(source, autoplay);
+	});
+	return true;
+}
+
 function performLoad(source: PlayerSource, autoplay: boolean) {
 	if (!ws) return;
 	// Register playback before loading to avoid race with fast-ready
@@ -300,4 +433,22 @@ function performLoad(source: PlayerSource, autoplay: boolean) {
 		ws.on('ready', onReady);
 	}
 	ws.load?.(source.src);
+}
+
+function handleFinish() {
+	const snapshot = get(state);
+	if (snapshot.repeatMode === 'one') {
+		ws?.setTime?.(0);
+		ws?.play?.();
+		state.update((s) => ({ ...s, time: 0 }));
+		syncPlaybackState('playing');
+		syncPositionState();
+		return;
+	}
+	const advanced = next(true);
+	if (!advanced) {
+		state.update((s) => ({ ...s, isPlaying: false, time: 0 }));
+		syncPlaybackState('paused');
+		syncPositionState();
+	}
 }
