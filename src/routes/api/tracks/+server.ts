@@ -10,7 +10,7 @@ export type TrackOverview = {
 	latest_status: string | null;
 	latest_resource_url: string | null;
 	latest_release_date: string | null;
-  	latest_version_id: string | null;
+	latest_version_id: string | null;
 };
 
 const TABLE = 'track_overview';
