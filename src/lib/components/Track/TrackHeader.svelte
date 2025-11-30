@@ -11,6 +11,7 @@
 
 	export let trackName: string;
 	export let albumName: string | null = null;
+	export let albumId: string | null = null;
 	export let coverUrl: string | null = null;
 	export let coverDisplay: 'none' | 'default' | 'large' = 'default';
 	export let latestResourceUrl: string | null = null;
@@ -47,7 +48,13 @@
 		<div class="track-header-text">
 			<div class="track-title">{trackName}</div>
 			{#if albumName}
-				<div class="track-album">{albumName}</div>
+				{#if albumId}
+					<a class="track-album track-album-link" href={`/albums/${albumId}`}>
+						{albumName}
+					</a>
+				{:else}
+					<div class="track-album">{albumName}</div>
+				{/if}
 			{/if}
 		</div>
 	</div>
@@ -93,6 +100,13 @@
     font-size 0.95rem
     line-height 1.2
     word-break break-word
+
+  .track-album-link
+    text-decoration none
+    transition opacity 0.15s ease-out
+
+    &:hover
+      opacity 0.9
 
 .track-header-featured
   .track-title
