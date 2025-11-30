@@ -16,7 +16,7 @@
 
 	export let version: Version;
 	export let trackTitle: string | undefined;
-	export let trackSlug: string | undefined;
+	export let trackId: string | undefined;
 	export let trackDescription: string | null | undefined = null;
 	export let trackCoverUrl: string | null | undefined = undefined;
 	export let descriptionMode: 'track' | 'version' | 'none' = 'version';
@@ -46,7 +46,7 @@
 				src={version.resource_url}
 				version_id={version.id}
 				title={trackTitle}
-				track_slug={trackSlug}
+				{trackId}
 				coverUrl={trackCoverUrl ?? undefined}
 			/>
 		</div>

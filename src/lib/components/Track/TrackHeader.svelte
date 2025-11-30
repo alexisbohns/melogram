@@ -10,6 +10,7 @@
 	import Cover from './Cover.svelte';
 
 	export let trackName: string;
+	export let trackId: string | null = null;
 	export let albumName: string | null = null;
 	export let albumId: string | null = null;
 	export let coverUrl: string | null = null;
@@ -32,7 +33,7 @@
 					src: latestResourceUrl,
 					versionId: latestVersionId ?? undefined,
 					title: trackName,
-					trackSlug: undefined,
+					trackId: trackId ?? undefined,
 					coverUrl: coverUrl ?? undefined
 				},
 				true
@@ -47,7 +48,13 @@
 	<div class="track-header-main">
 		<Cover cover_url={coverUrl} alt={trackName} display={coverDisplay} />
 		<div class="track-header-text">
-			<div class="track-title">{trackName}</div>
+			<div class="track-title">
+				{#if trackId}
+					<a class="track-title-link" href={`/tracks/${trackId}`}>{trackName}</a>
+				{:else}
+					{trackName}
+				{/if}
+			</div>
 			{#if albumName && showAlbumName}
 				{#if albumId}
 					<a class="track-album track-album-link" href={`/albums/${albumId}`}>
@@ -94,6 +101,14 @@
     text-transform none
     line-height 1.25
     word-break break-word
+    color inherit
+
+  .track-title-link
+    color inherit
+    text-decoration none
+    transition opacity 0.15s ease-out
+    &:hover
+      opacity 0.8
 
   .track-album
     color var(--tertiary)

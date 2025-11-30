@@ -40,8 +40,8 @@
 	<div class="global-player-wrapper">
 		<div class="global-player" role="complementary" aria-label={$t('audio.player')}>
 			<div class="global-player-title">
-				{#if $current?.trackSlug}
-					<a href={`/tracks/${$current.trackSlug}`} class="title-link">{$current?.title}</a>
+				{#if $current?.trackId}
+					<a href={`/tracks/${$current.trackId}`} class="title-link">{$current?.title}</a>
 				{:else}
 					{$current?.title}
 				{/if}

@@ -34,7 +34,7 @@
 			{#each withVersions as track}
 				{@const version = latestVersion(track)}
 				<div class="track_item">
-					<a href={`/tracks/${track.slug}`} class="track_item_link">
+					<a href={`/tracks/${track.id}`} class="track_item_link">
 						<TrackItemHeader
 							title={track.name}
 							dateValue={track.latest_release
@@ -52,7 +52,7 @@
 								src={version.resource_url}
 								version_id={version.id}
 								title={track.name}
-								track_slug={track.slug}
+								trackId={track.id}
 								coverUrl={track.cover_url}
 							/>
 						</div>
