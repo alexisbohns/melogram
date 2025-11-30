@@ -1,5 +1,6 @@
 common:
   back: Retour
+  home: Accueil
   comments: Commentaires
   versions: Versions
   featured: Mise en avant
@@ -30,6 +31,11 @@ tracks:
     prototype: Prototype
     demo: Démo
     final: Finale
+albums:
+  title: Albums
+  collection_title: Collections
+  none: Aucun album pour le moment.
+  not_found: Album introuvable.
 audio:
   no_audio: Pas d’audio pour cette version.
   player: Lecteur
