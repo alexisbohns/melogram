@@ -5,11 +5,16 @@
 	import type { TrackOverview } from '$lib/types/tracks';
 
 	export let track: TrackOverview;
-	export let variant: 'featured' | 'compact' = 'compact';
+	export let variant: 'featured' | 'compact' | 'album' = 'compact';
 
 	let coverDisplay: 'none' | 'default' | 'large';
+	let showAlbumName: boolean;
+	let hasVersion = false;
+
 	$: coverDisplay = variant === 'featured' ? 'large' : 'default';
-	$: showDescription = variant === 'featured';
+	$: showDescription = variant === 'featured' || variant === 'album';
+	$: showAlbumName = variant !== 'album';
+	$: hasVersion = Boolean(track.latest_version_id);
 </script>
 
 <article class={`track track-${variant}`}>
@@ -19,17 +24,20 @@
 		albumId={track.album_id}
 		coverUrl={track.album_cover_url}
 		{coverDisplay}
+		{showAlbumName}
 		latestResourceUrl={track.latest_resource_url}
 		latestVersionId={track.latest_version_id}
 	/>
 
 	<TrackItemBody description={track.track_description} display={showDescription} />
 
-	<TrackFooter
-		track_id={track.track_id}
-		latest_status={track.latest_status}
-		latest_release_date={track.latest_release_date}
-	/>
+	{#if hasVersion}
+		<TrackFooter
+			track_id={track.track_id}
+			latest_status={track.latest_status}
+			latest_release_date={track.latest_release_date}
+		/>
+	{/if}
 </article>
 
 <style lang="stylus">
@@ -49,4 +57,11 @@
 
 .track-compact
   padding 0.75rem 0
+
+.track-album
+  gap 0.75rem
+  padding 1rem 0 1.25rem
+
+  :global(.track-header)
+    align-items flex-start
 </style>

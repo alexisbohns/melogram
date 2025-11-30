@@ -2,10 +2,17 @@
 	import { t } from '$lib/i18n/i18n';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import type { Album } from '$lib/types/albums';
+	import type { TrackOverview } from '$lib/types/tracks';
+	import Track from '$lib/components/Track/Track.svelte';
 
-	export let data: { album: Album | null; error: string | null };
+	export let data: {
+		album: Album | null;
+		tracks: TrackOverview[];
+		error: string | null;
+		tracksError: string | null;
+	};
 
-	const { album, error } = data;
+	const { album, tracks = [], error, tracksError } = data;
 
 	$: crumbs = [
 		{ label: $t('common.home'), href: '/' },
@@ -26,18 +33,35 @@
 	<section class="album-page">
 		<Breadcrumbs items={crumbs} ariaLabel={$t('albums.title')} />
 
-		<header class="album-header">
-			<h1>{album.name}</h1>
-			{#if album.description}
-				<p class="album-description">{album.description}</p>
-			{/if}
-		</header>
+		<section class="album-hero">
+			<header class="album-header">
+				<h1>{album.name}</h1>
+				{#if album.description}
+					<p class="album-description">{album.description}</p>
+				{/if}
+			</header>
 
-		{#if album.cover_url}
-			<div class="album-cover">
-				<img src={album.cover_url} alt={album.name} loading="lazy" />
-			</div>
-		{/if}
+			{#if album.cover_url}
+				<div class="album-cover">
+					<img src={album.cover_url} alt={album.name} loading="lazy" />
+				</div>
+			{/if}
+		</section>
+
+		<section class="album-tracks">
+			<h2>{$t('tracks.title')}</h2>
+			{#if tracksError}
+				<p class="error">{tracksError}</p>
+			{:else if tracks.length === 0}
+				<p class="empty">{$t('tracks.none')}</p>
+			{:else}
+				<div class="album-tracks-list">
+					{#each tracks as track (track.track_id)}
+						<Track {track} variant="album" />
+					{/each}
+				</div>
+			{/if}
+		</section>
 	</section>
 {/if}
 
@@ -45,36 +69,60 @@
 .album-page
   display flex
   flex-direction column
-  gap 1.5rem
+  gap 2rem
+
+.album-hero
+  display flex
+  flex-direction column
+  gap 1rem
 
 .album-header
   display flex
   flex-direction column
-  gap 0.4rem
+  gap 0.5rem
 
   h1
     font-family var(--font-captions)
-    font-size 2.2rem
+    font-size 2.4rem
     letter-spacing 0.07em
     line-height 1.2
 
 .album-description
   color var(--tertiary)
-  opacity 0.85
-  font-size 1.05rem
-  line-height 1.55
+  opacity 0.9
+  font-size 1.1rem
+  line-height 1.6
 
 .album-cover
   align-self center
   width 100%
-  max-width 400px
+  max-width 520px
+  border-radius 1.25rem
+  overflow hidden
+  background rgba(255,255,255,0.03)
 
   img
     width 100%
     height auto
     display block
-    border-radius 1rem
-    box-shadow 0 18px 60px rgba(0,0,0,0.35)
+    box-shadow 0 22px 70px rgba(0,0,0,0.38)
+
+.album-tracks
+  display flex
+  flex-direction column
+  gap 0.75rem
+
+  h2
+    font-family var(--font-captions)
+    letter-spacing 0.06em
+    font-size 1.2rem
+    color var(--tertiary)
+    opacity 0.9
+
+.album-tracks-list
+  display flex
+  flex-direction column
+  gap 1rem
 
 .empty, .error
   opacity 0.75

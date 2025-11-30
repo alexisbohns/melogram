@@ -11,6 +11,7 @@ export const GET: RequestHandler = async ({ locals, url, setHeaders }) => {
 	const q = url.searchParams.get('q')?.trim() || '';
 	const statusParam = url.searchParams.get('status')?.trim() || '';
 	const albumName = url.searchParams.get('album')?.trim() || '';
+	const albumId = url.searchParams.get('album_id')?.trim() || '';
 	const sort = url.searchParams.get('sort') || 'release_desc';
 
 	const from = (page - 1) * limit;
@@ -36,6 +37,10 @@ export const GET: RequestHandler = async ({ locals, url, setHeaders }) => {
 
 	if (albumName) {
 		query = query.ilike('album_name', albumName);
+	}
+
+	if (albumId) {
+		query = query.eq('album_id', albumId);
 	}
 
 	switch (sort) {
