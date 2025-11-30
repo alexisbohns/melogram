@@ -2,6 +2,7 @@
 	import '../global.styl';
 	import favicon from '$lib/assets/favicon.svg';
 	import GlobalPlayer from '$lib/components/GlobalPlayer.svelte';
+	import Logo from '$lib/components/Logo.svelte';
 
 	let { children } = $props();
 </script>
@@ -15,7 +16,11 @@
 		rel="stylesheet"
 	/>
 </svelte:head>
-
+<header>
+	<a class="logo-link" href="/" aria-label="Go to home">
+		<Logo />
+	</a>
+</header>
 <main>
 	{@render children?.()}
 	<GlobalPlayer />
@@ -24,12 +29,28 @@
 <div class="fkg_bg"></div>
 
 <style lang="stylus">
+    header
+        display flex
+        flex-direction column
+        align-items flex-start
+        padding 1rem 0
+        max-width 600px
+        margin 0 auto
     main
         display flex
         flex-direction column
         padding 1rem 1rem 10rem 1rem
         max-width 600px
         margin 0 auto
+    .logo-link
+        display flex
+        align-items center
+        text-decoration none
+        color inherit
+        opacity 0.5
+        transition all 0.2s ease-in-out
+        &:hover
+            opacity 1
     @media screen and (max-width: 768px)
         .fkg_bg
             position fixed
