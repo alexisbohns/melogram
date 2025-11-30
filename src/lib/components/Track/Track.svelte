@@ -16,6 +16,7 @@
 	<TrackHeader
 		trackName={track.track_name}
 		albumName={track.album_name}
+		albumId={track.album_id}
 		coverUrl={track.album_cover_url}
 		{coverDisplay}
 		latestResourceUrl={track.latest_resource_url}
