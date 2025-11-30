@@ -1,32 +1,32 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte'
-  import Icon from '$lib/components/Icon.svelte'
-  import { icons } from '$lib/icons'
-  import { t } from '$lib/i18n/i18n'
+	import { createEventDispatcher } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
+	import { icons } from '$lib/icons';
+	import { t } from '$lib/i18n/i18n';
 
-  export let isPlaying = false
-  export let disabled = false
+	export let isPlaying = false;
+	export let disabled = false;
 
-  const dispatch = createEventDispatcher<{ click: MouseEvent }>()
+	const dispatch = createEventDispatcher<{ click: MouseEvent }>();
 
-  function handleClick(event: MouseEvent) {
-    dispatch('click', event)
-  }
+	function handleClick(event: MouseEvent) {
+		dispatch('click', event);
+	}
 </script>
 
 <button
-  type="button"
-  class="player-control {isPlaying ? "playing" : ""}"
-  on:click={handleClick}
-  {disabled}
-  aria-label={isPlaying ? $t('common.pause') : $t('common.play')}
-  aria-pressed={isPlaying}
+	type="button"
+	class="player-control {isPlaying ? 'playing' : ''}"
+	on:click={handleClick}
+	{disabled}
+	aria-label={isPlaying ? $t('common.pause') : $t('common.play')}
+	aria-pressed={isPlaying}
 >
-  {#if isPlaying}
-    <Icon icon={icons.pause} size={16} label={$t('common.pause')} />
-  {:else}
-    <Icon icon={icons.play} size={16} label={$t('common.play')} />
-  {/if}
+	{#if isPlaying}
+		<Icon icon={icons.pause} size={16} label={$t('common.pause')} />
+	{:else}
+		<Icon icon={icons.play} size={16} label={$t('common.play')} />
+	{/if}
 </button>
 
 <style lang="stylus">

@@ -1,29 +1,29 @@
 <script lang="ts" context="module">
-  export type Track = {
-    id: string
-    slug: string
-    name: string
-    description?: string | null
-    cover_url?: string | null
-    created_at: string
-  }
+	export type Track = {
+		id: string;
+		slug: string;
+		name: string;
+		description?: string | null;
+		cover_url?: string | null;
+		created_at: string;
+	};
 </script>
 
 <script lang="ts">
-  export let track: Track
-  import BackButton from '$lib/components/BackButton.svelte'
+	export let track: Track;
+	import BackButton from '$lib/components/BackButton.svelte';
 </script>
 
 <header class="track-header">
-  <BackButton />
-  {#if track.cover_url}
-  <img src={track.cover_url} alt={track.name} />
-  {/if}
-  <h1 class="track-name">{track.name}</h1>
-  {#if track.description}
-    <p class="track-description">{track.description}</p>
-  {/if}
-  <slot />
+	<BackButton />
+	{#if track.cover_url}
+		<img src={track.cover_url} alt={track.name} />
+	{/if}
+	<h1 class="track-name">{track.name}</h1>
+	{#if track.description}
+		<p class="track-description">{track.description}</p>
+	{/if}
+	<slot />
 </header>
 
 <style lang="stylus">

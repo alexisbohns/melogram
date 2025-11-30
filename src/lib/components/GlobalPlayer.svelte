@@ -1,50 +1,59 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte'
-  import PlayerControlButton from '$lib/components/PlayerControlButton.svelte'
-  import { t } from '$lib/i18n/i18n'
-  import { attach, detach, current, isPlaying, isReady, toggle, time, duration } from '$lib/player/player'
+	import { onDestroy, onMount } from 'svelte';
+	import PlayerControlButton from '$lib/components/PlayerControlButton.svelte';
+	import { t } from '$lib/i18n/i18n';
+	import {
+		attach,
+		detach,
+		current,
+		isPlaying,
+		isReady,
+		toggle,
+		time,
+		duration
+	} from '$lib/player/player';
 
-  let containerEl: HTMLDivElement | null = null
+	let containerEl: HTMLDivElement | null = null;
 
-  onMount(() => {
-    if (containerEl) attach(containerEl)
-  })
+	onMount(() => {
+		if (containerEl) attach(containerEl);
+	});
 
-  // attach when the element becomes available after first track loads
-  $: if (containerEl) attach(containerEl)
+	// attach when the element becomes available after first track loads
+	$: if (containerEl) attach(containerEl);
 
-  onDestroy(() => detach())
+	onDestroy(() => detach());
 
-  $: hasTrack = $current !== null
+	$: hasTrack = $current !== null;
 
-  function fmtTime(totalSeconds: number) {
-    const s = Math.max(0, Math.floor(totalSeconds || 0))
-    const m = Math.floor(s / 60)
-    const sec = s % 60
-    return `${m}:${sec.toString().padStart(2, '0')}`
-  }
-  $: formattedCurrent = fmtTime($time)
-  $: formattedRemaining = `-${fmtTime(Math.max(0, $duration - $time))}`
+	function fmtTime(totalSeconds: number) {
+		const s = Math.max(0, Math.floor(totalSeconds || 0));
+		const m = Math.floor(s / 60);
+		const sec = s % 60;
+		return `${m}:${sec.toString().padStart(2, '0')}`;
+	}
+	$: formattedCurrent = fmtTime($time);
+	$: formattedRemaining = `-${fmtTime(Math.max(0, $duration - $time))}`;
 </script>
 
 {#if hasTrack}
-<div class="global-player-wrapper">
-  <div class="global-player" role="complementary" aria-label="{$t('audio.player')}">
-    <div class="global-player-title">
-      {#if $current?.trackSlug}
-        <a href={`/tracks/${$current.trackSlug}`} class="title-link">{$current?.title}</a>
-      {:else}
-        {$current?.title}
-      {/if}
-    </div>
-    <div class="global-player-controls">
-      <PlayerControlButton on:click={toggle} disabled={!$isReady} isPlaying={$isPlaying} />
-      <span class="timecode current">{formattedCurrent}</span>
-      <div class="global-player-wave" bind:this={containerEl}></div>
-      <span class="timecode remaining">{formattedRemaining}</span>
-    </div>
-  </div>
-</div>
+	<div class="global-player-wrapper">
+		<div class="global-player" role="complementary" aria-label={$t('audio.player')}>
+			<div class="global-player-title">
+				{#if $current?.trackSlug}
+					<a href={`/tracks/${$current.trackSlug}`} class="title-link">{$current?.title}</a>
+				{:else}
+					{$current?.title}
+				{/if}
+			</div>
+			<div class="global-player-controls">
+				<PlayerControlButton on:click={toggle} disabled={!$isReady} isPlaying={$isPlaying} />
+				<span class="timecode current">{formattedCurrent}</span>
+				<div class="global-player-wave" bind:this={containerEl}></div>
+				<span class="timecode remaining">{formattedRemaining}</span>
+			</div>
+		</div>
+	</div>
 {/if}
 
 <style lang="stylus">

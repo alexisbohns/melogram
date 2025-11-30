@@ -1,34 +1,36 @@
 <script lang="ts">
-  import Icon from '$lib/components/Icon.svelte'
-  import { t } from '$lib/i18n/i18n'
+	import Icon from '$lib/components/Icon.svelte';
+	import { t } from '$lib/i18n/i18n';
 
-  export let title: string
-  export let dateValue: string | null = null
-  export let statusText: string | null = null
-  export let statusVariant: string | null = null
-  export let icon: any = null
-  export let iconSize = 12
+	export let title: string;
+	export let dateValue: string | null = null;
+	export let statusText: string | null = null;
+	export let statusVariant: string | null = null;
+	export let icon: any = null;
+	export let iconSize = 12;
 </script>
 
 <div class="track_item_header">
-  <div class="track_item_name">{title}</div>
-  <div class="track_item_meta">
-    {#if icon || dateValue !== null}
-      <div class="track_item_date">
-        {#if icon}
-          <Icon {icon} size={iconSize} label={$t('tracks.latests')} />
-        {/if}
-        {#if dateValue !== null}
-          <span>{dateValue}</span>
-        {/if}
-      </div>
-    {/if}
-    {#if statusText}
-      <span class={`track_item_status${statusVariant ? ` track_item_status_${statusVariant}` : ''}`}>
-        {statusText}
-      </span>
-    {/if}
-  </div>
+	<div class="track_item_name">{title}</div>
+	<div class="track_item_meta">
+		{#if icon || dateValue !== null}
+			<div class="track_item_date">
+				{#if icon}
+					<Icon {icon} size={iconSize} label={$t('tracks.latests')} />
+				{/if}
+				{#if dateValue !== null}
+					<span>{dateValue}</span>
+				{/if}
+			</div>
+		{/if}
+		{#if statusText}
+			<span
+				class={`track_item_status${statusVariant ? ` track_item_status_${statusVariant}` : ''}`}
+			>
+				{statusText}
+			</span>
+		{/if}
+	</div>
 </div>
 
 <style lang="stylus">
