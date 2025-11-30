@@ -1,10 +1,17 @@
 <script lang="ts">
 	import { t } from '$lib/i18n/i18n';
+	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import type { Album } from '$lib/types/albums';
 
 	export let data: { album: Album | null; error: string | null };
 
 	const { album, error } = data;
+
+	$: crumbs = [
+		{ label: $t('common.home'), href: '/' },
+		{ label: $t('albums.title'), href: '/albums' },
+		...(album ? [{ label: album.name }] : [])
+	];
 </script>
 
 <svelte:head>
@@ -17,13 +24,7 @@
 	<p class="empty">{$t('albums.not_found')}</p>
 {:else}
 	<section class="album-page">
-		<nav class="breadcrumbs" aria-label={$t('albums.title')}>
-			<a href="/">{$t('common.home')}</a>
-			<span class="breadcrumbs-sep">›</span>
-			<a href="/albums">{$t('albums.title')}</a>
-			<span class="breadcrumbs-sep">›</span>
-			<span>{album.name}</span>
-		</nav>
+		<Breadcrumbs items={crumbs} ariaLabel={$t('albums.title')} />
 
 		<header class="album-header">
 			<h1>{album.name}</h1>
@@ -45,21 +46,6 @@
   display flex
   flex-direction column
   gap 1.5rem
-
-.breadcrumbs
-  display flex
-  align-items center
-  gap 0.35rem
-  font-size 0.9rem
-  color var(--tertiary)
-  opacity 0.75
-
-  a
-    color inherit
-    text-decoration none
-
-.breadcrumbs-sep
-  opacity 0.6
 
 .album-header
   display flex

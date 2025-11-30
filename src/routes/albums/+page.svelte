@@ -1,11 +1,14 @@
 <script lang="ts">
 	import AlbumCard from '$lib/components/Album/AlbumCard.svelte';
+	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import { t } from '$lib/i18n/i18n';
 	import type { Album } from '$lib/types/albums';
 
 	export let data: { albums: Album[]; error: string | null };
 
 	const { albums = [], error = null } = data;
+
+	$: crumbs = [{ label: $t('common.home'), href: '/' }, { label: $t('albums.title') }];
 </script>
 
 <svelte:head>
@@ -13,11 +16,7 @@
 </svelte:head>
 
 <section class="albums-page">
-	<nav class="breadcrumbs" aria-label={$t('albums.title')}>
-		<a href="/">{$t('common.home')}</a>
-		<span class="breadcrumbs-sep">›</span>
-		<span>{$t('albums.title')}</span>
-	</nav>
+	<Breadcrumbs items={crumbs} ariaLabel={$t('albums.title')} />
 
 	<header class="albums-heading">
 		<h1>{$t('albums.collection_title')}</h1>
@@ -41,21 +40,6 @@
   display flex
   flex-direction column
   gap 1.25rem
-
-.breadcrumbs
-  display flex
-  align-items center
-  gap 0.35rem
-  font-size 0.9rem
-  color var(--tertiary)
-  opacity 0.75
-
-  a
-    color inherit
-    text-decoration none
-
-.breadcrumbs-sep
-  opacity 0.6
 
 .albums-heading
   display flex
