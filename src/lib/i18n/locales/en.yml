@@ -26,6 +26,7 @@ tracks:
   available: Available tracks
   upcoming: Upcoming tracks
   latests: Latests tracks
+  see_all: See all tracks
   status:
     raw: Raw
     draft: Draft

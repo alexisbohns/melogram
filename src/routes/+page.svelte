@@ -1,10 +1,22 @@
 <script lang="ts">
+	import AlbumsList from '$lib/components/Album/AlbumsList.svelte';
 	import Track from '$lib/components/Track/Track.svelte';
 	import { t } from '$lib/i18n/i18n';
+	import type { Album } from '$lib/types/albums';
 	import type { TrackOverview } from '$lib/types/tracks';
 
 	export let data;
-	const { tracks = [], error = null }: { tracks: TrackOverview[]; error: string | null } = data;
+	const {
+		tracks = [],
+		tracksError = null,
+		albums = [],
+		albumsError = null
+	}: {
+		tracks: TrackOverview[];
+		tracksError: string | null;
+		albums: Album[];
+		albumsError: string | null;
+	} = data;
 
 	$: featuredTrack = tracks[0];
 	$: otherTracks = tracks.slice(1, 4);
@@ -14,63 +26,89 @@
 	<title>{$t('tracks.latests')}</title>
 </svelte:head>
 
-<section class="latests">
-	<div class="latests-heading">
-		<div class="latests-badge">BO;NS</div>
-		<h1>{$t('tracks.latests')}</h1>
-	</div>
-
-	{#if error}<p class="error">{error}</p>{/if}
-
-	{#if tracks.length === 0}
-		<p class="empty">{$t('tracks.none')}</p>
-	{:else}
-		{#if featuredTrack}
-			<Track track={featuredTrack} variant="featured" />
-		{/if}
-		<div class="latests-list">
-			{#each otherTracks as track (track.track_id)}
-				<Track {track} variant="compact" />
-			{/each}
+<section class="home-page">
+	<section class="latests">
+		<div class="section-heading">
+			<h2>{$t('tracks.latests')}</h2>
 		</div>
-	{/if}
+
+		{#if tracksError}<p class="error">{tracksError}</p>{/if}
+
+		{#if tracks.length === 0}
+			<p class="empty">{$t('tracks.none')}</p>
+		{:else}
+			{#if featuredTrack}
+				<Track track={featuredTrack} variant="featured" />
+			{/if}
+			<div class="latests-list">
+				{#each otherTracks as track (track.track_id)}
+					<Track {track} variant="compact" />
+				{/each}
+			</div>
+
+			<a class="tracks-cta" href="/tracks">{$t('tracks.see_all')}</a>
+		{/if}
+	</section>
+
+	<section class="collections">
+		<div class="section-heading">
+			<h2>{$t('albums.collection_title')}</h2>
+		</div>
+
+		<AlbumsList {albums} error={albumsError} />
+	</section>
 </section>
 
 <style lang="stylus">
+.home-page
+  display flex
+  flex-direction column
+  gap 2.5rem
+
 .latests
   display flex
   flex-direction column
-  gap 1rem
+  gap 1.1rem
 
-.latests-heading
+.section-heading
   display flex
   flex-direction column
   gap 0.35rem
   margin-bottom 0.5rem
 
-.latests-badge
-  display inline-flex
-  align-items center
-  justify-content center
-  padding 0.35rem 0.65rem
-  background rgba(255,255,255,0.04)
-  border 1px solid rgba(255,255,255,0.05)
-  border-radius 999px
+.section-heading :global(h1), .section-heading :global(h2)
   font-family var(--font-captions)
-  letter-spacing 0.1em
-  font-size 0.85rem
-  color var(--tertiary)
-  width fit-content
-
-h1
-  font-family var(--font-captions)
-  font-size 1.8rem
   letter-spacing 0.05em
+  line-height 1.15
 
 .latests-list
   display flex
   flex-direction column
   gap 1.25rem
+
+.tracks-cta
+  display flex
+  justify-content center
+  align-items center
+  padding 0.95rem 1.1rem
+  border-radius 0.5rem
+  mix-blend-mode plus-lighter
+  border 1px solid var(--tertiary)
+  color var(--tertiary)
+  font-family var(--font-captions)
+  letter-spacing 0.08em
+  opacity 0.8
+  text-transform uppercase
+  transition background 0.2s ease-out, transform 0.2s ease-out
+
+  &:hover
+    background rgba(255,255,255,0.05)
+    transform translateY(1px)
+
+.collections
+  display flex
+  flex-direction column
+  gap 1rem
 
 .empty, .error
   opacity 0.7

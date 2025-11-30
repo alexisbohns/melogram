@@ -98,7 +98,7 @@
   .track-album
     color var(--tertiary)
     opacity 0.6
-    font-size 0.95rem
+    font-size 0.9rem
     line-height 1.2
     word-break break-word
 
