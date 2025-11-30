@@ -1,143 +1,97 @@
 <script lang="ts">
-	export let data;
-	const { tracks, error } = data;
-
+	import Track from '$lib/components/Track/Track.svelte';
 	import { t } from '$lib/i18n/i18n';
-	import { icons } from '$lib/icons';
-	import TrackVersionFooter from '$lib/components/TrackVersionFooter.svelte';
-	import TrackItemHeader from '$lib/components/TrackItemHeader.svelte';
+	import type { TrackOverview } from '$lib/types/tracks';
+	import SectionHeading from '$lib/components/SectionHeading.svelte';
 
-	function latestVersion(track: any) {
-		const list = Array.isArray(track?.track_versions)
-			? track.track_versions.map((tv: any) => tv?.versions).filter(Boolean)
-			: [];
-		if (list.length === 0) return null;
-		return list
-			.slice()
-			.sort(
-				(a: any, b: any) => new Date(b.release_date).getTime() - new Date(a.release_date).getTime()
-			)[0];
-	}
+	export let data: { tracks: TrackOverview[]; error: string | null };
 
-	$: withVersions = (tracks ?? []).filter((t: any) => t.latest_release !== null);
-	$: withoutVersions = (tracks ?? []).filter((t: any) => t.latest_release === null);
+	const { tracks = [], error = null } = data;
+
+	$: availableTracks = tracks.filter((t) => Boolean(t.latest_version_id));
+	$: upcomingTracks = tracks.filter((t) => !t.latest_version_id);
 </script>
 
-<h1>Morceaux</h1>
-{#if error}<p class="error">{error}</p>{/if}
-{#if tracks.length === 0}
-	<p>Aucun morceau.</p>
-{:else}
-	<section class="tracks-latests">
-		<h2 style="margin-top: 2rem;">{$t('tracks.latests')}</h2>
-		<div class="tracks_list">
-			{#each withVersions as track}
-				{@const version = latestVersion(track)}
-				<div class="track_item">
-					<a href={`/tracks/${track.id}`} class="track_item_link">
-						<TrackItemHeader
-							title={track.name}
-							dateValue={track.latest_release
-								? new Date(track.latest_release).toLocaleDateString()
-								: '—'}
-							icon={icons.clockRotateLeft}
-							statusVariant={version?.status ?? null}
-							statusText={version?.status ? $t(`tracks.status.${version.status}`) : null}
-						/>
-						<div class="track_item_description">{track.description}</div>
-					</a>
-					{#if version?.resource_url}
-						<div class="track_item_player">
-							<TrackVersionFooter
-								src={version.resource_url}
-								version_id={version.id}
-								title={track.name}
-								trackId={track.id}
-								coverUrl={track.cover_url}
-							/>
-						</div>
-					{/if}
-				</div>
-			{/each}
-		</div>
-	</section>
-	{#if withoutVersions.length > 0}
-		<section class="tracks-upcoming">
-			<h2 style="margin-top: 2rem;">{$t('tracks.upcoming')}</h2>
-			<div class="tracks_list">
-				{#each withoutVersions as track}
-					<div class="track_item">
-						<div class="track_item_name">{track.name}</div>
-						<div class="track_item_description">{track.description}</div>
-					</div>
-				{/each}
-			</div>
-		</section>
+<svelte:head>
+	<title>{$t('tracks.latests')}</title>
+</svelte:head>
+
+<section class="tracks-page">
+	<header class="tracks-heading">
+		<h1>{$t('tracks.latests')}</h1>
+	</header>
+
+	{#if error}
+		<p class="error">{error}</p>
 	{/if}
-{/if}
+
+	{#if tracks.length === 0 && !error}
+		<p class="empty">{$t('tracks.none')}</p>
+	{:else if tracks.length > 0}
+		{#if availableTracks.length > 0}
+			<section class="tracks-section">
+				<SectionHeading>{$t('tracks.available')}</SectionHeading>
+				<div class="tracks-list">
+					{#each availableTracks as track (track.track_id)}
+						<Track {track} variant="featured" />
+					{/each}
+				</div>
+			</section>
+		{/if}
+
+		{#if upcomingTracks.length > 0}
+			<section class="tracks-section tracks-upcoming">
+				<SectionHeading>{$t('tracks.upcoming')}</SectionHeading>
+				<div class="tracks-list">
+					{#each upcomingTracks as track (track.track_id)}
+						<Track {track} muted />
+					{/each}
+				</div>
+			</section>
+		{/if}
+
+		{#if availableTracks.length === 0 && upcomingTracks.length === 0}
+			<p class="empty">{$t('tracks.none')}</p>
+		{/if}
+	{/if}
+</section>
 
 <style lang="stylus">
-  h1, h2
-    font-family var(--font-captions)
-    text-align center
+.tracks-page
+  display flex
+  flex-direction column
+  gap 1.25rem
+
+.tracks-heading
+  display flex
+  flex-direction column
+  gap 0.35rem
 
   h1
-    font-size 1rem
-    margin-bottom 2rem
+    font-family var(--font-captions)
+    font-size 2rem
+    letter-spacing 0.07em
 
-  h2
-    font-size 1.5rem
-    margin 2rem 0
-  .tracks
-    &-latests
-      .track
-        &_item
-          display flex
-          flex-direction column
-          gap 0.5rem
+.tracks-section
+  display flex
+  flex-direction column
+  gap 1rem
+  padding 1rem 0
+  border-top 1px solid rgba(255,255,255,0.05)
 
-          & a.track_item_link
-            transition all ease-out 0.25s
-            display flex
-            flex-direction column
-            gap .5rem
+  &:first-of-type
+    border-top none
+    padding-top 0
 
-            &:hover
-              opacity 0.5
+.tracks-list
+  display flex
+  flex-direction column
+  gap 0.75rem
 
-          &_description
-            opacity 0.4
-            font-size 0.8rem
-            font-weight 300   
-            line-height 150%         
+.empty, .error
+  opacity 0.75
+  font-size 0.95rem
 
-          &_player
-            border-top 1px solid rgba(255,255,255,0.05)
-            padding .5rem 0
-      
-    &-upcoming
-      .track
-        &_item
-          display flex
-          flex-direction column
-          gap .25rem
-          text-align left
-
-          &_name
-            opacity 0.6
-            font-size: 0.8rem
-
-          &_description
-            opacity 0.3
-            font-size 0.8rem
-            font-weight 300
-          
-  .tracks_list
-      display flex
-      flex-direction column
-      gap 3rem
-
-  .error
-    color #dc2626
-
+.error
+  color #dc2626
 </style>
