@@ -14,6 +14,6 @@
   font-size 0.95rem
   line-height 1.6
   color var(--default)
-  opacity 0.9
+  opacity 0.7
   padding-right 0.5rem
 </style>

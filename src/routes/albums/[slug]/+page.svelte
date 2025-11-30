@@ -19,6 +19,9 @@
 		{ label: $t('albums.title'), href: '/albums' },
 		...(album ? [{ label: album.name }] : [])
 	];
+
+	$: availableTracks = tracks.filter((t) => Boolean(t.latest_version_id));
+	$: upcomingTracks = tracks.filter((t) => !t.latest_version_id);
 </script>
 
 <svelte:head>
@@ -49,85 +52,118 @@
 		</section>
 
 		<section class="album-tracks">
-			<h2>{$t('tracks.title')}</h2>
 			{#if tracksError}
 				<p class="error">{tracksError}</p>
 			{:else if tracks.length === 0}
 				<p class="empty">{$t('tracks.none')}</p>
 			{:else}
-				<div class="album-tracks-list">
-					{#each tracks as track (track.track_id)}
-						<Track {track} variant="album" />
-					{/each}
-				</div>
+				{#if availableTracks.length > 0}
+					<section class="album-tracks-section">
+						<h3>{$t('tracks.available')}</h3>
+						<div class="album-tracks-list">
+							{#each availableTracks as track (track.track_id)}
+								<Track {track} variant="album" />
+							{/each}
+						</div>
+					</section>
+				{/if}
+
+				{#if upcomingTracks.length > 0}
+					<section class="album-tracks-section album-tracks-upcoming">
+						<h3>{$t('tracks.upcoming')}</h3>
+						<div class="album-tracks-list">
+							{#each upcomingTracks as track (track.track_id)}
+								<Track {track} variant="album" muted />
+							{/each}
+						</div>
+					</section>
+				{/if}
+
+				{#if availableTracks.length === 0 && upcomingTracks.length === 0}
+					<p class="empty">{$t('tracks.none')}</p>
+				{/if}
 			{/if}
 		</section>
 	</section>
 {/if}
 
 <style lang="stylus">
-.album-page
-  display flex
-  flex-direction column
-  gap 2rem
+	.album-page
+		display flex
+		flex-direction column
+		gap 2rem
 
-.album-hero
-  display flex
-  flex-direction column
-  gap 1rem
+	.album-hero
+		display flex
+		flex-direction column
+		gap 1rem
 
-.album-header
-  display flex
-  flex-direction column
-  gap 0.5rem
+	.album-header
+		display flex
+		flex-direction column
+		gap 0.5rem
 
-  h1
-    font-family var(--font-captions)
-    font-size 2.4rem
-    letter-spacing 0.07em
-    line-height 1.2
+	h1
+		font-family var(--font-captions)
+		font-size 2.4rem
+		letter-spacing 0.07em
+		line-height 1.2
 
-.album-description
-  color var(--tertiary)
-  opacity 0.9
-  font-size 1.1rem
-  line-height 1.6
+	.album-description
+		color var(--tertiary)
+		opacity 0.9
+		font-size 1.1rem
+		line-height 1.6
 
-.album-cover
-  align-self center
-  width 100%
-  max-width 520px
-  border-radius 1.25rem
-  overflow hidden
-  background rgba(255,255,255,0.03)
+	.album-cover
+		align-self center
+		width 100%
+		max-width 520px
+		border-radius 1.25rem
+		overflow hidden
+		background rgba(255,255,255,0.03)
 
-  img
-    width 100%
-    height auto
-    display block
-    box-shadow 0 22px 70px rgba(0,0,0,0.38)
+	img
+		width 100%
+		height auto
+		display block
+		box-shadow 0 22px 70px rgba(0,0,0,0.38)
 
-.album-tracks
-  display flex
-  flex-direction column
-  gap 0.75rem
+	.album-tracks
+		display flex
+		flex-direction column
+		gap 3rem
 
-  h2
-    font-family var(--font-captions)
-    letter-spacing 0.06em
-    font-size 1.2rem
-    color var(--tertiary)
-    opacity 0.9
+	.album-tracks-section
+		display flex
+		flex-direction column
+		gap 2rem
 
-.album-tracks-list
-  display flex
-  flex-direction column
-  gap 1rem
+	h3
+		font-family var(--font-captions)
+		letter-spacing 0.06em
+		font-size 1.5rem
+		color var(--tertiary)
+		opacity 0.95
+		display inline-flex
+		align-items center
+		gap 1rem
 
-.empty, .error
-  opacity 0.75
-  font-size 0.95rem
+		&::after
+			content ''
+			height 2px
+			flex 1
+			opacity 0.1
+			background-color var(--tertiary)
 
-.error
-  color #dc2626
+	.album-tracks-list
+		display flex
+		flex-direction column
+		gap 0.5rem
+
+	.empty, .error
+		opacity 0.75
+		font-size 0.95rem
+	.error
+		color #dc2626
 </style>

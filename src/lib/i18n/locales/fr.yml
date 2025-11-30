@@ -23,6 +23,7 @@ tracks:
   no_other_versions: Aucune autre version.
   no_versions: Aucune version pour le moment.
   slug_label: Slug
+  available: Morceaux disponibles
   upcoming: Morceaux à venir
   latests: Dernières sorties
   status:
