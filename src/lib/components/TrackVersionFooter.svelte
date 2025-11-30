@@ -4,7 +4,7 @@
 	export let src: string | null | undefined;
 	export let version_id: string;
 	export let title: string | undefined;
-	export let track_slug: string | undefined;
+	export let trackId: string | undefined;
 	export let coverUrl: string | undefined = undefined;
 
 	let isReady = false;
@@ -38,10 +38,7 @@
 	async function toggle() {
 		if (!src) return;
 		if ($gCurrent?.src !== src) {
-			await playerLoad(
-				{ src, versionId: version_id, title, trackSlug: track_slug, coverUrl },
-				true
-			);
+			await playerLoad({ src, versionId: version_id, title, trackId, coverUrl }, true);
 		} else {
 			playerToggle();
 		}

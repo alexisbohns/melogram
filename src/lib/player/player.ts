@@ -4,7 +4,7 @@ export type PlayerSource = {
 	src: string;
 	versionId?: string;
 	title?: string;
-	trackSlug?: string;
+	trackId?: string;
 	coverUrl?: string;
 };
 

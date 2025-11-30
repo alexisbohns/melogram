@@ -21,6 +21,7 @@
 <article class={`track track-${variant}${muted ? ' track-muted' : ''}`}>
 	<TrackHeader
 		trackName={track.track_name}
+		trackId={track.track_id}
 		albumName={track.album_name}
 		albumId={track.album_id}
 		coverUrl={track.album_cover_url}

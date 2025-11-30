@@ -19,7 +19,13 @@
 	{#if track.cover_url}
 		<img src={track.cover_url} alt={track.name} />
 	{/if}
-	<h1 class="track-name">{track.name}</h1>
+	<h1 class="track-name">
+		{#if track.id}
+			<a class="track-link" href={`/tracks/${track.id}`}>{track.name}</a>
+		{:else}
+			{track.name}
+		{/if}
+	</h1>
 	{#if track.description}
 		<p class="track-description">{track.description}</p>
 	{/if}
@@ -36,6 +42,12 @@
   h1
     font-family var(--font-headings)
     font-size 2rem
+    .track-link
+      color inherit
+      text-decoration none
+      transition opacity 0.15s ease-out
+      &:hover
+        opacity 0.8
 
   img
     width 100%

@@ -2,13 +2,13 @@ import type { PageServerLoad } from './$types';
 import { supabase } from '$lib/supabaseClient';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const { slug } = params;
+	const { track_id } = params;
 
-	// 1) Fetch the track by slug
+	// 1) Fetch the track by id
 	const { data: track, error: trackErr } = await supabase
 		.from('tracks')
 		.select('id, slug, name, description, cover_url, created_at, lyrics')
-		.eq('slug', slug)
+		.eq('id', track_id)
 		.single();
 
 	if (trackErr || !track) {

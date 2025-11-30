@@ -6,7 +6,6 @@
 	type Track = {
 		id: string;
 		name: string;
-		slug?: string;
 		description?: string | null;
 		cover_url?: string | null;
 	};
@@ -23,7 +22,7 @@
 				<TrackVersionItem
 					version={v}
 					trackTitle={track?.name}
-					trackSlug={track?.slug}
+					trackId={track?.id}
 					trackDescription={track?.description}
 					trackCoverUrl={track?.cover_url}
 					descriptionMode="version"
