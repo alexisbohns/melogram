@@ -26,6 +26,7 @@ tracks:
   available: Morceaux disponibles
   upcoming: Morceaux à venir
   latests: Dernières sorties
+  see_all: Voir tous les morceaux
   status:
     raw: Brut
     draft: Brouillon
