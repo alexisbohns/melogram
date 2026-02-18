@@ -41,3 +41,11 @@ albums:
 audio:
   no_audio: No audio for this version.
   player: Player
+auth:
+  sign_in: Sign in with Google
+  sign_out: Sign out
+  profile: Profile
+  profile_title: Your profile
+  profile_name: Name
+  profile_email: Email
+  anonymous: Anonymous

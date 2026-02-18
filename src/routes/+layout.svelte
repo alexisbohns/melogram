@@ -3,8 +3,10 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import GlobalPlayer from '$lib/components/GlobalPlayer.svelte';
 	import Logo from '$lib/components/Logo.svelte';
+	import AuthStatus from '$lib/components/AuthStatus.svelte';
 
-	let { children } = $props();
+	let { children, data } = $props();
+	const user = $derived(data?.user ?? null);
 </script>
 
 <svelte:head>
@@ -20,6 +22,7 @@
 	<a class="logo-link" href="/" aria-label="Go to home">
 		<Logo />
 	</a>
+	<AuthStatus {user} />
 </header>
 <main>
 	{@render children?.()}
@@ -31,8 +34,8 @@
 <style lang="stylus">
     header
         display flex
-        flex-direction column
-        align-items flex-start
+        align-items center
+        justify-content space-between
         padding 1rem
         max-width 600px
         margin 0 auto

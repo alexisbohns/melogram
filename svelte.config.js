@@ -8,7 +8,7 @@ const config = {
 	// Consult https://svelte.dev/docs/kit/integrations
 	// for more information about preprocessors
 	preprocess: [vitePreprocess(), sveltePreprocess({ stylus: true }), mdsvex()],
-	kit: { adapter: adapter() },
+	kit: { adapter: adapter({ runtime: 'nodejs22.x' }) },
 	extensions: ['.svelte', '.svx']
 };
 
