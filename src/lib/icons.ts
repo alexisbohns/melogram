@@ -17,7 +17,8 @@ import {
 import {
 	faHeart as farHeart,
 	faThumbsUp as farThumbsUp,
-	faSquareMinus as farSquareMinus
+	faSquareMinus as farSquareMinus,
+	faUserCircle as farUserCircle
 } from '@fortawesome/free-regular-svg-icons';
 
 export type { IconDefinition };
@@ -34,6 +35,7 @@ export const icons = {
 	thumbsUpRegular: farThumbsUp as IconDefinition,
 	squareMinus: fasSquareMinus as IconDefinition,
 	squareMinusRegular: farSquareMinus as IconDefinition,
+	userCircle: farUserCircle as IconDefinition,
 	clockRotateLeft: faClockRotateLeft as IconDefinition,
 	forwardStep: faForwardStep as IconDefinition,
 	backwardStep: faBackwardStep as IconDefinition,
