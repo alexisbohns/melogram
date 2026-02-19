@@ -9,4 +9,6 @@ export type TrackOverview = {
 	latest_resource_url: string | null;
 	latest_release_date: string | null;
 	latest_version_id: string | null;
+	like_count: number;
+	liked_by_me: boolean;
 };

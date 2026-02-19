@@ -10,7 +10,6 @@
 	let isReady = false;
 	let isPlaying = false;
 
-	import Reactions from '$lib/components/Reactions.svelte';
 	import PlayerControlButton from '$lib/components/PlayerControlButton.svelte';
 	import { t } from '$lib/i18n/i18n';
 	import {
@@ -53,7 +52,6 @@
 				disabled={!isReady && $gCurrent?.src === src}
 				{isPlaying}
 			/>
-			<Reactions targetType="version" targetId={version_id} />
 		</div>
 	</div>
 {:else}

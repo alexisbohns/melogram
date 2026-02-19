@@ -9,10 +9,12 @@ common:
   lyrics: Paroles
   play: Lire
   pause: Pause
-  neutral: Neutre
-  love: Aimé
-  thumbs_up: Liké
   latest: La plus récente
+  like: Aimer
+  unlike: Ne plus aimer
+  likes_count: '{count} likes'
+  likes_count_one: '1 like'
+  likes_count_zero: '0 like'
 tracks:
   title: Morceaux
   none: Aucun morceau.
@@ -27,6 +29,10 @@ tracks:
   upcoming: Morceaux à venir
   latests: Dernières sorties
   see_all: Voir tous les morceaux
+  my_likes: Mes likes
+  no_liked_tracks: Aucun morceau liké pour le moment.
+  top_tracks: Top morceaux
+  sort_by_likes: Les plus likés
   status:
     raw: Brut
     draft: Brouillon
