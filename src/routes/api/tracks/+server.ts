@@ -5,6 +5,7 @@ const TABLE = 'track_overview';
 
 export const GET: RequestHandler = async ({ locals, url, setHeaders }) => {
 	const supabase = locals.supabase;
+	const user = locals.user;
 
 	const page = Math.max(parseInt(url.searchParams.get('page') ?? '1', 10), 1);
 	const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit') ?? '20', 10), 1), 100);
@@ -53,17 +54,45 @@ export const GET: RequestHandler = async ({ locals, url, setHeaders }) => {
 		case 'name_desc':
 			query = query.order('track_name', { ascending: false });
 			break;
+		case 'likes_desc':
+			query = query.order('like_count', { ascending: false });
+			break;
+		case 'likes_asc':
+			query = query.order('like_count', { ascending: true });
+			break;
 		case 'release_desc':
 		default:
 			query = query.order('latest_release_date', { ascending: false, nullsFirst: false });
 			break;
 	}
 
-	const { data, error, count } = await query.range(from, to).returns<TrackOverview[]>();
+	const { data, error, count } = await query.range(from, to);
 
 	if (error) {
 		return new Response(JSON.stringify({ error: error.message }), { status: 500 });
 	}
+
+	const tracks = (data ?? []) as Array<Omit<TrackOverview, 'liked_by_me'> & { like_count: number }>;
+
+	// Build liked_by_me for each track
+	let likedSet = new Set<string>();
+	if (user && tracks.length > 0) {
+		const trackIds = tracks.map((t) => t.track_id);
+		const { data: likes } = await supabase
+			.from('track_likes')
+			.select('track_id')
+			.eq('user_id', user.id)
+			.in('track_id', trackIds);
+
+		if (likes) {
+			likedSet = new Set(likes.map((l: { track_id: string }) => l.track_id));
+		}
+	}
+
+	const items: TrackOverview[] = tracks.map((t) => ({
+		...t,
+		liked_by_me: likedSet.has(t.track_id)
+	}));
 
 	setHeaders({
 		'Cache-Control': 'private, max-age=30, stale-while-revalidate=60',
@@ -77,7 +106,7 @@ export const GET: RequestHandler = async ({ locals, url, setHeaders }) => {
 			page,
 			limit,
 			total: count ?? 0,
-			items: data ?? []
+			items
 		}),
 		{
 			status: 200,

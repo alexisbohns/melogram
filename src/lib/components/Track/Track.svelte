@@ -43,6 +43,8 @@
 			track_id={track.track_id}
 			latest_status={track.latest_status}
 			latest_release_date={track.latest_release_date}
+			like_count={track.like_count}
+			liked_by_me={track.liked_by_me}
 		/>
 	{/if}
 </article>

@@ -9,10 +9,12 @@ common:
   lyrics: Lyrics
   play: Play
   pause: Pause
-  neutral: Neutral
-  love: Love
-  thumbs_up: Like
   latest: Latest
+  like: Like
+  unlike: Unlike
+  likes_count: '{count} likes'
+  likes_count_one: '1 like'
+  likes_count_zero: '0 likes'
 tracks:
   title: Tracks
   none: No tracks.
@@ -27,6 +29,10 @@ tracks:
   upcoming: Upcoming tracks
   latests: Latests tracks
   see_all: See all tracks
+  my_likes: My likes
+  no_liked_tracks: No liked tracks yet.
+  top_tracks: Top tracks
+  sort_by_likes: Most liked
   status:
     raw: Raw
     draft: Draft
