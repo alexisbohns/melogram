@@ -4,6 +4,7 @@
 	import GlobalPlayer from '$lib/components/GlobalPlayer.svelte';
 	import Logo from '$lib/components/Logo.svelte';
 	import AuthStatus from '$lib/components/AuthStatus.svelte';
+	import ConsentBanner from '$lib/components/ConsentBanner.svelte';
 
 	let { children, data } = $props();
 	const user = $derived(data?.user ?? null);
@@ -30,6 +31,7 @@
 </main>
 
 <div class="fkg_bg"></div>
+<ConsentBanner />
 
 <style lang="stylus">
     header

@@ -3,15 +3,19 @@
  *
  * GDPR considerations
  * -------------------
+ * - Analytics are only collected after the user has explicitly accepted via
+ *   the consent banner (ePrivacy Directive compliance).
  * - For unauthenticated users a randomly generated UUID is stored in
  *   `localStorage` under the key `melogram_anonymous_id`. It contains no
  *   personally identifiable information (PII).
  * - Authenticated users' plays are linked to their Supabase account on the
  *   server side; the anonymous ID is ignored in that case.
  * - No cookies are used for tracking.
- * - Users can remove their anonymous tracking ID at any time by clearing
- *   their browser's localStorage (or calling `clearAnonymousId()` below).
+ * - Users can remove their anonymous tracking ID at any time by declining
+ *   consent (calls `denyConsent()` which removes the key) or by calling
+ *   `clearAnonymousId()` directly.
  */
+import { hasAnalyticsConsent } from '$lib/consent';
 
 const ANONYMOUS_ID_KEY = 'melogram_anonymous_id';
 
@@ -47,6 +51,7 @@ export function clearAnonymousId(): void {
  */
 export async function logPlay(trackId: string, source: string): Promise<void> {
 	if (!trackId) return;
+	if (!hasAnalyticsConsent()) return;
 
 	const key = `${trackId}:${source}`;
 	const now = Date.now();
