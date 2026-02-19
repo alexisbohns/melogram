@@ -3,7 +3,10 @@ import type { RequestHandler } from '@sveltejs/kit';
 export const POST: RequestHandler = async ({ locals, params }) => {
 	const user = locals.user;
 	if (!user) {
-		return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+		return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+			status: 401,
+			headers: { 'Content-Type': 'application/json' }
+		});
 	}
 
 	const trackId = params.trackId;
@@ -12,7 +15,10 @@ export const POST: RequestHandler = async ({ locals, params }) => {
 		.upsert({ user_id: user.id, track_id: trackId }, { onConflict: 'user_id,track_id' });
 
 	if (error) {
-		return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+		return new Response(JSON.stringify({ error: error.message }), {
+			status: 500,
+			headers: { 'Content-Type': 'application/json' }
+		});
 	}
 
 	return new Response(JSON.stringify({ liked_by_me: true }), {
@@ -24,7 +30,10 @@ export const POST: RequestHandler = async ({ locals, params }) => {
 export const DELETE: RequestHandler = async ({ locals, params }) => {
 	const user = locals.user;
 	if (!user) {
-		return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+		return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+			status: 401,
+			headers: { 'Content-Type': 'application/json' }
+		});
 	}
 
 	const trackId = params.trackId;
@@ -35,7 +44,10 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 		.eq('track_id', trackId);
 
 	if (error) {
-		return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+		return new Response(JSON.stringify({ error: error.message }), {
+			status: 500,
+			headers: { 'Content-Type': 'application/json' }
+		});
 	}
 
 	return new Response(JSON.stringify({ liked_by_me: false }), {
