@@ -4,7 +4,10 @@ import type { TrackOverview } from '$lib/types/tracks';
 export const GET: RequestHandler = async ({ locals, url, setHeaders }) => {
 	const user = locals.user;
 	if (!user) {
-		return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+		return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+			status: 401,
+			headers: { 'Content-Type': 'application/json' }
+		});
 	}
 
 	const supabase = locals.supabase;
@@ -25,7 +28,10 @@ export const GET: RequestHandler = async ({ locals, url, setHeaders }) => {
 		.range(from, from + limit - 1);
 
 	if (likesErr) {
-		return new Response(JSON.stringify({ error: likesErr.message }), { status: 500 });
+		return new Response(JSON.stringify({ error: likesErr.message }), {
+			status: 500,
+			headers: { 'Content-Type': 'application/json' }
+		});
 	}
 
 	const likedIds = (likes ?? []).map((l: { track_id: string }) => l.track_id);
@@ -51,7 +57,10 @@ export const GET: RequestHandler = async ({ locals, url, setHeaders }) => {
 		.in('track_id', likedIds);
 
 	if (tracksErr) {
-		return new Response(JSON.stringify({ error: tracksErr.message }), { status: 500 });
+		return new Response(JSON.stringify({ error: tracksErr.message }), {
+			status: 500,
+			headers: { 'Content-Type': 'application/json' }
+		});
 	}
 
 	// 3) Preserve like-date ordering
