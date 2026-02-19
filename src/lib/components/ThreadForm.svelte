@@ -1,11 +1,12 @@
 <script lang="ts">
+	import type { User } from '@supabase/supabase-js';
 	import type { ThreadKind } from '$lib/types/threads';
 	import { t } from '$lib/i18n/i18n';
 	import { createThread } from '$lib/stores/threads';
 
 	export let entityType: string;
 	export let entityId: string;
-	export let user: any;
+	export let user: User | null;
 
 	let body = '';
 	let kind: ThreadKind = 'comment';

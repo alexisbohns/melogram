@@ -19,9 +19,9 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		});
 	}
 
-	let body: any;
+	let payload: { body?: string; parentCommentId?: string };
 	try {
-		body = await request.json();
+		payload = await request.json();
 	} catch {
 		return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
 			status: 400,
@@ -29,7 +29,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		});
 	}
 
-	const { body: commentBody, parentCommentId } = body;
+	const { body: commentBody, parentCommentId } = payload;
 
 	if (!commentBody || typeof commentBody !== 'string' || commentBody.trim().length === 0) {
 		return new Response(JSON.stringify({ error: 'body must be a non-empty string' }), {

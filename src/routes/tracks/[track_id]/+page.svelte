@@ -18,11 +18,13 @@
 		lyrics?: string | null;
 	};
 
+	import type { User } from '@supabase/supabase-js';
+
 	export let data: {
 		track: Track | null;
 		versions: Version[];
 		error: string | null;
-		user?: any;
+		user?: User | null;
 	};
 
 	const { track, versions, error } = data;

@@ -1,5 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import type { ThreadWithComments, ThreadsResponse } from '$lib/types/threads';
+import type { ThreadWithComments, ThreadsResponse, Comment } from '$lib/types/threads';
 
 export const GET: RequestHandler = async ({ locals, url }) => {
 	const limit = Math.min(
@@ -45,7 +45,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
 		const threadIds = sliced.map((t) => t.id);
 
-		let comments: any[] = [];
+		let comments: Comment[] = [];
 		if (threadIds.length > 0) {
 			const { data: commentsData, error: commentsErr } = await locals.supabase
 				.from('comments')
@@ -58,7 +58,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 			}
 		}
 
-		const commentsByThread = new Map<string, any[]>();
+		const commentsByThread = new Map<string, Comment[]>();
 		for (const c of comments) {
 			const list = commentsByThread.get(c.thread_id) ?? [];
 			list.push(c);

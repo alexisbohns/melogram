@@ -1,5 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import type { ThreadWithComments, ThreadsResponse } from '$lib/types/threads';
+import type { ThreadWithComments, ThreadsResponse, Comment } from '$lib/types/threads';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -66,7 +66,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
 		const threadIds = sliced.map((t) => t.id);
 
-		let comments: any[] = [];
+		let comments: Comment[] = [];
 		if (threadIds.length > 0) {
 			const { data: commentsData, error: commentsErr } = await locals.supabase
 				.from('comments')
@@ -79,7 +79,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 			}
 		}
 
-		const commentsByThread = new Map<string, any[]>();
+		const commentsByThread = new Map<string, Comment[]>();
 		for (const c of comments) {
 			const list = commentsByThread.get(c.thread_id) ?? [];
 			list.push(c);
@@ -115,9 +115,9 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		});
 	}
 
-	let body: any;
+	let payload: { entityType?: string; entityId?: string; kind?: string; body?: string };
 	try {
-		body = await request.json();
+		payload = await request.json();
 	} catch {
 		return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
 			status: 400,
@@ -125,7 +125,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		});
 	}
 
-	const { entityType, entityId, kind, body: commentBody } = body;
+	const { entityType, entityId, kind, body: commentBody } = payload;
 
 	if (entityType !== 'track') {
 		return new Response(JSON.stringify({ error: 'entityType must be "track"' }), {
