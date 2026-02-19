@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import PlayerControlButton from '$lib/components/PlayerControlButton.svelte';
 	import { t } from '$lib/i18n/i18n';
 	import {
@@ -15,21 +15,30 @@
 		repeatMode,
 		next,
 		previous,
-		setRepeat
+		setRepeat,
+		subscribeToPlayStart
 	} from '$lib/player/player';
 	import Icon from '$lib/components/Icon.svelte';
 	import { icons } from '$lib/icons';
+	import { logPlay } from '$lib/analytics';
 
 	let containerEl: HTMLDivElement | null = null;
 
 	onMount(() => {
 		if (containerEl) attach(containerEl);
+		const unsubscribe = subscribeToPlayStart((source) => {
+			if (source.trackId && source.playSource) {
+				logPlay(source.trackId, source.playSource);
+			}
+		});
+		return () => {
+			unsubscribe();
+			detach();
+		};
 	});
 
 	// attach when the element becomes available after first track loads
 	$: if (containerEl) attach(containerEl);
-
-	onDestroy(() => detach());
 
 	$: hasTrack = $current !== null;
 	$: hasQueue = ($queue?.length ?? 0) > 0;

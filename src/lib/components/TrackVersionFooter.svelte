@@ -38,7 +38,11 @@
 	async function toggle() {
 		if (!src) return;
 		if ($gCurrent?.src !== src) {
-			await setQueue([{ src, versionId: version_id, title, trackId, coverUrl }], 0, true);
+			await setQueue(
+				[{ src, versionId: version_id, title, trackId, coverUrl, playSource: 'track_page' }],
+				0,
+				true
+			);
 		} else {
 			playerToggle();
 		}

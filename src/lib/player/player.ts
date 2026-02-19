@@ -6,6 +6,8 @@ export type PlayerSource = {
 	title?: string;
 	trackId?: string;
 	coverUrl?: string;
+	/** Analytics context: which page/surface initiated this play. */
+	playSource?: string;
 };
 
 type RepeatMode = 'none' | 'one' | 'all';
@@ -40,6 +42,29 @@ type NavigatorWithMediaSession = Navigator & { mediaSession?: MediaSession };
 type WindowWithMediaMetadata = Window & { MediaMetadata?: typeof MediaMetadata };
 
 let mediaSessionHandlersConfigured = false;
+
+/**
+ * When set, the next WaveSurfer 'play' event is treated as a fresh start
+ * (new load or repeat-one restart) rather than a resume after pause.
+ * Consumed and cleared on the first 'play' event.
+ */
+let pendingPlaySource: PlayerSource | null = null;
+
+type PlayStartListener = (source: PlayerSource) => void;
+const playStartListeners = new Set<PlayStartListener>();
+
+/**
+ * Subscribe to "track freshly started" events (new load or repeat-one
+ * restart). Returns an unsubscribe function.
+ */
+export function subscribeToPlayStart(listener: PlayStartListener): () => void {
+	playStartListeners.add(listener);
+	return () => playStartListeners.delete(listener);
+}
+
+function notifyPlayStarted(source: PlayerSource) {
+	playStartListeners.forEach((l) => l(source));
+}
 
 function getMediaSession(): MediaSession | null {
 	if (typeof navigator === 'undefined') return null;
@@ -191,6 +216,11 @@ async function ensureWaveSurfer() {
 			state.update((s) => ({ ...s, isPlaying: true }));
 			syncPlaybackState('playing');
 			syncPositionState();
+			if (pendingPlaySource) {
+				const src = pendingPlaySource;
+				pendingPlaySource = null;
+				notifyPlayStarted(src);
+			}
 		});
 		ws.on('pause', () => {
 			state.update((s) => ({ ...s, isPlaying: false }));
@@ -424,6 +454,7 @@ export function previous(autoplay = false) {
 
 function performLoad(source: PlayerSource, autoplay: boolean) {
 	if (!ws) return;
+	pendingPlaySource = source;
 	// Register playback before loading to avoid race with fast-ready
 	if (autoplay) {
 		const onReady = () => {
@@ -439,6 +470,7 @@ function handleFinish() {
 	const snapshot = get(state);
 	if (snapshot.repeatMode === 'one') {
 		ws?.setTime?.(0);
+		pendingPlaySource = snapshot.current;
 		ws?.play?.();
 		state.update((s) => ({ ...s, time: 0 }));
 		syncPlaybackState('playing');

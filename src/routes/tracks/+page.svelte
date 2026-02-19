@@ -16,7 +16,8 @@
 		versionId: t.latest_version_id ?? undefined,
 		title: t.track_name,
 		trackId: t.track_id,
-		coverUrl: t.album_cover_url ?? undefined
+		coverUrl: t.album_cover_url ?? undefined,
+		playSource: 'tracks_page'
 	}));
 	$: playlistIndexByTrackId = Object.fromEntries(
 		playlist.map((item, idx) => [item.trackId, idx])
