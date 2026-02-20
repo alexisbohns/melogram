@@ -16,7 +16,7 @@
 {#if show}
 	<div
 		class="consent-banner"
-		role="dialog"
+		role="region"
 		aria-live="polite"
 		aria-label={$t('consent.banner_label')}
 	>
