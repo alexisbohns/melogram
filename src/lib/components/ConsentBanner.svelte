@@ -22,8 +22,8 @@
 	>
 		<p class="consent-text">{$t('consent.banner_text')}</p>
 		<div class="consent-actions">
-			<button class="btn-deny" on:click={denyConsent}>{$t('consent.decline')}</button>
-			<button class="btn-accept" on:click={grantConsent}>{$t('consent.accept')}</button>
+			<button type="button" class="btn-deny" on:click={denyConsent}>{$t('consent.decline')}</button>
+			<button type="button" class="btn-accept" on:click={grantConsent}>{$t('consent.accept')}</button>
 		</div>
 	</div>
 {/if}
