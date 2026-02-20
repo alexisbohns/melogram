@@ -20,6 +20,28 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return new Response(JSON.stringify({ error: 'track_id is required' }), { status: 400 });
 	}
 
+	// Basic UUID format validation to avoid unnecessary database calls and clearer errors.
+	const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+	if (!uuidRegex.test(track_id)) {
+		return new Response(JSON.stringify({ error: 'track_id must be a valid UUID' }), {
+			status: 400
+		});
+	}
+
+	// Optionally verify that the track exists before recording a play.
+	const { data: track, error: trackLookupError } = await supabase
+		.from('tracks')
+		.select('id')
+		.eq('id', track_id)
+		.maybeSingle();
+
+	if (trackLookupError) {
+		return new Response(JSON.stringify({ error: trackLookupError.message }), { status: 500 });
+	}
+
+	if (!track) {
+		return new Response(JSON.stringify({ error: 'Track not found' }), { status: 404 });
+	}
 	const user = locals.user;
 
 	const { error } = await supabase.from('track_plays').insert({
