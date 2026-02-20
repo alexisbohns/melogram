@@ -15,11 +15,9 @@
  *   consent (calls `denyConsent()` which removes the key) or by calling
  *   `clearAnonymousId()` directly.
  */
-import { hasAnalyticsConsent } from '$lib/consent';
+import { hasAnalyticsConsent, ANONYMOUS_ID_KEY } from '$lib/consent';
 
-const ANONYMOUS_ID_KEY = 'melogram_anonymous_id';
-
-/** Minimum milliseconds between two logged plays of the same track+source. */
+const PLAY_COOLDOWN_MS = 10_000;
 const PLAY_COOLDOWN_MS = 10_000;
 
 const recentPlays = new Map<string, number>();
