@@ -55,3 +55,8 @@ auth:
   profile_name: Name
   profile_email: Email
   anonymous: Anonymous
+consent:
+  banner_label: Analytics consent
+  banner_text: We use a local anonymous ID to count song plays and improve the app. No personal data is shared with third parties.
+  accept: Accept
+  decline: Decline

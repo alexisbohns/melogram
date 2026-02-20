@@ -55,3 +55,8 @@ auth:
   profile_name: Nom
   profile_email: Email
   anonymous: Anonyme
+consent:
+  banner_label: Consentement analytique
+  banner_text: Nous utilisons un identifiant local anonyme pour comptabiliser les écoutes et améliorer l'application. Aucune donnée personnelle n'est partagée avec des tiers.
+  accept: Accepter
+  decline: Refuser
