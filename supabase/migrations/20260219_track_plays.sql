@@ -33,10 +33,18 @@ create index if not exists track_plays_created_at_idx  on public.track_plays (cr
 -- Row-level security
 alter table public.track_plays enable row level security;
 
--- Allow any client (anon or authenticated) to insert plays.
+-- Allow authenticated clients to insert their own plays, and the service role
+-- (used by the backend API) to insert any valid play, including anonymous ones.
 create policy "Anyone can insert track plays"
     on public.track_plays for insert
-    with check (true);
+    with check (
+        (
+            auth.role() = 'authenticated'
+            and user_id = auth.uid()
+            and anonymous_id is null
+        )
+        or auth.role() = 'service_role'
+    );
 
 -- Only the owning user can read their own plays; anonymous plays are not
 -- readable by clients (admin/service-role access only).
