@@ -14,7 +14,12 @@ import { writable } from 'svelte/store';
 export type ConsentState = 'granted' | 'denied' | null;
 
 const CONSENT_KEY = 'melogram_analytics_consent';
-const ANONYMOUS_ID_KEY = 'melogram_anonymous_id';
+
+/**
+ * Key used by both `consent.ts` and `analytics.ts` to store the anonymous
+ * tracking UUID. Centralised here to avoid duplication.
+ */
+export const ANONYMOUS_ID_KEY = 'melogram_anonymous_id';
 
 function readConsent(): ConsentState {
 	if (typeof window === 'undefined') return null;

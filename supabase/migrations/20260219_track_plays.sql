@@ -16,11 +16,10 @@ create table if not exists public.track_plays (
     source       text,
     created_at   timestamptz not null default now(),
 
-    -- Either user_id or anonymous_id must be set, never both.
+    -- Exactly one of user_id / anonymous_id must be set (XOR).
+    -- Both null and both non-null are explicitly disallowed.
     constraint track_plays_identity_check check (
-        (user_id is not null and anonymous_id is null)
-        or
-        (user_id is null and anonymous_id is not null)
+        (user_id is not null) <> (anonymous_id is not null)
     )
 );
 

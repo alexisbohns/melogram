@@ -17,7 +17,7 @@
  */
 import { hasAnalyticsConsent, ANONYMOUS_ID_KEY } from '$lib/consent';
 
-const PLAY_COOLDOWN_MS = 10_000;
+/** Minimum milliseconds between two logged plays of the same track+source. */
 const PLAY_COOLDOWN_MS = 10_000;
 
 const recentPlays = new Map<string, number>();
@@ -53,6 +53,12 @@ export async function logPlay(trackId: string, source: string): Promise<void> {
 
 	const key = `${trackId}:${source}`;
 	const now = Date.now();
+
+	// Prune entries that are past the cooldown window to prevent unbounded growth.
+	for (const [k, ts] of recentPlays) {
+		if (now - ts >= PLAY_COOLDOWN_MS) recentPlays.delete(k);
+	}
+
 	const last = recentPlays.get(key);
 	if (last !== undefined && now - last < PLAY_COOLDOWN_MS) {
 		return;

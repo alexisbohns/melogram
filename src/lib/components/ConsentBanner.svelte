@@ -23,7 +23,9 @@
 		<p class="consent-text">{$t('consent.banner_text')}</p>
 		<div class="consent-actions">
 			<button type="button" class="btn-deny" on:click={denyConsent}>{$t('consent.decline')}</button>
-			<button type="button" class="btn-accept" on:click={grantConsent}>{$t('consent.accept')}</button>
+			<button type="button" class="btn-accept" on:click={grantConsent}
+				>{$t('consent.accept')}</button
+			>
 		</div>
 	</div>
 {/if}
@@ -38,7 +40,8 @@
   display flex
   flex-direction column
   gap .75rem
-  padding 1rem 1.25rem
+  // Offset above the global audio player (~90px) so they don't overlap on mobile.
+  padding 1rem 1.25rem 6rem
   background rgba(20, 13, 24, 0.95)
   backdrop-filter blur(12px)
   border-top 1px solid rgba(255,255,255,0.08)
@@ -49,6 +52,8 @@
     flex-direction row
     align-items center
     justify-content space-between
+    // On desktop the player sits at the bottom edge; normal padding is fine.
+    padding 1rem 1.25rem
 
 .consent-text
   font-size 0.85rem
