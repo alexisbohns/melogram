@@ -454,7 +454,9 @@ export function previous(autoplay = false) {
 
 function performLoad(source: PlayerSource, autoplay: boolean) {
 	if (!ws) return;
-	pendingPlaySource = source;
+	if (pendingPlaySource == null) {
+		pendingPlaySource = source;
+	}
 	// Register playback before loading to avoid race with fast-ready
 	if (autoplay) {
 		const onReady = () => {
