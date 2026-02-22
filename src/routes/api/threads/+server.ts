@@ -1,5 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import type { ThreadWithComments, ThreadsResponse, Comment } from '$lib/types/threads';
+import type { Rights } from '$lib/types/rights';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -155,13 +156,20 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		});
 	}
 
+	const { data: rights } = await locals.supabase
+		.from('rights')
+		.select('comments_admin')
+		.eq('user_id', user.id)
+		.maybeSingle<Rights>();
+	const isPublished = rights?.comments_admin === true;
+
 	try {
 		const { data, error } = await locals.supabase.rpc('create_thread_with_comment', {
 			p_entity_type: entityType,
 			p_entity_id: entityId,
 			p_kind: kind,
 			p_body: commentBody.trim(),
-			p_is_published: false
+			p_is_published: isPublished
 		});
 
 		if (error) {
