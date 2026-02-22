@@ -53,7 +53,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 				user_id: user.id,
 				body: commentBody.trim(),
 				parent_comment_id: parentCommentId || null,
-				is_published: true
+				is_published: false
 			})
 			.select()
 			.single();

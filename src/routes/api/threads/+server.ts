@@ -161,7 +161,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			p_entity_id: entityId,
 			p_kind: kind,
 			p_body: commentBody.trim(),
-			p_is_published: true
+			p_is_published: false
 		});
 
 		if (error) {
