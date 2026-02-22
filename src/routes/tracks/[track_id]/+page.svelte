@@ -25,6 +25,7 @@
 		versions: Version[];
 		likeCount: number;
 		likedByMe: boolean;
+		canAnswer: boolean;
 		error: string | null;
 		user?: User | null;
 	};
@@ -33,6 +34,7 @@
 	$: user = data.user ?? null;
 	$: likeCount = data.likeCount ?? 0;
 	$: likedByMe = data.likedByMe ?? false;
+	$: canAnswer = data.canAnswer ?? false;
 
 	$: sorted = (versions ?? [])
 		.slice()
@@ -69,7 +71,7 @@
 			/>
 		</TrackHeader>
 
-		<TrackActivity {track} versions={sorted} {user} />
+		<TrackActivity {track} versions={sorted} {user} {canAnswer} />
 	</section>
 
 	<LyricsSidesheet lyrics={track.lyrics} open={lyricsOpen} on:close={() => (lyricsOpen = false)} />

@@ -1,5 +1,6 @@
 import type { PageServerLoad } from './$types';
 import { supabase } from '$lib/supabaseClient';
+import type { Rights } from '$lib/types/rights';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const { track_id } = params;
@@ -17,6 +18,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			versions: [],
 			likeCount: 0,
 			likedByMe: false,
+			canAnswer: false,
 			error: trackErr?.message ?? 'Track not found'
 		};
 	}
@@ -28,7 +30,14 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		.eq('track_id', track.id);
 
 	if (linksErr) {
-		return { track, versions: [], likeCount: 0, likedByMe: false, error: linksErr.message };
+		return {
+			track,
+			versions: [],
+			likeCount: 0,
+			likedByMe: false,
+			canAnswer: false,
+			error: linksErr.message
+		};
 	}
 
 	const versionIds = (links ?? []).map((l) => l.version_id).filter(Boolean);
@@ -55,6 +64,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	// 5) Check if current user liked this track
 	let likedByMe = false;
+	let canAnswer = false;
 	const user = locals.user;
 	if (user) {
 		const { data: likeRow } = await supabase
@@ -64,6 +74,13 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			.eq('user_id', user.id)
 			.maybeSingle();
 		likedByMe = !!likeRow;
+
+		const { data: rights } = await locals.supabase
+			.from('rights')
+			.select('comments_answers')
+			.eq('user_id', user.id)
+			.maybeSingle<Rights>();
+		canAnswer = rights?.comments_answers === true;
 	}
 
 	return {
@@ -71,6 +88,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		versions: versions ?? [],
 		likeCount: likeCount ?? 0,
 		likedByMe,
+		canAnswer,
 		error: verErr?.message ?? null
 	};
 };
