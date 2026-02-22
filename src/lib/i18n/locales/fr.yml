@@ -47,6 +47,24 @@ albums:
 audio:
   no_audio: Pas d’audio pour cette version.
   player: Lecteur
+threads:
+  title: Commentaires
+  no_threads: Aucun commentaire pour le moment.
+  new_thread: Nouveau commentaire
+  kind_comment: Commentaire
+  kind_question: Question
+  reply: Répondre
+  replies_count: '{count} réponses'
+  replies_count_one: '1 réponse'
+  replies_count_zero: Aucune réponse
+  body_placeholder: Écrivez votre commentaire…
+  submit: Publier
+  reply_placeholder: Écrivez une réponse…
+  submit_reply: Répondre
+  sign_in_to_comment: Connectez-vous pour commenter
+  error_create: Impossible de créer le commentaire.
+  error_reply: Impossible de publier la réponse.
+  error_load: Impossible de charger les commentaires.
 auth:
   sign_in: Se connecter avec Google
   sign_out: Se déconnecter

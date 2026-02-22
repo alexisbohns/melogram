@@ -18,13 +18,17 @@
 		lyrics?: string | null;
 	};
 
+	import type { User } from '@supabase/supabase-js';
+
 	export let data: {
 		track: Track | null;
 		versions: Version[];
 		error: string | null;
+		user?: User | null;
 	};
 
 	const { track, versions, error } = data;
+	$: user = data.user ?? null;
 
 	$: sorted = (versions ?? [])
 		.slice()
@@ -36,7 +40,9 @@
 	import TrackTimeline from '$lib/components/TrackTimeline.svelte';
 	import TrackVersions from '$lib/components/TrackVersions.svelte';
 	import TrackLyrics from '$lib/components/TrackLyrics.svelte';
-	let tab: 'timeline' | 'versions' | 'lyrics' = 'timeline';
+	import ThreadList from '$lib/components/ThreadList.svelte';
+	import ThreadForm from '$lib/components/ThreadForm.svelte';
+	let tab: 'timeline' | 'versions' | 'lyrics' | 'comments' = 'timeline';
 </script>
 
 {#if error}
@@ -51,7 +57,8 @@
 			items={[
 				{ id: 'timeline', label: $t('common.timeline') },
 				{ id: 'versions', label: $t('common.versions') },
-				{ id: 'lyrics', label: $t('common.lyrics') }
+				{ id: 'lyrics', label: $t('common.lyrics') },
+				{ id: 'comments', label: $t('common.comments') }
 			]}
 			bind:value={tab}
 			ariaLabel={$t('common.versions')}
@@ -61,6 +68,9 @@
 			<TrackTimeline {track} versions={sorted} />
 		{:else if tab === 'versions'}
 			<TrackVersions {track} versions={sorted} />
+		{:else if tab === 'comments'}
+			<ThreadForm entityType="track" entityId={track.id} {user} />
+			<ThreadList entityType="track" entityId={track.id} />
 		{:else}
 			<TrackLyrics {track} />
 		{/if}

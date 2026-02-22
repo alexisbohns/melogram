@@ -47,6 +47,24 @@ albums:
 audio:
   no_audio: No audio for this version.
   player: Player
+threads:
+  title: Comments
+  no_threads: No comments yet.
+  new_thread: New comment
+  kind_comment: Comment
+  kind_question: Question
+  reply: Reply
+  replies_count: '{count} replies'
+  replies_count_one: '1 reply'
+  replies_count_zero: No replies
+  body_placeholder: Write your comment…
+  submit: Post
+  reply_placeholder: Write a reply…
+  submit_reply: Reply
+  sign_in_to_comment: Sign in to comment
+  error_create: Could not create comment.
+  error_reply: Could not post reply.
+  error_load: Could not load comments.
 auth:
   sign_in: Sign in with Google
   sign_out: Sign out
