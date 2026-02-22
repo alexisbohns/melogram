@@ -9,7 +9,9 @@ import {
 	faClockRotateLeft,
 	faForwardStep,
 	faBackwardStep,
-	faRepeat
+	faRepeat,
+	faMicrophone,
+	faXmark
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -31,5 +33,7 @@ export const icons = {
 	clockRotateLeft: faClockRotateLeft as IconDefinition,
 	forwardStep: faForwardStep as IconDefinition,
 	backwardStep: faBackwardStep as IconDefinition,
-	repeat: faRepeat as IconDefinition
+	repeat: faRepeat as IconDefinition,
+	microphone: faMicrophone as IconDefinition,
+	xmark: faXmark as IconDefinition
 };
