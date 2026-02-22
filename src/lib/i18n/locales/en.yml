@@ -1,12 +1,8 @@
 common:
   back: Back
   home: Home
-  comments: Comments
-  versions: Versions
   featured: Featured
   history: History
-  timeline: Timeline
-  lyrics: Lyrics
   play: Play
   pause: Pause
   latest: Latest
@@ -15,6 +11,8 @@ common:
   likes_count: '{count} likes'
   likes_count_one: '1 like'
   likes_count_zero: '0 likes'
+  show_lyrics: Lyrics
+  close: Close
 tracks:
   title: Tracks
   none: No tracks.
@@ -24,6 +22,7 @@ tracks:
   history_title: Previous versions
   no_other_versions: No other versions.
   no_versions: No versions yet.
+  no_lyrics: No lyrics available.
   slug_label: Slug
   available: Available tracks
   upcoming: Upcoming tracks
