@@ -10,7 +10,7 @@ import {
 	faForwardStep,
 	faBackwardStep,
 	faRepeat,
-	faHourglass
+	faHourglass,
 	faMicrophone,
 	faXmark
 } from '@fortawesome/free-solid-svg-icons';

@@ -19,7 +19,12 @@
 <svelte:window on:keydown={handleKeydown} />
 
 {#if open}
-	<div class="lyrics-sidesheet" role="dialog" aria-modal="true" aria-label={$t('common.show_lyrics')}>
+	<div
+		class="lyrics-sidesheet"
+		role="dialog"
+		aria-modal="true"
+		aria-label={$t('common.show_lyrics')}
+	>
 		<div class="lyrics-sidesheet-header">
 			<h2>{$t('common.show_lyrics')}</h2>
 			<button

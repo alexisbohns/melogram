@@ -72,11 +72,7 @@
 		<TrackActivity {track} versions={sorted} {user} />
 	</section>
 
-	<LyricsSidesheet
-		lyrics={track.lyrics}
-		open={lyricsOpen}
-		on:close={() => (lyricsOpen = false)}
-	/>
+	<LyricsSidesheet lyrics={track.lyrics} open={lyricsOpen} on:close={() => (lyricsOpen = false)} />
 {/if}
 
 <style lang="stylus">
