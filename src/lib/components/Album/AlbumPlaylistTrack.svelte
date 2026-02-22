@@ -40,11 +40,7 @@
 	}
 </script>
 
-<div
-	class="album-playlist-track"
-	class:no-audio={!track.latest_resource_url}
-	class:upcoming={!track.latest_version_id}
->
+<div class="album-playlist-track" class:upcoming={!track.latest_version_id}>
 	{#if track.latest_resource_url}
 		<PlayerControlButton
 			on:click={toggle}
@@ -52,7 +48,7 @@
 			{isPlaying}
 		/>
 	{:else}
-		<div class="track-play-placeholder" aria-hidden="true"></div>
+		<PlayerControlButton upcoming />
 	{/if}
 
 	<div class="track-info">
@@ -77,11 +73,6 @@
 
   &.upcoming
     opacity 0.5
-
-.track-play-placeholder
-  width 2rem
-  min-width 2rem
-  height 2rem
 
 .track-info
   flex 1

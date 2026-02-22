@@ -45,7 +45,7 @@ albums:
   none: Aucun album pour le moment.
   not_found: Album introuvable.
   play_album: Lire l'album
-  upcoming_tracks: Morceaux à venir
+  upcoming_tracks: À venir
 audio:
   no_audio: Pas d’audio pour cette version.
   player: Lecteur
