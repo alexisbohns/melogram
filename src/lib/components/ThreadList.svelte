@@ -12,6 +12,7 @@
 
 	export let entityType: string;
 	export let entityId: string;
+	export let canAnswer: boolean = false;
 
 	import { onMount } from 'svelte';
 
@@ -31,7 +32,7 @@
 
 	<ul class="threads">
 		{#each $threads as thread (thread.id)}
-			<ThreadItem {thread} {entityType} {entityId} />
+			<ThreadItem {thread} {entityType} {entityId} {canAnswer} />
 		{/each}
 	</ul>
 

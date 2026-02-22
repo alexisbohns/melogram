@@ -25,10 +25,12 @@
 		versions: Version[];
 		error: string | null;
 		user?: User | null;
+		canAnswer: boolean;
 	};
 
 	const { track, versions, error } = data;
 	$: user = data.user ?? null;
+	$: canAnswer = data.canAnswer ?? false;
 
 	$: sorted = (versions ?? [])
 		.slice()
@@ -70,7 +72,7 @@
 			<TrackVersions {track} versions={sorted} />
 		{:else if tab === 'comments'}
 			<ThreadForm entityType="track" entityId={track.id} {user} />
-			<ThreadList entityType="track" entityId={track.id} />
+			<ThreadList entityType="track" entityId={track.id} {canAnswer} />
 		{:else}
 			<TrackLyrics {track} />
 		{/if}

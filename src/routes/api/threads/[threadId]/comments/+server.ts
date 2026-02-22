@@ -48,10 +48,18 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 
 	const { data: rights } = await locals.supabase
 		.from('rights')
-		.select('comments_admin')
+		.select('comments_admin, comments_answers')
 		.eq('user_id', user.id)
 		.maybeSingle<Rights>();
-	const isPublished = rights?.comments_admin === true;
+
+	if (rights?.comments_answers !== true) {
+		return new Response(JSON.stringify({ error: 'Forbidden' }), {
+			status: 403,
+			headers: { 'Content-Type': 'application/json' }
+		});
+	}
+
+	const isPublished = rights.comments_admin === true;
 
 	try {
 		const { data, error } = await locals.supabase
