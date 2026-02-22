@@ -1,4 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
+import type { Rights } from '$lib/types/rights';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -45,6 +46,13 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		});
 	}
 
+	const { data: rights } = await locals.supabase
+		.from('rights')
+		.select('comments_admin')
+		.eq('user_id', user.id)
+		.maybeSingle<Rights>();
+	const isPublished = rights?.comments_admin === true;
+
 	try {
 		const { data, error } = await locals.supabase
 			.from('comments')
@@ -53,7 +61,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 				user_id: user.id,
 				body: commentBody.trim(),
 				parent_comment_id: parentCommentId || null,
-				is_published: false
+				is_published: isPublished
 			})
 			.select()
 			.single();
