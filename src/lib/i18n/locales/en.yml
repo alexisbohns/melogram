@@ -43,6 +43,8 @@ albums:
   collection_title: Collections
   none: No albums yet.
   not_found: Album not found.
+  play_album: Play album
+  upcoming_tracks: Upcoming
 audio:
   no_audio: No audio for this version.
   player: Player

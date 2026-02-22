@@ -6,23 +6,27 @@
 
 	export let isPlaying = false;
 	export let disabled = false;
+	export let upcoming = false;
 
 	const dispatch = createEventDispatcher<{ click: MouseEvent }>();
 
 	function handleClick(event: MouseEvent) {
+		if (upcoming) return;
 		dispatch('click', event);
 	}
 </script>
 
 <button
 	type="button"
-	class="player-control {isPlaying ? 'playing' : ''}"
+	class="player-control {isPlaying ? 'playing' : ''} {upcoming ? 'upcoming' : ''}"
 	on:click={handleClick}
-	{disabled}
-	aria-label={isPlaying ? $t('common.pause') : $t('common.play')}
-	aria-pressed={isPlaying}
+	disabled={disabled || upcoming}
+	aria-label={upcoming ? $t('tracks.upcoming') : isPlaying ? $t('common.pause') : $t('common.play')}
+	aria-pressed={!upcoming ? isPlaying : undefined}
 >
-	{#if isPlaying}
+	{#if upcoming}
+		<Icon icon={icons.hourglass} size={14} label={$t('tracks.upcoming')} />
+	{:else if isPlaying}
 		<Icon icon={icons.pause} size={16} label={$t('common.pause')} />
 	{:else}
 		<Icon icon={icons.play} size={16} label={$t('common.play')} />
@@ -59,6 +63,11 @@
     mix-blend-mode unset
     color var(--background)
 
+  &.upcoming
+    opacity 0.4
+    padding-left 0
+    cursor wait
+
   &:disabled
     opacity .5
     cursor default
@@ -66,4 +75,7 @@
   &:active
     transform translate(0, 2px)
     opacity 0.8
+
+  &.upcoming:active
+    transform none
 </style>

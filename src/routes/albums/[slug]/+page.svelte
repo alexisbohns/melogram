@@ -3,8 +3,7 @@
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import type { Album } from '$lib/types/albums';
 	import type { TrackOverview } from '$lib/types/tracks';
-	import Track from '$lib/components/Track/Track.svelte';
-	import SectionHeading from '$lib/components/SectionHeading.svelte';
+	import AlbumPlaylist from '$lib/components/Album/AlbumPlaylist.svelte';
 
 	export let data: {
 		album: Album | null;
@@ -20,21 +19,6 @@
 		{ label: $t('albums.title'), href: '/albums' },
 		...(album ? [{ label: album.name }] : [])
 	];
-
-	$: availableTracks = tracks.filter((t) => Boolean(t.latest_version_id));
-	$: upcomingTracks = tracks.filter((t) => !t.latest_version_id);
-	$: playableTracks = availableTracks.filter((t) => Boolean(t.latest_resource_url));
-	$: playlist = playableTracks.map((t) => ({
-		src: t.latest_resource_url as string,
-		versionId: t.latest_version_id ?? undefined,
-		title: t.track_name,
-		trackId: t.track_id,
-		coverUrl: t.album_cover_url ?? undefined,
-		playSource: 'album_page'
-	}));
-	$: playlistIndexByTrackId = Object.fromEntries(
-		playlist.map((item, idx) => [item.trackId, idx])
-	) as Record<string, number>;
 </script>
 
 <svelte:head>
@@ -49,59 +33,11 @@
 	<section class="album-page">
 		<Breadcrumbs items={crumbs} ariaLabel={$t('albums.title')} />
 
-		<section class="album-hero">
-			<header class="album-header">
-				<h1>{album.name}</h1>
-				{#if album.description}
-					<p class="album-description">{album.description}</p>
-				{/if}
-			</header>
+		{#if tracksError}
+			<p class="error">{tracksError}</p>
+		{/if}
 
-			{#if album.cover_url}
-				<div class="album-cover">
-					<img src={album.cover_url} alt={album.name} loading="lazy" />
-				</div>
-			{/if}
-		</section>
-
-		<section class="album-tracks">
-			{#if tracksError}
-				<p class="error">{tracksError}</p>
-			{:else if tracks.length === 0}
-				<p class="empty">{$t('tracks.none')}</p>
-			{:else}
-				{#if availableTracks.length > 0}
-					<section class="album-tracks-section">
-						<SectionHeading>{$t('tracks.available')}</SectionHeading>
-						<div class="album-tracks-list">
-							{#each availableTracks as track (track.track_id)}
-								<Track
-									{track}
-									variant="album"
-									{playlist}
-									playlistIndex={playlistIndexByTrackId[track.track_id] ?? null}
-								/>
-							{/each}
-						</div>
-					</section>
-				{/if}
-
-				{#if upcomingTracks.length > 0}
-					<section class="album-tracks-section album-tracks-upcoming">
-						<SectionHeading>{$t('tracks.upcoming')}</SectionHeading>
-						<div class="album-tracks-list">
-							{#each upcomingTracks as track (track.track_id)}
-								<Track {track} variant="album" muted />
-							{/each}
-						</div>
-					</section>
-				{/if}
-
-				{#if availableTracks.length === 0 && upcomingTracks.length === 0}
-					<p class="empty">{$t('tracks.none')}</p>
-				{/if}
-			{/if}
-		</section>
+		<AlbumPlaylist {album} {tracks} />
 	</section>
 {/if}
 
@@ -110,57 +46,6 @@
 		display flex
 		flex-direction column
 		gap 2rem
-
-	.album-hero
-		display flex
-		flex-direction column
-		gap 1rem
-
-	.album-header
-		display flex
-		flex-direction column
-		gap 0.5rem
-
-	h1
-		font-family var(--font-captions)
-		font-size 2.4rem
-		letter-spacing 0.07em
-		line-height 1.2
-
-	.album-description
-		color var(--tertiary)
-		opacity 0.9
-		font-size 1.1rem
-		line-height 1.6
-
-	.album-cover
-		align-self center
-		width 100%
-		max-width 520px
-		border-radius 1.25rem
-		overflow hidden
-		background rgba(255,255,255,0.03)
-
-	img
-		width 100%
-		height auto
-		display block
-		box-shadow 0 22px 70px rgba(0,0,0,0.38)
-
-	.album-tracks
-		display flex
-		flex-direction column
-		gap 3rem
-
-	.album-tracks-section
-		display flex
-		flex-direction column
-		gap 2rem
-
-	.album-tracks-list
-		display flex
-		flex-direction column
-		gap 0.5rem
 
 	.empty, .error
 		opacity 0.75

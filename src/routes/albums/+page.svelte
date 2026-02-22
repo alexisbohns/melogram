@@ -1,10 +1,10 @@
 <script lang="ts">
-	import AlbumsList from '$lib/components/Album/AlbumsList.svelte';
+	import AlbumPlaylist from '$lib/components/Album/AlbumPlaylist.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import { t } from '$lib/i18n/i18n';
-	import type { Album } from '$lib/types/albums';
+	import type { AlbumWithTracks } from '$lib/types/albums';
 
-	export let data: { albums: Album[]; error: string | null };
+	export let data: { albums: AlbumWithTracks[]; error: string | null };
 
 	const { albums = [], error = null } = data;
 
@@ -22,7 +22,17 @@
 		<h1>{$t('albums.collection_title')}</h1>
 	</header>
 
-	<AlbumsList {albums} {error} />
+	{#if error}
+		<p class="error">{error}</p>
+	{:else if albums.length === 0}
+		<p class="empty">{$t('albums.none')}</p>
+	{:else}
+		<div class="albums-list">
+			{#each albums as album (album.id)}
+				<AlbumPlaylist {album} tracks={album.tracks} />
+			{/each}
+		</div>
+	{/if}
 </section>
 
 <style lang="stylus">
@@ -42,4 +52,14 @@
     font-size 2.1rem
     letter-spacing 0.07em
 
+.albums-list
+  display flex
+  flex-direction column
+
+.empty, .error
+  opacity 0.75
+  font-size 0.95rem
+
+.error
+  color #dc2626
 </style>

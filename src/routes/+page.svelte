@@ -1,8 +1,8 @@
 <script lang="ts">
-	import AlbumsList from '$lib/components/Album/AlbumsList.svelte';
+	import AlbumPlaylist from '$lib/components/Album/AlbumPlaylist.svelte';
 	import Track from '$lib/components/Track/Track.svelte';
 	import { t } from '$lib/i18n/i18n';
-	import type { Album } from '$lib/types/albums';
+	import type { AlbumWithTracks } from '$lib/types/albums';
 	import type { TrackOverview } from '$lib/types/tracks';
 	import SectionHeading from '$lib/components/SectionHeading.svelte';
 
@@ -15,7 +15,7 @@
 	}: {
 		tracks: TrackOverview[];
 		tracksError: string | null;
-		albums: Album[];
+		albums: AlbumWithTracks[];
 		albumsError: string | null;
 	} = data;
 
@@ -74,7 +74,17 @@
 	<section class="collections">
 		<SectionHeading>{$t('albums.collection_title')}</SectionHeading>
 
-		<AlbumsList {albums} error={albumsError} />
+		{#if albumsError}<p class="error">{albumsError}</p>{/if}
+
+		{#if albums.length === 0}
+			<p class="empty">{$t('albums.none')}</p>
+		{:else}
+			<div class="albums-list">
+				{#each albums as album (album.id)}
+					<AlbumPlaylist {album} tracks={album.tracks} />
+				{/each}
+			</div>
+		{/if}
 	</section>
 </section>
 
@@ -117,6 +127,10 @@
   display flex
   flex-direction column
   gap 1rem
+
+.albums-list
+  display flex
+  flex-direction column
 
 .empty, .error
   opacity 0.7
