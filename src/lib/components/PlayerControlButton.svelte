@@ -64,11 +64,9 @@
     color var(--background)
 
   &.upcoming
-    background transparent
-    mix-blend-mode plus-lighter
     opacity 0.4
     padding-left 0
-    cursor default
+    cursor wait
 
   &:disabled
     opacity .5
