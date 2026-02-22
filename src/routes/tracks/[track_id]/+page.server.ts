@@ -1,7 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { supabase } from '$lib/supabaseClient';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 	const { track_id } = params;
 
 	// 1) Fetch the track by id
@@ -12,7 +12,13 @@ export const load: PageServerLoad = async ({ params }) => {
 		.single();
 
 	if (trackErr || !track) {
-		return { track: null, versions: [], error: trackErr?.message ?? 'Track not found' };
+		return {
+			track: null,
+			versions: [],
+			likeCount: 0,
+			likedByMe: false,
+			error: trackErr?.message ?? 'Track not found'
+		};
 	}
 
 	// 2) Get version ids linked to this track via join table (no FK embedding required)
@@ -22,21 +28,49 @@ export const load: PageServerLoad = async ({ params }) => {
 		.eq('track_id', track.id);
 
 	if (linksErr) {
-		return { track, versions: [], error: linksErr.message };
+		return { track, versions: [], likeCount: 0, likedByMe: false, error: linksErr.message };
 	}
 
 	const versionIds = (links ?? []).map((l) => l.version_id).filter(Boolean);
 
-	if (versionIds.length === 0) {
-		return { track, versions: [], error: null };
+	let versions: any[] = [];
+	let verErr: any = null;
+
+	if (versionIds.length > 0) {
+		// 3) Fetch the versions themselves, ordered by release_date desc
+		const result = await supabase
+			.from('versions')
+			.select('id, name, resource_url, release_date, status, description')
+			.in('id', versionIds)
+			.order('release_date', { ascending: false });
+		versions = result.data ?? [];
+		verErr = result.error;
 	}
 
-	// 3) Fetch the versions themselves, ordered by release_date desc
-	const { data: versions, error: verErr } = await supabase
-		.from('versions')
-		.select('id, name, resource_url, release_date, status, description')
-		.in('id', versionIds)
-		.order('release_date', { ascending: false });
+	// 4) Fetch like count
+	const { count: likeCount } = await supabase
+		.from('track_likes')
+		.select('*', { count: 'exact', head: true })
+		.eq('track_id', track.id);
 
-	return { track, versions: versions ?? [], error: verErr?.message ?? null };
+	// 5) Check if current user liked this track
+	let likedByMe = false;
+	const user = locals.user;
+	if (user) {
+		const { data: likeRow } = await supabase
+			.from('track_likes')
+			.select('user_id')
+			.eq('track_id', track.id)
+			.eq('user_id', user.id)
+			.maybeSingle();
+		likedByMe = !!likeRow;
+	}
+
+	return {
+		track,
+		versions: versions ?? [],
+		likeCount: likeCount ?? 0,
+		likedByMe,
+		error: verErr?.message ?? null
+	};
 };

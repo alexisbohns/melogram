@@ -11,6 +11,8 @@ import {
 	faBackwardStep,
 	faRepeat,
 	faHourglass
+	faMicrophone,
+	faXmark
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -33,5 +35,7 @@ export const icons = {
 	forwardStep: faForwardStep as IconDefinition,
 	backwardStep: faBackwardStep as IconDefinition,
 	repeat: faRepeat as IconDefinition,
-	hourglass: faHourglass as IconDefinition
+	hourglass: faHourglass as IconDefinition,
+	microphone: faMicrophone as IconDefinition,
+	xmark: faXmark as IconDefinition
 };
