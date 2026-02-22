@@ -1,12 +1,8 @@
 common:
   back: Retour
   home: Accueil
-  comments: Commentaires
-  versions: Versions
   featured: Mise en avant
   history: Historique
-  timeline: Chronologie
-  lyrics: Paroles
   play: Lire
   pause: Pause
   latest: La plus récente
@@ -15,6 +11,8 @@ common:
   likes_count: '{count} likes'
   likes_count_one: '1 like'
   likes_count_zero: '0 like'
+  show_lyrics: Paroles
+  close: Fermer
 tracks:
   title: Morceaux
   none: Aucun morceau.
@@ -24,6 +22,7 @@ tracks:
   history_title: Versions antérieures
   no_other_versions: Aucune autre version.
   no_versions: Aucune version pour le moment.
+  no_lyrics: Aucune parole disponible.
   slug_label: Slug
   available: Morceaux disponibles
   upcoming: Morceaux à venir

@@ -23,6 +23,8 @@
 	export let data: {
 		track: Track | null;
 		versions: Version[];
+		likeCount: number;
+		likedByMe: boolean;
 		error: string | null;
 		user?: User | null;
 		canAnswer: boolean;
@@ -31,20 +33,22 @@
 	const { track, versions, error } = data;
 	$: user = data.user ?? null;
 	$: canAnswer = data.canAnswer ?? false;
+	$: likeCount = data.likeCount ?? 0;
+	$: likedByMe = data.likedByMe ?? false;
 
 	$: sorted = (versions ?? [])
 		.slice()
 		.sort((a, b) => new Date(b.release_date).getTime() - new Date(a.release_date).getTime());
 
-	import Tabs from '$lib/components/Tabs.svelte';
+	$: latestVersion = sorted.length > 0 ? sorted[0] : null;
+
 	import TrackHeader from '$lib/components/TrackHeader.svelte';
+	import TrackHeaderActions from '$lib/components/TrackHeaderActions.svelte';
+	import TrackActivity from '$lib/components/TrackActivity.svelte';
+	import LyricsSidesheet from '$lib/components/LyricsSidesheet.svelte';
 	import { t } from '$lib/i18n/i18n';
-	import TrackTimeline from '$lib/components/TrackTimeline.svelte';
-	import TrackVersions from '$lib/components/TrackVersions.svelte';
-	import TrackLyrics from '$lib/components/TrackLyrics.svelte';
-	import ThreadList from '$lib/components/ThreadList.svelte';
-	import ThreadForm from '$lib/components/ThreadForm.svelte';
-	let tab: 'timeline' | 'versions' | 'lyrics' | 'comments' = 'timeline';
+
+	let lyricsOpen = false;
 </script>
 
 {#if error}
@@ -53,34 +57,31 @@
 	<p>{$t('tracks.not_found')}</p>
 {:else}
 	<section>
-		<TrackHeader {track} />
+		<TrackHeader {track}>
+			<TrackHeaderActions
+				trackId={track.id}
+				trackName={track.name}
+				coverUrl={track.cover_url}
+				latestVersionId={latestVersion?.id ?? null}
+				latestResourceUrl={latestVersion?.resource_url ?? null}
+				{likeCount}
+				{likedByMe}
+				hasLyrics={!!track.lyrics}
+				on:toggleLyrics={() => (lyricsOpen = !lyricsOpen)}
+			/>
+		</TrackHeader>
 
-		<Tabs
-			items={[
-				{ id: 'timeline', label: $t('common.timeline') },
-				{ id: 'versions', label: $t('common.versions') },
-				{ id: 'lyrics', label: $t('common.lyrics') },
-				{ id: 'comments', label: $t('common.comments') }
-			]}
-			bind:value={tab}
-			ariaLabel={$t('common.versions')}
-		/>
-
-		{#if tab === 'timeline'}
-			<TrackTimeline {track} versions={sorted} />
-		{:else if tab === 'versions'}
-			<TrackVersions {track} versions={sorted} />
-		{:else if tab === 'comments'}
-			<ThreadForm entityType="track" entityId={track.id} {user} />
-			<ThreadList entityType="track" entityId={track.id} {canAnswer} />
-		{:else}
-			<TrackLyrics {track} />
-		{/if}
+		<TrackActivity {track} versions={sorted} {user} />
 	</section>
+
+	<LyricsSidesheet
+		lyrics={track.lyrics}
+		open={lyricsOpen}
+		on:close={() => (lyricsOpen = false)}
+	/>
 {/if}
 
 <style lang="stylus">
-  // tabs styles moved to Tabs.svelte
   .error
     color #dc2626
 </style>
