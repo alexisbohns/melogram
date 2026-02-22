@@ -24,6 +24,7 @@
 	export let track: Track;
 	export let versions: Version[] = [];
 	export let user: User | null = null;
+	export let canAnswer: boolean = false;
 
 	type ActivityItem =
 		| { type: 'version'; date: string; version: Version }
@@ -83,7 +84,7 @@
 					descriptionMode="version"
 				/>
 			{:else}
-				<ThreadItem thread={item.thread} entityType="track" entityId={track.id} />
+				<ThreadItem thread={item.thread} entityType="track" entityId={track.id} {canAnswer} />
 			{/if}
 		{/each}
 	</ul>

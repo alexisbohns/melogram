@@ -6,6 +6,7 @@
 	export let thread: ThreadWithComments;
 	export let entityType: string;
 	export let entityId: string;
+	export let canAnswer: boolean = false;
 
 	const formatDate = (iso: string) => new Date(iso).toLocaleDateString();
 
@@ -59,17 +60,19 @@
 		</ul>
 	{/if}
 
-	<form class="reply-form" on:submit|preventDefault={handleReply}>
-		<input
-			type="text"
-			bind:value={replyBody}
-			placeholder={$t('threads.reply_placeholder')}
-			disabled={submitting}
-		/>
-		<button type="submit" disabled={!replyBody.trim() || submitting}>
-			{$t('threads.submit_reply')}
-		</button>
-	</form>
+	{#if canAnswer}
+		<form class="reply-form" on:submit|preventDefault={handleReply}>
+			<input
+				type="text"
+				bind:value={replyBody}
+				placeholder={$t('threads.reply_placeholder')}
+				disabled={submitting}
+			/>
+			<button type="submit" disabled={!replyBody.trim() || submitting}>
+				{$t('threads.submit_reply')}
+			</button>
+		</form>
+	{/if}
 </li>
 
 <style lang="stylus">
