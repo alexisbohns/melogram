@@ -4,7 +4,8 @@ import type { TrackOverview } from '$lib/types/tracks';
 
 const TRACKS_URL = '/api/tracks?limit=4&sort=release_desc';
 const ALBUMS_URL = '/api/albums?limit=9&sort=created_desc';
-const ALL_TRACKS_URL = '/api/tracks?limit=200&sort=release_desc';
+// Fetch enough tracks to cover all albums shown on this page (max 9 albums × ~50 tracks each)
+const ALL_TRACKS_URL = '/api/tracks?limit=500&sort=release_desc';
 
 type LoadResult<T> = { items: T[]; error: string | null };
 

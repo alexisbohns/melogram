@@ -3,6 +3,7 @@ import type { Album, AlbumWithTracks } from '$lib/types/albums';
 import type { TrackOverview } from '$lib/types/tracks';
 
 const LIST_URL = '/api/albums?limit=50&sort=created_desc';
+// Fetch enough tracks to cover all albums shown on this page (max 50 albums × ~50 tracks each)
 const ALL_TRACKS_URL = '/api/tracks?limit=500&sort=release_desc';
 
 export const load: PageServerLoad = async ({ fetch }) => {
