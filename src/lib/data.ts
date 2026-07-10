@@ -2,6 +2,11 @@ import { supabase } from "./supabase";
 import type { Album, AlbumWithTracks, Track, TrackLyrics } from "./types";
 
 const ALBUM_COLS = "id,name,description,type,cover_url,created_at";
+
+/** Supabase errors are plain objects; wrap them so logs show a real message. */
+function fail(context: string, error: { message?: string }): never {
+  throw new Error(`${context}: ${error.message ?? JSON.stringify(error)}`);
+}
 const TRACK_COLS =
   "track_id,track_name,track_description,album_id,album_name,album_cover_url,latest_version_id,latest_status,latest_resource_url,latest_release_date,like_count";
 
@@ -32,8 +37,8 @@ export async function getAlbumsWithTracks(): Promise<AlbumWithTracks[]> {
       .order("latest_release_date", { ascending: false }),
   ]);
 
-  if (albumsRes.error) throw albumsRes.error;
-  if (tracksRes.error) throw tracksRes.error;
+  if (albumsRes.error) fail("Failed to load albums", albumsRes.error);
+  if (tracksRes.error) fail("Failed to load tracks", tracksRes.error);
 
   return groupTracks(
     (albumsRes.data ?? []) as Album[],
@@ -54,7 +59,7 @@ export async function getAlbumWithTracks(
   ]);
 
   if (albumRes.error || !albumRes.data) return null;
-  if (tracksRes.error) throw tracksRes.error;
+  if (tracksRes.error) fail("Failed to load album tracks", tracksRes.error);
 
   return {
     ...(albumRes.data as Album),
@@ -68,7 +73,7 @@ export async function getLyrics(trackIds: string[]): Promise<TrackLyrics> {
     .from("tracks")
     .select("id,lyrics")
     .in("id", trackIds);
-  if (error) throw error;
+  if (error) fail("Failed to load lyrics", error);
   return Object.fromEntries(
     (data ?? []).map((row) => [row.id as string, row.lyrics as string | null])
   );
