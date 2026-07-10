@@ -1,0 +1,56 @@
+.cover {
+  position: relative;
+  width: calc(var(--size) * 1.16);
+  height: var(--size);
+  flex-shrink: 0;
+}
+
+.wrap {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--size);
+  height: var(--size);
+  border-radius: calc(var(--size) * 0.05) calc(var(--size) * 0.1)
+    calc(var(--size) * 0.1) calc(var(--size) * 0.05);
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.wrap img {
+  object-fit: cover;
+}
+
+.texture {
+  position: absolute;
+  inset: 0;
+  background: url("/cover-texture.png") center / cover;
+  /* Figma: LINEAR_BURN image fill over the art */
+  mix-blend-mode: multiply;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    var(--album-deep),
+    color-mix(in srgb, var(--album-accent) 40%, var(--bg))
+  );
+}
+
+.vinyl {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  translate: 0 -50%;
+  width: calc(var(--size) * 0.94);
+  aspect-ratio: 1;
+  z-index: 0;
+}
+
+.vinyl img {
+  object-fit: contain;
+}

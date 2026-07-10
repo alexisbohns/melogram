@@ -1,0 +1,161 @@
+/* floating card above the bottom edge (safe-area aware for iOS) */
+.bar {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  max-width: 1296px;
+  margin-inline: auto;
+  z-index: 40;
+  background: color-mix(in srgb, #1a1118 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--album-light) 8%, transparent);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  transition: translate 0.3s ease, visibility 0s linear 0s;
+}
+
+.bar[data-player-visible="false"] {
+  /* fully off-screen AND unrendered — iOS Safari's translucent toolbar
+     otherwise reveals the area below the viewport */
+  translate: 0 calc(100% + 40px + env(safe-area-inset-bottom));
+  visibility: hidden;
+  pointer-events: none;
+  transition: translate 0.3s ease, visibility 0s linear 0.3s;
+}
+
+.inner {
+  max-width: 1296px;
+  margin-inline: auto;
+  padding: 12px 24px;
+  display: grid;
+  grid-template-columns: minmax(160px, 280px) minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.cover {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  object-fit: cover;
+  background: color-mix(in srgb, var(--album-accent) 10%, transparent);
+}
+
+.titles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.trackName {
+  color: var(--album-light);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.albumName {
+  color: var(--album-accent);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timeline {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.waveform {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.time {
+  color: var(--album-deep);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  min-width: 36px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.controlButton {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-button);
+  color: var(--album-accent);
+  display: grid;
+  place-items: center;
+}
+
+.controlButton:hover {
+  background: color-mix(in srgb, var(--album-accent) 10%, transparent);
+}
+
+.repeatOff {
+  color: color-mix(in srgb, var(--album-light) 35%, transparent);
+}
+
+.playButton {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-button);
+  background: var(--album-accent);
+  color: var(--album-light);
+  display: grid;
+  place-items: center;
+}
+
+@media (max-width: 767px) {
+  .inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "meta controls"
+      "timeline timeline";
+    gap: 8px 16px;
+    padding: 12px 16px;
+  }
+
+  .meta {
+    grid-area: meta;
+  }
+
+  .controls {
+    grid-area: controls;
+  }
+
+  .timeline {
+    grid-area: timeline;
+    gap: 12px;
+  }
+}

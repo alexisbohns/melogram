@@ -1,0 +1,6 @@
+.playlist {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-self: stretch;
+}

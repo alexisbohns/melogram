@@ -1,0 +1,239 @@
+/* The whole header composites over the dark mauve page background:
+   soft grey content renders pink through color-dodge. No transform/
+   opacity/isolation on wrappers between body and this element. */
+.header {
+  mix-blend-mode: color-dodge;
+  color: var(--header-fg);
+  display: flex;
+  gap: 32px;
+}
+
+/* ---------- brand ---------- */
+
+.brand {
+  padding: 24px;
+}
+
+.composer {
+  position: relative;
+  display: block;
+}
+
+.picture {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: auto;
+}
+
+.logo {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+
+/* ---------- body ---------- */
+
+.body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.name {
+  font-family: var(--font-gloock), serif;
+  font-size: 24px;
+  line-height: 29px;
+}
+
+.bio {
+  font-size: 16px;
+  line-height: 22px;
+  opacity: 0.6;
+}
+
+/* ---------- menu ---------- */
+
+.menu {
+  display: flex;
+  gap: 32px;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.menuActive {
+  font-weight: 700;
+}
+
+.menuItem {
+  font-weight: 400;
+  opacity: 0.8;
+  cursor: default;
+}
+
+/* ---------- social ---------- */
+
+.social {
+  display: flex;
+  gap: 16px;
+}
+
+.socialItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.socialName {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.socialItem img {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+/* ================= home variant ================= */
+
+@media (min-width: 768px) {
+  .home {
+    align-items: flex-start;
+  }
+
+  .home .brand,
+  .home .body,
+  .home .social {
+    flex: 1 1 0;
+    max-width: 400px;
+  }
+
+  .home .composer {
+    width: 297px;
+    height: 252px;
+    max-width: 100%;
+  }
+
+  .home .picture {
+    height: 237px;
+  }
+
+  .home .logo {
+    width: 210px;
+  }
+
+  .home .social {
+    margin-left: auto;
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 16px;
+  }
+
+  .home .bottomMenu {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .home {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .home .brand {
+    align-self: center;
+  }
+
+  .home .composer {
+    width: 179px;
+    height: 152px;
+  }
+
+  .home .picture {
+    height: 143px;
+  }
+
+  .home .logo {
+    width: 127px;
+  }
+
+  .home .body {
+    gap: 24px;
+  }
+
+  .home .bodyMenu {
+    display: none;
+  }
+
+  .home .social {
+    padding: 16px 24px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  /* Figma HomeMobile: icon before label in the horizontal scroll row */
+  .home .socialItem {
+    flex-direction: row-reverse;
+  }
+
+  .home .social::-webkit-scrollbar {
+    display: none;
+  }
+
+  .home .bottomMenu {
+    padding: 25px;
+    border-top: 1px solid color-mix(in srgb, var(--header-fg) 10%, transparent);
+  }
+}
+
+/* ================= compact variant ================= */
+
+.compact {
+  align-items: center;
+  gap: 0;
+}
+
+.compact .composer {
+  width: 61px;
+  height: 52px;
+}
+
+.compact .picture {
+  height: 49px;
+}
+
+.compact .logo {
+  width: 43px;
+}
+
+.compact .body {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 32px;
+  flex: 1;
+}
+
+.compact .social {
+  padding: 16px;
+}
+
+.compact .bio {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .compact .bodyMenu {
+    display: none;
+  }
+
+  .compact .body {
+    padding: 24px 16px;
+  }
+}

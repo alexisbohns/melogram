@@ -1,0 +1,8 @@
+.infos {
+  color: var(--album-accent);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
