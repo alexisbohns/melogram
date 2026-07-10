@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Heart, Mic, Pause, Play } from "lucide-react";
-import { usePlayer } from "@/player/PlayerProvider";
+import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime, useDuration } from "@/player/durations";
 import type { Track } from "@/lib/types";
 import LyricsSheet from "./LyricsSheet";
@@ -10,22 +10,38 @@ import styles from "./AlbumTrack.module.css";
 
 type Props = {
   track: Track;
+  /** All tracks of the surrounding playlist — queued together on play. */
+  queue: Track[];
   variant?: "simple" | "detailed";
   lyrics?: string | null;
 };
 
 export default function AlbumTrack({
   track,
+  queue,
   variant = "simple",
   lyrics = null,
 }: Props) {
-  const { currentId, isPlaying, toggle } = usePlayer();
+  const { current, isPlaying, toggle, playFrom } = usePlayer();
   const duration = useDuration(track.latest_resource_url);
   const [lyricsOpen, setLyricsOpen] = useState(false);
 
   const playable = Boolean(track.latest_resource_url);
-  const active = currentId === track.track_id && isPlaying;
+  const active = current?.id === track.track_id && isPlaying;
   const detailed = variant === "detailed";
+
+  const onPlayClick = () => {
+    if (!playable) return;
+    if (current?.id === track.track_id) {
+      toggle();
+      return;
+    }
+    const playableTracks = queue.filter((t) => t.latest_resource_url);
+    playFrom(
+      playableTracks.map(toPlayerTrack),
+      playableTracks.findIndex((t) => t.track_id === track.track_id)
+    );
+  };
 
   return (
     <li className={`${styles.track} ${detailed ? styles.detailed : ""}`}>
@@ -34,14 +50,7 @@ export default function AlbumTrack({
         className={`${styles.play} ${active ? styles.playing : ""}`}
         disabled={!playable}
         aria-label={active ? `Pause ${track.track_name}` : `Play ${track.track_name}`}
-        onClick={() =>
-          playable &&
-          toggle({
-            id: track.track_id,
-            name: track.track_name,
-            url: track.latest_resource_url!,
-          })
-        }
+        onClick={onPlayClick}
       >
         {active ? (
           <Pause size={24} strokeWidth={2} />

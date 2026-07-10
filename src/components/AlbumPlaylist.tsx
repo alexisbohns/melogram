@@ -21,6 +21,7 @@ export default function AlbumPlaylist({
         <AlbumTrack
           key={track.track_id}
           track={track}
+          queue={tracks}
           variant={variant}
           lyrics={lyrics[track.track_id] ?? null}
         />

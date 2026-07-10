@@ -56,3 +56,8 @@ img {
   max-width: 100%;
   display: block;
 }
+
+/* keep page content clear of the fixed player bar while it is visible */
+body:has([data-player-visible="true"]) {
+  padding-bottom: 120px;
+}

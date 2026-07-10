@@ -30,6 +30,12 @@ Home and Album pages.
   horizontal strip on mobile) and album detail with track descriptions and a
   lyrics sheet
 
+Playing a track queues its whole album into a global player bar: waveform
+timeline (wavesurfer.js) recolored per album palette, play/pause,
+next/previous, repeat (`all` by default), scrubbing, and MediaSession
+metadata + handlers for lock-screen controls on iOS/Android. Playback
+survives page navigation (the player lives above the router).
+
 ## Development
 
 ```bash
