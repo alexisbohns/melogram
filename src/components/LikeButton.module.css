@@ -1,0 +1,33 @@
+.like {
+  height: 40px;
+  padding: 0 10px;
+  border-radius: var(--radius-button);
+  color: var(--album-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s ease-out, transform 0.1s ease-out, opacity 0.15s ease-out;
+}
+
+.like:hover {
+  color: var(--album-light);
+}
+
+.like:active {
+  transform: scale(0.92);
+}
+
+.like:disabled {
+  cursor: default;
+}
+
+.liked {
+  color: var(--album-light);
+}
+
+.count {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  min-width: 8px;
+}

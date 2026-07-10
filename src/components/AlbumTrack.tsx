@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Heart, Mic, Pause, Play } from "lucide-react";
+import { Mic, Pause, Play } from "lucide-react";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime, useDuration } from "@/player/durations";
 import type { Track } from "@/lib/types";
+import LikeButton from "./LikeButton";
 import LyricsSheet from "./LyricsSheet";
 import styles from "./AlbumTrack.module.css";
 
@@ -65,14 +66,7 @@ export default function AlbumTrack({
         <span className={styles.time}>
           {duration !== null ? formatTime(duration) : "–:–"}
         </span>
-        <button
-          type="button"
-          className={styles.iconButton}
-          aria-label="Like (coming soon)"
-          disabled
-        >
-          <Heart size={20} strokeWidth={2} />
-        </button>
+        <LikeButton trackId={track.track_id} likeCount={track.like_count ?? 0} />
         {detailed && (
           <button
             type="button"

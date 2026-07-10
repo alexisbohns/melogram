@@ -1,0 +1,26 @@
+.wrapper {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 50;
+  display: inline-flex;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  color: var(--album-light);
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, var(--album-light) 14%, transparent);
+  transition: transform 0.2s ease-out, background 0.2s ease-out;
+}
+
+.link:hover {
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  transform: translateY(1px);
+}

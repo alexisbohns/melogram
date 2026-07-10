@@ -18,7 +18,8 @@ try {
   );
 }
 
-/** Anonymous read-only client — no auth in step 1, server-side usage only. */
+/** Anonymous read-only client for public content (albums, tracks, lyrics).
+ *  Not tied to a user session — auth flows use the browser/server clients. */
 export const supabase = createClient(url, anonKey, {
   auth: { persistSession: false },
 });

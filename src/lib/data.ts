@@ -1,4 +1,5 @@
-import { supabase } from "./supabase";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { supabase } from "./supabase/anon";
 import type { Album, AlbumWithTracks, Track, TrackLyrics } from "./types";
 
 const ALBUM_COLS = "id,name,description,type,cover_url,created_at";
@@ -77,4 +78,37 @@ export async function getLyrics(trackIds: string[]): Promise<TrackLyrics> {
   return Object.fromEntries(
     (data ?? []).map((row) => [row.id as string, row.lyrics as string | null])
   );
+}
+
+/**
+ * Tracks the given user has liked, most recently liked first.
+ * Requires an authenticated client (RLS restricts track_likes to the owner).
+ */
+export async function getLikedTracks(
+  client: SupabaseClient,
+  userId: string
+): Promise<Track[]> {
+  const { data: likes, error: likesErr } = await client
+    .from("track_likes")
+    .select("track_id")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+  if (likesErr) fail("Failed to load likes", likesErr);
+
+  const likedIds = (likes ?? []).map((row) => row.track_id as string);
+  if (likedIds.length === 0) return [];
+
+  const { data: tracks, error: tracksErr } = await client
+    .from("track_overview")
+    .select(TRACK_COLS)
+    .in("track_id", likedIds);
+  if (tracksErr) fail("Failed to load liked tracks", tracksErr);
+
+  // Preserve the like-recency order from the track_likes query.
+  const byId = new Map(
+    ((tracks ?? []) as Track[]).map((track) => [track.track_id, track])
+  );
+  return likedIds
+    .map((id) => byId.get(id))
+    .filter((track): track is Track => Boolean(track));
 }
