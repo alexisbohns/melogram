@@ -1,0 +1,52 @@
+.tiles {
+  display: flex;
+  gap: 16px;
+  align-self: stretch;
+}
+
+.tile {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-button);
+  background: color-mix(in srgb, var(--album-accent) 10%, transparent);
+}
+
+.icon {
+  color: var(--album-deep);
+  flex-shrink: 0;
+}
+
+.label {
+  color: var(--album-light);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vertical .tile {
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 8px;
+}
+
+.horizontal .tile {
+  flex-direction: row;
+  gap: 16px;
+  padding: 16px;
+}
+
+/* on mobile the album page tiles stack like the home ones (Figma AlbumMobile) */
+@media (max-width: 767px) {
+  .horizontal .tile {
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 8px;
+  }
+}

@@ -1,0 +1,58 @@
+:root {
+  --bg: #11090c;
+  --header-fg: #eaeaea;
+
+  /* default album palette (overridden per album via inline style) */
+  --album-light: #f2eff5;
+  --album-accent: #7b5e99;
+  --album-deep: #56426b;
+
+  --radius-button: 10px;
+  --radius-cover: 16px;
+  --radius-card: 20px;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  /* the header relies on mix-blend-mode: color-dodge compositing against
+     this background — keep it on body, in the same stacking context */
+  background: var(--bg);
+  color: var(--album-light);
+  font-family: var(--font-grotesk), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+ul {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
