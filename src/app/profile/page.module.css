@@ -1,0 +1,85 @@
+.page {
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px;
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--album-light) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--album-light) 10%, transparent);
+  min-width: 320px;
+  max-width: 420px;
+}
+
+.details {
+  text-align: center;
+}
+
+.name {
+  font-family: var(--font-gloock), serif;
+  font-size: 24px;
+  line-height: 29px;
+  color: var(--album-light);
+}
+
+.email {
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--album-light);
+  opacity: 0.55;
+  margin-top: 4px;
+}
+
+.likesLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--album-accent);
+  transition: color 0.15s ease-out;
+}
+
+.likesLink:hover {
+  color: var(--album-light);
+}
+
+.signout {
+  padding: 10px 20px;
+  border-radius: var(--radius-button);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--album-light);
+  background: color-mix(in srgb, var(--album-accent) 20%, transparent);
+  transition: background 0.15s ease-out;
+}
+
+.signout:hover {
+  background: color-mix(in srgb, var(--album-accent) 35%, transparent);
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding: 0 24px 48px;
+    gap: 16px;
+  }
+
+  .card {
+    min-width: 0;
+    width: 100%;
+  }
+}

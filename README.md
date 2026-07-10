@@ -7,8 +7,9 @@ Home and Album pages.
 ## Stack
 
 - [Next.js 16](https://nextjs.org) (App Router, TypeScript, CSS Modules)
-- [Supabase](https://supabase.com) — read-only queries against `albums`,
-  `track_overview` (view) and `tracks` (lyrics); no authentication in step 1
+- [Supabase](https://supabase.com) — public content (`albums`, `track_overview`
+  view, `tracks` lyrics) plus Google sign-in and per-user likes
+  (`@supabase/ssr`)
 - [lucide-react](https://lucide.dev) icons
 - Fonts: Gloock (display) + Space Grotesk via `next/font`
 
@@ -35,6 +36,29 @@ timeline (wavesurfer.js) recolored per album palette, play/pause,
 next/previous, repeat (`all` by default), scrubbing, and MediaSession
 metadata + handlers for lock-screen controls on iOS/Android. Playback
 survives page navigation (the player lives above the router).
+
+## Accounts & likes
+
+- **Sign in with Google** from the account button (top-right on every page).
+  OAuth runs through Supabase Auth: the browser client starts the flow, Google
+  redirects back to `/auth/callback`, and the route handler exchanges the code
+  for a cookie session. `middleware.ts` keeps the session fresh.
+- **Likes** are per-user and persisted in the `track_likes` table. The heart on
+  each track toggles a row via the browser client (writes are guarded by
+  row-level security), with an optimistic count and rollback on failure. The
+  public catalog stays statically cached (ISR) — only the like state is resolved
+  client-side, so pages don't become per-user dynamic.
+- `/profile` shows the signed-in user and a sign-out control; `/likes` lists the
+  tracks the user has liked, most recent first.
+
+Supabase clients live in `src/lib/supabase/`: `anon.ts` (public read-only
+content), `client.ts` (browser, auth + likes) and `server.ts` (cookie-bound, for
+the callback route and the protected pages). The `track_likes` schema + RLS are
+in `supabase/migrations/20260710_track_likes.sql`.
+
+> The hosted project must have Google enabled as an auth provider and
+> `<site>/auth/callback` in its redirect allow-list. No extra environment
+> variables are needed beyond the two below.
 
 ## Development
 

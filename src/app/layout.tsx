@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Gloock, Space_Grotesk } from "next/font/google";
 import { PlayerProvider } from "@/player/PlayerProvider";
 import PlayerBar from "@/components/PlayerBar";
+import AuthStatus from "@/components/AuthStatus";
+import { LikesProvider } from "@/components/LikesProvider";
 import "./globals.css";
 
 const gloock = Gloock({
@@ -29,10 +31,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${gloock.variable} ${spaceGrotesk.variable}`}>
       <body>
-        <PlayerProvider>
-          {children}
-          <PlayerBar />
-        </PlayerProvider>
+        <LikesProvider>
+          <PlayerProvider>
+            <AuthStatus />
+            {children}
+            <PlayerBar />
+          </PlayerProvider>
+        </LikesProvider>
       </body>
     </html>
   );
