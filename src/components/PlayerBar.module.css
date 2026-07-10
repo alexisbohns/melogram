@@ -1,17 +1,28 @@
+/* floating card above the bottom edge (safe-area aware for iOS) */
 .bar {
   position: fixed;
-  inset: auto 0 0 0;
+  left: 16px;
+  right: 16px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  max-width: 1296px;
+  margin-inline: auto;
   z-index: 40;
   background: color-mix(in srgb, #1a1118 92%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid color-mix(in srgb, var(--album-light) 8%, transparent);
-  transition: translate 0.3s ease;
+  border: 1px solid color-mix(in srgb, var(--album-light) 8%, transparent);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  transition: translate 0.3s ease, visibility 0s linear 0s;
 }
 
 .bar[data-player-visible="false"] {
-  translate: 0 110%;
+  /* fully off-screen AND unrendered — iOS Safari's translucent toolbar
+     otherwise reveals the area below the viewport */
+  translate: 0 calc(100% + 40px + env(safe-area-inset-bottom));
+  visibility: hidden;
   pointer-events: none;
+  transition: translate 0.3s ease, visibility 0s linear 0.3s;
 }
 
 .inner {

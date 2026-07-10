@@ -57,7 +57,7 @@ img {
   display: block;
 }
 
-/* keep page content clear of the fixed player bar while it is visible */
+/* keep page content clear of the floating player bar while it is visible */
 body:has([data-player-visible="true"]) {
-  padding-bottom: 120px;
+  padding-bottom: calc(132px + env(safe-area-inset-bottom));
 }
