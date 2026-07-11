@@ -242,7 +242,7 @@ alter table public.albums
   add column if not exists artist_id uuid references public.artists(id);
 
 update public.albums
-  set artist_id = (select id from public.artists where name = 'bohns' limit 1)
+  set artist_id = (select id from public.artists where lower(name) = 'bohns' limit 1)
   where artist_id is null;
 ```
 
@@ -1133,7 +1133,7 @@ Wire your own account as `owner` of `bohns`, then run one non-rollback smoke tes
 
 ```sql
 select id, email from auth.users;                 -- copy your id
-select id, name from public.artists where name='bohns';
+select id, name from public.artists where lower(name) = 'bohns';
 ```
 
 - [ ] **Step 2: Insert your ownership** (persists — this is intentional)
@@ -1144,7 +1144,7 @@ insert into public.artist_members (artist_id, user_id, role)
 select a.id, u.id, 'owner'
 from public.artists a
 join auth.users u on u.email = 'hello@bohns.design'   -- your login email
-where a.name = 'bohns'
+where lower(a.name) = 'bohns'
 on conflict (artist_id, user_id) do update set role = 'owner';
 ```
 
@@ -1155,7 +1155,7 @@ begin;
 do $$
 declare _artist uuid; _uid uuid; _album uuid; _tid uuid; _vid uuid; _path text;
 begin
-  select id into _artist from public.artists where name = 'bohns' limit 1;
+  select id into _artist from public.artists where lower(name) = 'bohns' limit 1;
   assert _artist is not null, 'bohns artist must exist';
   select user_id into _uid from public.artist_members
     where artist_id = _artist and role = 'owner' limit 1;
