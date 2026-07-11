@@ -81,18 +81,14 @@ create table if not exists public.artist_members (
 
 alter table public.artist_members enable row level security;
 
--- A member may read the membership rows of artists they belong to. No client
--- writes: memberships are seeded manually in the dashboard for now.
+-- A member may read their own membership rows (enough to compute canEdit). This
+-- is intentionally non-recursive: a policy that sub-queries artist_members would
+-- trigger "infinite recursion detected in policy". No client writes: memberships
+-- are seeded manually in the dashboard for now.
 drop policy if exists "members read own artist memberships" on public.artist_members;
 create policy "members read own artist memberships"
   on public.artist_members for select
-  using (
-    exists (
-      select 1 from public.artist_members m
-      where m.artist_id = artist_members.artist_id
-        and m.user_id = auth.uid()
-    )
-  );
+  using (user_id = auth.uid());
 
 -- SECURITY DEFINER so it can read artist_members regardless of the caller's RLS.
 create or replace function public.is_artist_member(_artist_id uuid)
