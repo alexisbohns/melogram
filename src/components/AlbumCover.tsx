@@ -43,7 +43,7 @@ export default function AlbumCover({
         <Image src="/vinyl.png" alt="" fill sizes={`${size}px`} />
       </div>
       <div className={styles.wrap}>
-        {coverUrl ? (
+        {coverUrl && (
           <Image
             src={coverUrl}
             alt={alt}
@@ -51,8 +51,6 @@ export default function AlbumCover({
             sizes={`${size}px`}
             priority={priority}
           />
-        ) : (
-          <div className={styles.placeholder} />
         )}
         <div className={styles.texture} />
       </div>

@@ -30,6 +30,13 @@
   transform-origin: center;
   transition: transform 0.55s var(--ease);
   z-index: 1;
+  /* Palette-coloured backdrop so the cover never shows through (to the vinyl
+     behind it) while the artwork is still loading. */
+  background: linear-gradient(
+    135deg,
+    var(--album-deep),
+    color-mix(in srgb, var(--album-accent) 40%, var(--bg))
+  );
 }
 
 .active .wrap {
@@ -48,16 +55,6 @@
   mix-blend-mode: multiply;
   opacity: 0.6;
   pointer-events: none;
-}
-
-.placeholder {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    var(--album-deep),
-    color-mix(in srgb, var(--album-accent) 40%, var(--bg))
-  );
 }
 
 .vinyl {
