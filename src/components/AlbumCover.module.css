@@ -1,8 +1,21 @@
 .cover {
+  /* Tunable geometry, all as a fraction of --size (the square cover). */
+  --vinyl: 0.94; /* vinyl diameter */
+  --peek: 0.16; /* resting: vinyl overhang beyond the cover's right edge */
+  --slide: 0.46; /* active: extra rightward slide (~66% of the disc exposed) */
+  --tilt: 2deg; /* active: cover rotation */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
   position: relative;
-  width: calc(var(--size) * 1.16);
+  width: calc(var(--size) * (1 + var(--peek)));
   height: var(--size);
   flex-shrink: 0;
+}
+
+/* Reserve room for the fully extracted vinyl (contexts with content to the
+   right of the cover). Without it the vinyl simply overflows when active. */
+.reserve {
+  width: calc(var(--size) * (1 + var(--peek) + var(--slide)));
 }
 
 .wrap {
@@ -14,7 +27,13 @@
     calc(var(--size) * 0.1) calc(var(--size) * 0.05);
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  transform-origin: center;
+  transition: transform 0.55s var(--ease);
   z-index: 1;
+}
+
+.active .wrap {
+  transform: rotate(var(--tilt));
 }
 
 .wrap img {
@@ -44,13 +63,25 @@
 .vinyl {
   position: absolute;
   top: 50%;
-  right: 0;
-  translate: 0 -50%;
-  width: calc(var(--size) * 0.94);
+  left: calc(var(--size) * (1 + var(--peek) - var(--vinyl)));
+  width: calc(var(--size) * var(--vinyl));
   aspect-ratio: 1;
+  transform: translateY(-50%);
+  transition: transform 0.55s var(--ease);
   z-index: 0;
+}
+
+.active .vinyl {
+  transform: translateY(-50%) translateX(calc(var(--size) * var(--slide)));
 }
 
 .vinyl img {
   object-fit: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrap,
+  .vinyl {
+    transition: none;
+  }
 }
