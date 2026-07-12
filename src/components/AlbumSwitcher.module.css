@@ -12,9 +12,10 @@
 }
 
 /* All albums read at full opacity at rest; hovering one fades the rest so the
-   focus sits on the item being pointed at. */
-.switcher:hover .item,
-.switcher:focus-within .item {
+   focus sits on the item being pointed at. The :not() keeps the hovered/focused
+   item itself clear and avoids it losing a specificity race to this rule. */
+.switcher:hover .item:not(:hover),
+.switcher:focus-within .item:not(:focus-visible) {
   opacity: 0.4;
 }
 
