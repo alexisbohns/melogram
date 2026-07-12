@@ -5,6 +5,8 @@ export type Album = {
   description: string | null;
   type: string | null;
   cover_url: string | null;
+  /** Color theme key (see src/lib/palettes.ts); 'auto' derives it from the cover. */
+  theme: string;
   created_at: string;
 };
 

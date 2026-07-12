@@ -2,7 +2,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "./supabase/anon";
 import type { Album, AlbumWithTracks, Genre, Track, TrackLyrics } from "./types";
 
-const ALBUM_COLS = "id,artist_id,name,description,type,cover_url,created_at";
+const ALBUM_COLS =
+  "id,artist_id,name,description,type,cover_url,theme,created_at";
 
 /** Supabase errors are plain objects; wrap them so logs show a real message. */
 function fail(context: string, error: { message?: string }): never {
