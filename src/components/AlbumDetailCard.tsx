@@ -11,6 +11,7 @@ import EditToggle from "./edit/EditToggle";
 import EditableText from "./edit/EditableText";
 import AlbumTypeSelect from "./edit/AlbumTypeSelect";
 import GenrePicker from "./edit/GenrePicker";
+import CoverUploader from "./edit/CoverUploader";
 import { useAlbumEdit } from "./edit/AlbumEditProvider";
 import styles from "./AlbumDetailCard.module.css";
 
@@ -30,12 +31,21 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
         <EditToggle />
       </div>
       <div className={styles.hero}>
-        <AlbumCover
-          coverUrl={album.cover_url}
-          alt={album.name}
-          size={165}
-          priority
-        />
+        {editing ? (
+          <CoverUploader
+            albumId={album.id}
+            coverUrl={album.cover_url}
+            alt={album.name}
+            size={165}
+          />
+        ) : (
+          <AlbumCover
+            coverUrl={album.cover_url}
+            alt={album.name}
+            size={165}
+            priority
+          />
+        )}
         <div className={styles.heroBody}>
           {editing ? (
             <div className={styles.header}>
