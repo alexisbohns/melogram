@@ -7,6 +7,12 @@
   gap: 24px;
 }
 
+/* Slide the vinyl out while the cover is hovered or keyboard-focused. */
+.coverLink:hover,
+.coverLink:focus-visible {
+  --extract: 1;
+}
+
 .description {
   color: var(--album-light);
   font-size: 16px;

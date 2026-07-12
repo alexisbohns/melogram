@@ -13,7 +13,11 @@ export default function AlbumCard({ album }: { album: AlbumWithTracks }) {
 
   return (
     <article className={styles.card} style={paletteVars(palette)}>
-      <Link href={`/albums/${album.id}`} aria-label={album.name}>
+      <Link
+        href={`/albums/${album.id}`}
+        aria-label={album.name}
+        className={styles.coverLink}
+      >
         <AlbumCoverLive
           albumId={album.id}
           coverUrl={album.cover_url}

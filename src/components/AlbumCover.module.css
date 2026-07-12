@@ -18,6 +18,13 @@
   width: calc(var(--size) * (1 + var(--peek) + var(--slide)));
 }
 
+/* --extract (0 resting → 1 extracted) drives the cover tilt and vinyl slide.
+   Set here by the active state; a hovered ancestor (album card / nav item)
+   can also set it, since custom properties inherit into the cover. */
+.active {
+  --extract: 1;
+}
+
 .wrap {
   position: absolute;
   inset: 0 auto 0 0;
@@ -28,6 +35,7 @@
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   transform-origin: center;
+  transform: rotate(calc(var(--extract, 0) * var(--tilt)));
   transition: transform 0.55s var(--ease);
   z-index: 1;
   /* Palette-coloured backdrop so the cover never shows through (to the vinyl
@@ -37,10 +45,6 @@
     var(--album-deep),
     color-mix(in srgb, var(--album-accent) 40%, var(--bg))
   );
-}
-
-.active .wrap {
-  transform: rotate(var(--tilt));
 }
 
 .wrap img {
@@ -63,13 +67,10 @@
   left: calc(var(--size) * (1 + var(--peek) - var(--vinyl)));
   width: calc(var(--size) * var(--vinyl));
   aspect-ratio: 1;
-  transform: translateY(-50%);
+  transform: translateY(-50%)
+    translateX(calc(var(--extract, 0) * var(--size) * var(--slide)));
   transition: transform 0.55s var(--ease);
   z-index: 0;
-}
-
-.active .vinyl {
-  transform: translateY(-50%) translateX(calc(var(--size) * var(--slide)));
 }
 
 .vinyl img {
