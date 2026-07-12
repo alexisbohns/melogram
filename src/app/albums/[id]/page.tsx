@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import AlbumSwitcher from "@/components/AlbumSwitcher";
 import AlbumDetailCard from "@/components/AlbumDetailCard";
-import { getAlbumsWithTracks, getLyrics } from "@/lib/data";
+import { getAlbumsWithTracks, getAlbumWithTracks, getLyrics } from "@/lib/data";
 import styles from "./page.module.css";
 
 export const revalidate = 300;
@@ -22,8 +22,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function AlbumPage({ params }: Props) {
   const { id } = await params;
 
-  const albums = await getAlbumsWithTracks();
-  const album = albums.find((a) => a.id === id);
+  const [albums, album] = await Promise.all([
+    getAlbumsWithTracks(),
+    getAlbumWithTracks(id),
+  ]);
   if (!album) notFound();
 
   const lyrics = await getLyrics(album.tracks.map((t) => t.track_id));
