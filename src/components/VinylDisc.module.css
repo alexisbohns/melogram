@@ -1,0 +1,49 @@
+/* The vinyl engine — three layers stacked inside a circular, blend-isolated
+   frame. See VinylDisc.tsx. Fills its positioned parent (AlbumCover's .vinyl). */
+.disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  /* Contain the luminosity blend to the layers within the disc, so the mask
+     composites against the colour + cover — never the page behind it. */
+  isolation: isolate;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* 1. Solid fill in the album's primary theme colour. */
+.color {
+  position: absolute;
+  inset: 0;
+  background: var(--album-accent);
+}
+
+/* 2. Album cover, centred in a circle (~38% of the disc — matching the Figma
+   layout). Sized just over the mask's transparent hole so its edge tucks under
+   the innermost grooves rather than leaving a colour ring. */
+.cover {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 38%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.cover img {
+  object-fit: cover;
+}
+
+/* 3. Vinyl mask — luminance only, so the grooves take their hue from the theme
+   colour below while the transparent centre reveals the cover. */
+.mask {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: luminosity;
+}
+
+.mask img {
+  object-fit: cover;
+}

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
+import VinylDisc from "./VinylDisc";
 import styles from "./AlbumCover.module.css";
 
 type Props = {
@@ -40,7 +41,7 @@ export default function AlbumCover({
       style={{ "--size": `${size}px` } as CSSProperties}
     >
       <div className={styles.vinyl}>
-        <Image src="/vinyl.png" alt="" fill sizes={`${size}px`} />
+        <VinylDisc coverUrl={coverUrl} size={size} />
       </div>
       <div className={styles.wrap}>
         {coverUrl && (

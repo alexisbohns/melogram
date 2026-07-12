@@ -75,10 +75,6 @@
   z-index: 0;
 }
 
-.vinyl img {
-  object-fit: contain;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .wrap,
   .vinyl {
