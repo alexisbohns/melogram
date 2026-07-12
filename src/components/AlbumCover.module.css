@@ -3,6 +3,7 @@
   --vinyl: 0.94; /* vinyl diameter */
   --peek: 0.16; /* resting: vinyl overhang beyond the cover's right edge */
   --slide: 0.46; /* active: extra rightward slide (~66% of the disc exposed) */
+  --roll: 2.5deg; /* active: vinyl spin, as if rolling out of the sleeve */
   --tilt: -2deg; /* active: cover rotation */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -68,7 +69,8 @@
   width: calc(var(--size) * var(--vinyl));
   aspect-ratio: 1;
   transform: translateY(-50%)
-    translateX(calc(var(--extract, 0) * var(--size) * var(--slide)));
+    translateX(calc(var(--extract, 0) * var(--size) * var(--slide)))
+    rotate(calc(var(--extract, 0) * var(--roll)));
   transition: transform 0.55s var(--ease);
   z-index: 0;
 }
