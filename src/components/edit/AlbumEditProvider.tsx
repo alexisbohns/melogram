@@ -6,18 +6,19 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
 import type { AlbumWithTracks, Genre } from "@/lib/types";
 import {
-  createTrack,
   getMyArtistIds,
   removeTrackFromAlbum,
   reorderSetlist,
   setAlbumGenres,
   updateAlbum,
 } from "@/lib/edit";
+import { revalidateContent } from "@/lib/revalidate";
 
 type Draft = {
   name: string;
@@ -26,13 +27,14 @@ type Draft = {
   genres: Genre[];
 };
 
-export type SetlistItem = { key: string; trackId: string | null; name: string };
+export type SetlistItem = { trackId: string; name: string };
 
 type EditContextValue = {
   canEdit: boolean;
   editing: boolean;
   saving: boolean;
   dirty: boolean;
+  saveError: string | null;
   draft: Draft;
   setlist: SetlistItem[];
   startEditing: () => void;
@@ -40,8 +42,9 @@ type EditContextValue = {
   save: () => Promise<void>;
   setField: <K extends keyof Draft>(key: K, value: Draft[K]) => void;
   moveItem: (index: number, delta: number) => void;
-  removeItem: (key: string) => void;
-  addItem: (name: string) => void;
+  removeItem: (trackId: string) => void;
+  /** Purge the route cache and re-fetch server data (after a drawer commit). */
+  refresh: () => Promise<void>;
   album: AlbumWithTracks;
 };
 
@@ -64,7 +67,6 @@ function draftFrom(album: AlbumWithTracks): Draft {
 
 function setlistFrom(album: AlbumWithTracks): SetlistItem[] {
   return album.tracks.map((t) => ({
-    key: t.track_id,
     trackId: t.track_id,
     name: t.track_name,
   }));
@@ -81,8 +83,17 @@ export function AlbumEditProvider({
   const [canEdit, setCanEdit] = useState(false);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft>(() => draftFrom(album));
   const [setlist, setSetlist] = useState<SetlistItem[]>(() => setlistFrom(album));
+  // Tracks the user removed from the staged setlist (unlinked on Save).
+  const [removedIds, setRemovedIds] = useState<Set<string>>(() => new Set());
+  // Mirror for the merge effect below, which must read the current removals
+  // without re-running on every removal. Declared before it so it syncs first.
+  const removedRef = useRef(removedIds);
+  useEffect(() => {
+    removedRef.current = removedIds;
+  }, [removedIds]);
 
   useEffect(() => {
     let active = true;
@@ -98,9 +109,28 @@ export function AlbumEditProvider({
     };
   }, [album.artist_id]);
 
-  // Re-sync the staged setlist after the server data changes (e.g. router.refresh()).
+  // Merge fresh server data into the staged setlist after every refresh
+  // (drawer commits refresh mid-session): keep the staged order and staged
+  // removals, refresh names, drop tracks deleted server-side, and append
+  // tracks created server-side. A blind reset would wipe staged work.
   useEffect(() => {
-    setSetlist(setlistFrom(album));
+    const server = new Map(album.tracks.map((t) => [t.track_id, t.track_name]));
+    setSetlist((prev) => {
+      const staged = new Set(prev.map((i) => i.trackId));
+      const kept = prev
+        .filter((i) => server.has(i.trackId))
+        .map((i) => ({ trackId: i.trackId, name: server.get(i.trackId)! }));
+      const added = album.tracks
+        .filter(
+          (t) => !staged.has(t.track_id) && !removedRef.current.has(t.track_id)
+        )
+        .map((t) => ({ trackId: t.track_id, name: t.track_name }));
+      return [...kept, ...added];
+    });
+    setRemovedIds((prev) => {
+      const next = new Set([...prev].filter((id) => server.has(id)));
+      return next.size === prev.size ? prev : next;
+    });
   }, [album.tracks]);
 
   const albumDirty = useMemo(() => {
@@ -115,18 +145,27 @@ export function AlbumEditProvider({
   }, [draft, album]);
 
   const setlistDirty = useMemo(() => {
-    const now = setlist.map((i) => i.trackId ?? `+${i.name}`).join(",");
-    const orig = album.tracks.map((t) => t.track_id).join(",");
-    return now !== orig;
-  }, [setlist, album.tracks]);
+    const serverOrder = album.tracks
+      .map((t) => t.track_id)
+      .filter((id) => !removedIds.has(id));
+    return (
+      removedIds.size > 0 ||
+      setlist.map((i) => i.trackId).join(",") !== serverOrder.join(",")
+    );
+  }, [setlist, removedIds, album.tracks]);
 
   const dirty = albumDirty || setlistDirty;
 
-  const startEditing = useCallback(() => setEditing(true), []);
+  const startEditing = useCallback(() => {
+    setSaveError(null);
+    setEditing(true);
+  }, []);
 
   const cancel = useCallback(() => {
     setDraft(draftFrom(album));
     setSetlist(setlistFrom(album));
+    setRemovedIds(new Set());
+    setSaveError(null);
     setEditing(false);
   }, [album]);
 
@@ -146,49 +185,48 @@ export function AlbumEditProvider({
     });
   }, []);
 
-  const removeItem = useCallback((key: string) => {
-    setSetlist((list) => list.filter((i) => i.key !== key));
+  const removeItem = useCallback((trackId: string) => {
+    setSetlist((list) => list.filter((i) => i.trackId !== trackId));
+    setRemovedIds((prev) => new Set(prev).add(trackId));
   }, []);
 
-  const addItem = useCallback((name: string) => {
-    const clean = name.trim();
-    if (!clean) return;
-    setSetlist((list) => [
-      ...list,
-      { key: `new-${list.length}-${clean}`, trackId: null, name: clean },
-    ]);
-  }, []);
+  const refresh = useCallback(async () => {
+    await revalidateContent();
+    router.refresh();
+  }, [router]);
 
   const save = useCallback(async () => {
     setSaving(true);
+    setSaveError(null);
     try {
       if (albumDirty) {
         await updateAlbum(album.id, draft.name, draft.description || null, draft.type);
         await setAlbumGenres(album.id, draft.genres.map((g) => g.id));
       }
       if (setlistDirty) {
-        const keptIds = new Set(
-          setlist.filter((i) => i.trackId).map((i) => i.trackId as string)
-        );
-        for (const t of album.tracks) {
-          if (!keptIds.has(t.track_id)) await removeTrackFromAlbum(album.id, t.track_id);
+        const serverIds = new Set(album.tracks.map((t) => t.track_id));
+        for (const id of removedIds) {
+          if (serverIds.has(id)) await removeTrackFromAlbum(album.id, id);
         }
-        const created: Record<string, string> = {};
-        for (const item of setlist) {
-          if (!item.trackId) created[item.key] = await createTrack(album.id, item.name);
-        }
-        const orderedIds = setlist.map((i) => i.trackId ?? created[i.key]);
+        const orderedIds = setlist
+          .map((i) => i.trackId)
+          .filter((id) => serverIds.has(id));
         if (orderedIds.length) await reorderSetlist(album.id, orderedIds);
+        // Clear only the snapshot this save processed — removals staged
+        // while the RPCs were in flight must survive to the next save.
+        setRemovedIds(
+          (prev) => new Set([...prev].filter((id) => !removedIds.has(id)))
+        );
       }
       setEditing(false);
-      router.refresh();
+      await refresh();
     } catch (err) {
       console.error("Save failed", err);
-      alert("Save failed: " + (err as Error).message);
+      setSaveError((err as Error).message);
     } finally {
       setSaving(false);
     }
-  }, [album, draft, albumDirty, setlist, setlistDirty, router]);
+  }, [album, draft, albumDirty, setlist, setlistDirty, removedIds, refresh]);
 
   const value = useMemo<EditContextValue>(
     () => ({
@@ -196,6 +234,7 @@ export function AlbumEditProvider({
       editing,
       saving,
       dirty,
+      saveError,
       draft,
       setlist,
       startEditing,
@@ -204,12 +243,12 @@ export function AlbumEditProvider({
       setField,
       moveItem,
       removeItem,
-      addItem,
+      refresh,
       album,
     }),
     [
-      canEdit, editing, saving, dirty, draft, setlist,
-      startEditing, cancel, save, setField, moveItem, removeItem, addItem, album,
+      canEdit, editing, saving, dirty, saveError, draft, setlist,
+      startEditing, cancel, save, setField, moveItem, removeItem, refresh, album,
     ]
   );
 

@@ -38,6 +38,8 @@ type PlayerContextValue = {
   previous: () => void;
   seek: (seconds: number) => void;
   cycleRepeat: () => void;
+  /** Drop deleted tracks/versions from the queue; stop if one is playing. */
+  evict: (ids: string[]) => void;
 };
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
@@ -254,6 +256,30 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const evict = useCallback((ids: string[]) => {
+    const dead = new Set(ids);
+    const { queue, index } = stateRef.current;
+    const playing = queue[index] ?? null;
+    const nextQueue = queue.filter((t) => !dead.has(t.id));
+    if (nextQueue.length === queue.length) return;
+    setQueue(nextQueue);
+    if (playing && dead.has(playing.id)) {
+      const audio = audioRef.current;
+      if (audio) {
+        audio.pause();
+        audio.removeAttribute("src");
+        audio.load();
+      }
+      setIsPlaying(false);
+      setTime(0);
+      setDuration(0);
+      setIndex(0);
+    } else if (playing) {
+      const i = nextQueue.findIndex((t) => t.id === playing.id);
+      if (i >= 0) setIndex(i);
+    }
+  }, []);
+
   useEffect(() => {
     stateRef.current = { queue, index, repeat };
   }, [queue, index, repeat]);
@@ -278,6 +304,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       previous,
       seek,
       cycleRepeat,
+      evict,
     }),
     [
       current,
@@ -292,6 +319,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       previous,
       seek,
       cycleRepeat,
+      evict,
     ]
   );
 

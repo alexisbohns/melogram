@@ -1,0 +1,125 @@
+/* Sheet mechanics mirror LyricsSheet: fixed overlay, right sheet on desktop,
+   bottom sheet on mobile. */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.sheet {
+  position: relative;
+  width: min(480px, 100%);
+  height: 100%;
+  overflow-y: auto;
+  background: #1a1118;
+  color: var(--album-light);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.title {
+  font-family: var(--font-gloock), serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 29px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.close {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-button);
+  background: color-mix(in srgb, var(--album-accent) 10%, transparent);
+  color: var(--album-accent);
+  display: grid;
+  place-items: center;
+}
+
+.close:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.sheet:focus-visible {
+  outline: none;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dangerZone {
+  composes: section;
+  border-top: 1px solid color-mix(in srgb, var(--album-light) 8%, transparent);
+  padding-top: 24px;
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.discard {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--radius-button);
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+}
+
+.discardText {
+  flex: 1;
+  min-width: 140px;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.dangerConfirm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dangerTrigger {
+  align-self: flex-start;
+}
+
+@media (max-width: 767px) {
+  .overlay {
+    align-items: flex-end;
+  }
+
+  .sheet {
+    width: 100%;
+    height: 85%;
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    padding: 24px;
+  }
+}

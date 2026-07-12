@@ -30,8 +30,8 @@ export default function EditableText({
       className={className}
       data-placeholder={placeholder}
       style={{
-        outline: "1px dashed rgba(91,140,255,0.6)",
-        borderRadius: 6,
+        outline: "1px dashed color-mix(in srgb, var(--album-accent) 60%, transparent)",
+        borderRadius: "var(--radius-button)",
         padding: "2px 6px",
         minHeight: "1em",
       }}

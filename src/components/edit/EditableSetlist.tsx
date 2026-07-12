@@ -1,101 +1,93 @@
 "use client";
 
-import { useState } from "react";
-import {
-  ArrowUp,
-  ArrowDown,
-  X,
-  Plus,
-  ChevronDown,
-  ChevronRight,
-} from "lucide-react";
+import { useMemo } from "react";
+import { ArrowUp, ArrowDown, X, Plus, Pencil } from "lucide-react";
 import { useAlbumEdit } from "./AlbumEditProvider";
-import VersionsPanel from "./VersionsPanel";
+import controls from "./controls.module.css";
 import styles from "./EditableSetlist.module.css";
 
-export default function EditableSetlist() {
-  const { setlist, moveItem, removeItem, addItem } = useAlbumEdit();
-  const [name, setName] = useState("");
-  const [openKey, setOpenKey] = useState<string | null>(null);
+type Props = {
+  /** Open the track drawer on an existing track. */
+  onEditTrack: (trackId: string) => void;
+  /** Open the track drawer in create mode. */
+  onAddTrack: () => void;
+};
+
+export default function EditableSetlist({ onEditTrack, onAddTrack }: Props) {
+  const { setlist, moveItem, removeItem, album } = useAlbumEdit();
+
+  const hasAudio = useMemo(
+    () =>
+      new Map(
+        album.tracks.map((t) => [t.track_id, Boolean(t.latest_resource_url)])
+      ),
+    [album.tracks]
+  );
 
   return (
     <div className={styles.list}>
       {setlist.map((item, i) => (
-        <div key={item.key}>
-          <div className={styles.row}>
+        <div key={item.trackId} className={styles.row}>
+          <span className={styles.num}>{i + 1}</span>
+          <button
+            type="button"
+            className={styles.nameButton}
+            onClick={() => onEditTrack(item.trackId)}
+          >
+            <span className={styles.name}>{item.name}</span>
+            {hasAudio.get(item.trackId) === false && (
+              <span className={styles.noAudio}>No audio</span>
+            )}
+          </button>
+          <div className={styles.controls}>
             <button
               type="button"
-              aria-label="Toggle versions"
-              className={styles.expand}
-              disabled={!item.trackId}
-              onClick={() =>
-                setOpenKey((k) => (k === item.key ? null : item.key))
-              }
+              className={controls.iconBtnSm}
+              aria-label={`Move ${item.name} up`}
+              disabled={i === 0}
+              onClick={() => moveItem(i, -1)}
             >
-              {openKey === item.key ? (
-                <ChevronDown size={16} />
-              ) : (
-                <ChevronRight size={16} />
-              )}
+              <ArrowUp size={18} strokeWidth={2} />
             </button>
-            <span className={styles.num}>{i + 1}</span>
-            <span className={styles.name}>
-              {item.name}
-              {!item.trackId && <em className={styles.pending}> · new</em>}
-            </span>
-            <div className={styles.controls}>
-              <button
-                type="button"
-                aria-label="Move up"
-                disabled={i === 0}
-                onClick={() => moveItem(i, -1)}
-              >
-                <ArrowUp size={16} />
-              </button>
-              <button
-                type="button"
-                aria-label="Move down"
-                disabled={i === setlist.length - 1}
-                onClick={() => moveItem(i, 1)}
-              >
-                <ArrowDown size={16} />
-              </button>
-              <button
-                type="button"
-                aria-label="Remove"
-                className={styles.remove}
-                onClick={() => removeItem(item.key)}
-              >
-                <X size={16} />
-              </button>
-            </div>
+            <button
+              type="button"
+              className={controls.iconBtnSm}
+              aria-label={`Move ${item.name} down`}
+              disabled={i === setlist.length - 1}
+              onClick={() => moveItem(i, 1)}
+            >
+              <ArrowDown size={18} strokeWidth={2} />
+            </button>
+            <button
+              type="button"
+              className={controls.iconBtnSm}
+              aria-label={`Edit ${item.name}`}
+              onClick={() => onEditTrack(item.trackId)}
+            >
+              <Pencil size={18} strokeWidth={2} />
+            </button>
+            <button
+              type="button"
+              className={controls.iconBtnDanger}
+              aria-label={`Remove ${item.name} from album`}
+              onClick={() => removeItem(item.trackId)}
+            >
+              <X size={18} strokeWidth={2} />
+            </button>
           </div>
-          {openKey === item.key && item.trackId && (
-            <VersionsPanel trackId={item.trackId} />
-          )}
         </div>
       ))}
-      <form
-        className={styles.add}
-        onSubmit={(e) => {
-          e.preventDefault();
-          addItem(name);
-          setName("");
-        }}
+      <button
+        type="button"
+        className={`${controls.btn} ${styles.add}`}
+        onClick={onAddTrack}
       >
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="New track name…"
-          aria-label="New track name"
-        />
-        <button type="submit" disabled={!name.trim()}>
-          <Plus size={16} /> Add
-        </button>
-      </form>
+        <Plus size={18} strokeWidth={2} />
+        Add track
+      </button>
       <p className={styles.hint}>
-        Order &amp; track changes apply when you Save. Add audio to a track after
-        saving.
+        Order and removals apply when you Save. Track details and recordings
+        save instantly from the track editor.
       </p>
     </div>
   );
