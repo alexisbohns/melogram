@@ -24,6 +24,23 @@
   line-height: 22px;
 }
 
+.editBar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nameEdit {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
 @media (max-width: 767px) {
   .hero {
     flex-direction: column;

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import AlbumSwitcher from "@/components/AlbumSwitcher";
 import AlbumDetailCard from "@/components/AlbumDetailCard";
+import { AlbumEditProvider } from "@/components/edit/AlbumEditProvider";
 import { getAlbumsWithTracks, getAlbumWithTracks, getLyrics } from "@/lib/data";
 import styles from "./page.module.css";
 
@@ -35,7 +36,9 @@ export default async function AlbumPage({ params }: Props) {
       <Header variant="compact" />
       <div className={styles.content}>
         <AlbumSwitcher albums={albums} activeId={album.id} />
-        <AlbumDetailCard album={album} lyrics={lyrics} />
+        <AlbumEditProvider album={album}>
+          <AlbumDetailCard album={album} lyrics={lyrics} />
+        </AlbumEditProvider>
       </div>
     </div>
   );
