@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { Upload } from "lucide-react";
 import AlbumCover from "../AlbumCover";
 import { uploadAlbumCover } from "@/lib/edit";
@@ -39,7 +39,10 @@ export default function CoverUploader({
   }
 
   return (
-    <div className={styles.wrap}>
+    <div
+      className={styles.wrap}
+      style={{ "--size": `${size}px` } as CSSProperties}
+    >
       <AlbumCover coverUrl={url} alt={alt} size={size} priority />
       <button
         type="button"

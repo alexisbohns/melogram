@@ -990,7 +990,7 @@ git commit -m "feat(ui): genre chip combobox with create, saved with the album"
 ```tsx
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { Upload } from "lucide-react";
 import AlbumCover from "../AlbumCover";
 import { uploadAlbumCover } from "@/lib/edit";
@@ -1026,7 +1026,7 @@ export default function CoverUploader({
   }
 
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrap} style={{ "--size": `${size}px` } as CSSProperties}>
       <AlbumCover coverUrl={url} alt={alt} size={size} priority />
       <button
         type="button"
@@ -1054,11 +1054,13 @@ export default function CoverUploader({
 
 ```css
 .wrap { position: relative; display: inline-block; }
-.overlay { position: absolute; inset: 0; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 4px; border: none; cursor: pointer;
-  border-radius: 8px; color: #fff; font: inherit; font-size: 12px;
-  background: rgba(0,0,0,0.45); opacity: 0; transition: opacity 0.15s; }
-.wrap:hover .overlay, .overlay:focus-visible { opacity: 1; }
+.overlay { position: absolute; top: 0; left: 0; width: var(--size); height: var(--size);
+  z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; border: none; cursor: pointer;
+  border-radius: calc(var(--size)*0.05) calc(var(--size)*0.1) calc(var(--size)*0.1) calc(var(--size)*0.05);
+  color: #fff; font: inherit; font-size: 12px; background: rgba(0,0,0,0.45);
+  opacity: 0; transition: opacity 0.15s; }
+.overlay:hover, .overlay:focus-visible { opacity: 1; }
 .overlay:disabled { opacity: 1; cursor: default; }
 ```
 
