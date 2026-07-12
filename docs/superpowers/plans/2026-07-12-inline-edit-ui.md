@@ -337,7 +337,10 @@ export async function createVersionWithFile(
     _release_date: releaseDate,
   });
   if (error) throw new Error(error.message);
-  const { version_id, upload_path } = data as { version_id: string; upload_path: string };
+  // create_version RETURNS TABLE(...) → PostgREST returns an array of rows.
+  const row = (data as { version_id: string; upload_path: string }[])[0];
+  if (!row) throw new Error("create_version returned no row");
+  const { version_id, upload_path } = row;
 
   const up = await supabase.storage.from("versions").upload(upload_path, file, { upsert: true });
   if (up.error) throw new Error(up.error.message);
