@@ -887,7 +887,15 @@ begin
   insert into public.versions (name, status, release_date, track_id)
     values (_name, _status, _release_date, _track_id)
     returning id into _vid;
-  insert into public.track_versions (track_id, version_id) values (_track_id, _vid);
+  -- A trigger auto-links track_versions from versions.track_id. Keep this
+  -- idempotent (works with or without the trigger) and table-qualified so
+  -- version_id is unambiguous against the OUT parameter of the same name.
+  insert into public.track_versions (track_id, version_id)
+  select _track_id, _vid
+  where not exists (
+    select 1 from public.track_versions tv
+    where tv.track_id = _track_id and tv.version_id = _vid
+  );
   version_id  := _vid;
   upload_path := _slug || '-' || _tid || '/' || _slug || '-' || _vid || '.m4a';
   return next;
