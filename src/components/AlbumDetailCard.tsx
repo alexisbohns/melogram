@@ -12,6 +12,7 @@ import EditableText from "./edit/EditableText";
 import AlbumTypeSelect from "./edit/AlbumTypeSelect";
 import GenrePicker from "./edit/GenrePicker";
 import CoverUploader from "./edit/CoverUploader";
+import EditableSetlist from "./edit/EditableSetlist";
 import { useAlbumEdit } from "./edit/AlbumEditProvider";
 import styles from "./AlbumDetailCard.module.css";
 
@@ -96,7 +97,11 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
           )}
         </div>
       </div>
-      <AlbumPlaylist tracks={album.tracks} variant="detailed" lyrics={lyrics} />
+      {editing ? (
+        <EditableSetlist />
+      ) : (
+        <AlbumPlaylist tracks={album.tracks} variant="detailed" lyrics={lyrics} />
+      )}
     </article>
   );
 }
