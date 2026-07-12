@@ -1046,10 +1046,11 @@ git commit -m "feat(db): create_genre RPC for members"
 
 ## Task 10: Storage buckets + write policies
 
-Audio lives in the existing public `songs` bucket. Covers need a public `covers`
-bucket. Both allow writes only to authenticated artist members (coarse policy for
-the single-artist phase — see spec §7). Functional upload testing happens via the
-app in Plan 2; here we create the bucket and policies and verify the policies exist.
+Audio lives in the existing public **`versions`** bucket (the audio bucket's id is
+`versions`, not `songs`); covers live in the existing public **`covers`** bucket.
+Both allow writes only to authenticated artist members (coarse policy for the
+single-artist phase — see spec §7). Functional upload testing happens via the app
+in Plan 2; here we set the policies and verify they exist.
 
 **Files:**
 - Create: `supabase/migrations/20260712001000_storage_policies.sql`
@@ -1063,28 +1064,25 @@ begin
   select count(*) into n from pg_policies
     where schemaname='storage' and tablename='objects'
       and policyname in (
-        'members write songs','members update songs','members delete songs',
+        'members write versions','members update versions','members delete versions',
         'members write covers','members update covers','members delete covers');
-  assert n = 6, 'expected 6 storage write policies for members';
-  assert exists (select 1 from storage.buckets where id='covers' and public), 'covers bucket public';
-  assert exists (select 1 from storage.buckets where id='songs'  and public), 'songs bucket public';
+  assert n = 6, 'expected 6 storage write policies for members (found ' || n || ')';
+  assert exists (select 1 from storage.buckets where id='covers'   and public), 'covers bucket public';
+  assert exists (select 1 from storage.buckets where id='versions' and public), 'versions bucket public';
+  raise notice 'Task 10 verification passed';
 end $$;
 ```
 
-- [ ] **Step 2: Run it — expect failure** (assert fails: 0 policies / no covers bucket).
+- [ ] **Step 2: Run it — expect failure** (assert fails: fewer than 6 policies).
 
 - [ ] **Step 3: Write the migration**
 
 ```sql
 -- supabase/migrations/20260712001000_storage_policies.sql
--- Public covers bucket + member-only write policies on songs and covers.
+-- Member-only write policies on the versions (audio) and covers buckets.
+-- Both buckets already exist and are public.
 
-insert into storage.buckets (id, name, public)
-  values ('covers', 'covers', true)
-  on conflict (id) do update set public = true;
-
--- Ensure songs stays public (it already exists).
-update storage.buckets set public = true where id = 'songs';
+update storage.buckets set public = true where id in ('versions','covers');
 
 -- Helper: is the caller a member of ANY artist? (coarse; tighten to per-artist
 -- path parsing when the platform opens up — spec §7.)
@@ -1095,16 +1093,21 @@ as $$
 $$;
 grant execute on function public.is_any_artist_member() to authenticated, anon;
 
--- songs bucket
-drop policy if exists "members write songs" on storage.objects;
-create policy "members write songs" on storage.objects for insert to authenticated
-  with check (bucket_id = 'songs' and public.is_any_artist_member());
+-- Clean up any earlier policies that targeted a mis-named 'songs' bucket.
+drop policy if exists "members write songs"  on storage.objects;
 drop policy if exists "members update songs" on storage.objects;
-create policy "members update songs" on storage.objects for update to authenticated
-  using (bucket_id = 'songs' and public.is_any_artist_member());
 drop policy if exists "members delete songs" on storage.objects;
-create policy "members delete songs" on storage.objects for delete to authenticated
-  using (bucket_id = 'songs' and public.is_any_artist_member());
+
+-- versions bucket (audio)
+drop policy if exists "members write versions" on storage.objects;
+create policy "members write versions" on storage.objects for insert to authenticated
+  with check (bucket_id = 'versions' and public.is_any_artist_member());
+drop policy if exists "members update versions" on storage.objects;
+create policy "members update versions" on storage.objects for update to authenticated
+  using (bucket_id = 'versions' and public.is_any_artist_member());
+drop policy if exists "members delete versions" on storage.objects;
+create policy "members delete versions" on storage.objects for delete to authenticated
+  using (bucket_id = 'versions' and public.is_any_artist_member());
 
 -- covers bucket
 drop policy if exists "members write covers" on storage.objects;
