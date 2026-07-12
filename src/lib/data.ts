@@ -11,6 +11,47 @@ function fail(context: string, error: { message?: string }): never {
 const TRACK_COLS =
   "track_id,track_name,track_description,album_id,album_name,album_cover_url,latest_version_id,latest_status,latest_resource_url,latest_release_date,like_count";
 
+/**
+ * Fill in each track's `duration` from `versions.duration_seconds`, keyed on
+ * the latest version id the overview already carries. One batched query keeps
+ * this cheap; duration is non-critical, so a failure degrades to null (the UI
+ * simply omits the time) rather than breaking the page.
+ */
+async function attachDurations(
+  client: SupabaseClient,
+  tracks: Track[]
+): Promise<void> {
+  const ids = [
+    ...new Set(
+      tracks
+        .map((t) => t.latest_version_id)
+        .filter((id): id is string => Boolean(id))
+    ),
+  ];
+  let byId = new Map<string, number | null>();
+  if (ids.length > 0) {
+    const { data, error } = await client
+      .from("versions")
+      .select("id,duration_seconds")
+      .in("id", ids);
+    if (error) {
+      console.error("Failed to load track durations", error.message);
+    } else {
+      byId = new Map(
+        (data ?? []).map((row) => [
+          row.id as string,
+          (row.duration_seconds as number | null) ?? null,
+        ])
+      );
+    }
+  }
+  for (const track of tracks) {
+    track.duration = track.latest_version_id
+      ? byId.get(track.latest_version_id) ?? null
+      : null;
+  }
+}
+
 function groupTracks(albums: Album[], tracks: Track[]): AlbumWithTracks[] {
   const byAlbum = new Map<string, Track[]>();
   for (const track of tracks) {
@@ -42,10 +83,9 @@ export async function getAlbumsWithTracks(): Promise<AlbumWithTracks[]> {
   if (albumsRes.error) fail("Failed to load albums", albumsRes.error);
   if (tracksRes.error) fail("Failed to load tracks", tracksRes.error);
 
-  return groupTracks(
-    (albumsRes.data ?? []) as Album[],
-    (tracksRes.data ?? []) as Track[]
-  );
+  const tracks = (tracksRes.data ?? []) as Track[];
+  await attachDurations(supabase, tracks);
+  return groupTracks((albumsRes.data ?? []) as Album[], tracks);
 }
 
 export async function getAlbumWithTracks(
@@ -80,6 +120,7 @@ export async function getAlbumWithTracks(
     .map((row) => (row as unknown as { genres: Genre | null }).genres)
     .filter((g): g is Genre => Boolean(g));
 
+  await attachDurations(supabase, tracks);
   return { ...(albumRes.data as Album), tracks, genres };
 }
 
@@ -133,7 +174,9 @@ export async function getLikedTracks(
   const byId = new Map(
     ((tracks ?? []) as Track[]).map((track) => [track.track_id, track])
   );
-  return likedIds
+  const ordered = likedIds
     .map((id) => byId.get(id))
     .filter((track): track is Track => Boolean(track));
+  await attachDurations(client, ordered);
+  return ordered;
 }

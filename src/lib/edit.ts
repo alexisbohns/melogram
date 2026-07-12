@@ -283,13 +283,16 @@ export async function uploadVersionAudio(
 }
 
 /** Upload to the versions bucket and record a cache-busted public URL —
-    the CDN keys on the query string, so replaced audio is fetched fresh. */
+    the CDN keys on the query string, so replaced audio is fetched fresh. The
+    audio length is measured once, here, from the local file so the app can
+    show track/album times without every client re-sniffing them at render. */
 async function uploadToPath(
   path: string,
   versionId: string,
   file: File
 ): Promise<void> {
   const supabase = createClient();
+  const duration = await audioDurationFromFile(file);
   const up = await supabase.storage
     .from("versions")
     .upload(path, file, { upsert: true });
@@ -300,8 +303,31 @@ async function uploadToPath(
   const { error } = await supabase.rpc("set_version_file", {
     _version_id: versionId,
     _resource_url: `${base}?v=${Date.now()}`,
+    _duration: duration,
   });
   if (error) throw new Error(error.message);
+}
+
+/** Read an audio file's duration in the browser from a local object URL (no
+    network — it decodes the file the user just picked). Best-effort: a decode
+    failure resolves to null and never blocks the upload. */
+function audioDurationFromFile(file: File): Promise<number | null> {
+  if (typeof Audio === "undefined") return Promise.resolve(null);
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const audio = new Audio();
+    audio.preload = "metadata";
+    const finish = (value: number | null) => {
+      URL.revokeObjectURL(url);
+      resolve(value);
+    };
+    audio.addEventListener("loadedmetadata", () => {
+      const d = audio.duration;
+      finish(Number.isFinite(d) && d > 0 ? d : null);
+    });
+    audio.addEventListener("error", () => finish(null));
+    audio.src = url;
+  });
 }
 
 /** Storage object path from a `versions` bucket public URL (query stripped). */

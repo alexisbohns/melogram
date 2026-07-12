@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Mic, Pause, Play } from "lucide-react";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
-import { formatTime, useDuration } from "@/player/durations";
+import { formatTime } from "@/player/durations";
 import type { Track } from "@/lib/types";
 import LikeButton from "./LikeButton";
 import LyricsSheet from "./LyricsSheet";
@@ -24,7 +24,7 @@ export default function AlbumTrack({
   lyrics = null,
 }: Props) {
   const { current, isPlaying, toggle, playFrom } = usePlayer();
-  const duration = useDuration(track.latest_resource_url);
+  const duration = track.duration;
   const [lyricsOpen, setLyricsOpen] = useState(false);
 
   const playable = Boolean(track.latest_resource_url);

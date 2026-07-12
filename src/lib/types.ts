@@ -41,6 +41,12 @@ export type Track = {
   latest_resource_url: string | null;
   latest_release_date: string | null;
   like_count: number | null;
+  /**
+   * Playback length (seconds) of the latest version. Populated by the data
+   * layer from `versions.duration_seconds`; null until it has been computed
+   * (on upload, or by the backfill script for pre-existing rows).
+   */
+  duration: number | null;
 };
 
 export type AlbumWithTracks = Album & {
