@@ -8,20 +8,21 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  opacity: 0.33;
   transition: opacity 0.15s ease;
+}
+
+/* All albums read at full opacity at rest; hovering one fades the rest so the
+   focus sits on the item being pointed at. */
+.switcher:hover .item,
+.switcher:focus-within .item {
+  opacity: 0.4;
 }
 
 .item:hover,
 .item:focus-visible {
-  opacity: 0.66;
+  opacity: 1;
   /* Slide the vinyl out of the hovered nav item's cover. */
   --extract: 1;
-}
-
-.active,
-.active:hover {
-  opacity: 1;
 }
 
 .text {
@@ -29,6 +30,11 @@
   flex-direction: column;
   gap: 4px;
   min-width: 0;
+  /* Rather than the vinyl pushing into the name, the name/meta slide out of its
+     way in step with the disc. Distance mirrors the cover geometry: --size (67)
+     * --slide (0.46) ≈ 31px. */
+  transform: translateX(calc(var(--extract, 0) * 31px));
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .name {
