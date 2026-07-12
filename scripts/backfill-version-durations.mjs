@@ -22,12 +22,16 @@
 //
 // The service-role key bypasses RLS to update versions directly; keep it out of
 // the browser and out of git. Re-runnable: it only touches rows where
-// duration_seconds is null. Files are uploaded as .m4a, so duration is read
-// from the MP4 `mvhd` atom (no external tools or npm deps). Anything that
-// doesn't parse is logged and left null for a manual pass.
+// duration_seconds is null. New uploads are .m4a, so duration is read from the
+// MP4 `mvhd` atom with no dependencies. Legacy files in other formats (mp3,
+// wav, flac…) fall back to `ffprobe` if ffmpeg is installed on the machine
+// running this. Anything still unreadable is logged and left null.
 
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync, unlinkSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { createClient } from "@supabase/supabase-js";
 
 // Best-effort load of .env.local then .env (real env vars still win). Minimal
@@ -143,6 +147,56 @@ function findBox(buf, from, to, type) {
   return null;
 }
 
+// ffprobe is checked once; ffprobeOk stays cached for the run.
+let ffprobeChecked = false;
+let ffprobeOk = false;
+function hasFfprobe() {
+  if (!ffprobeChecked) {
+    ffprobeChecked = true;
+    try {
+      const r = spawnSync("ffprobe", ["-version"], { stdio: "ignore" });
+      ffprobeOk = !r.error && r.status === 0;
+    } catch {
+      ffprobeOk = false;
+    }
+  }
+  return ffprobeOk;
+}
+
+let tmpCounter = 0;
+/**
+ * Duration (seconds) via ffprobe — the fallback for anything the MP4 parser
+ * can't read (mp3, wav, flac, ogg…). Requires ffmpeg/ffprobe on PATH; returns
+ * null if it's absent or the probe fails. Writes a temp file so ffprobe can
+ * seek (some formats need to read the tail).
+ */
+function ffprobeDuration(buf) {
+  if (!hasFfprobe()) return null;
+  const tmp = join(tmpdir(), `melogram-dur-${process.pid}-${tmpCounter++}`);
+  try {
+    writeFileSync(tmp, buf);
+    const r = spawnSync(
+      "ffprobe",
+      [
+        "-v", "error",
+        "-show_entries", "format=duration",
+        "-of", "default=noprint_wrappers=1:nokey=1",
+        tmp,
+      ],
+      { encoding: "utf8" }
+    );
+    if (r.status !== 0) return null;
+    const d = parseFloat((r.stdout || "").trim());
+    return Number.isFinite(d) && d > 0 ? d : null;
+  } catch {
+    return null;
+  } finally {
+    try {
+      unlinkSync(tmp);
+    } catch {}
+  }
+}
+
 async function main() {
   const { data: rows, error } = await supabase
     .from("versions")
@@ -167,9 +221,15 @@ async function main() {
         skipped++;
         continue;
       }
-      const seconds = mp4Duration(Buffer.from(await res.arrayBuffer()));
+      const buf = Buffer.from(await res.arrayBuffer());
+      const seconds = mp4Duration(buf) ?? ffprobeDuration(buf);
       if (seconds == null) {
-        console.warn(`✗ ${row.id}: could not read duration (not m4a?)`);
+        console.warn(
+          `✗ ${row.id}: could not read duration` +
+            (hasFfprobe()
+              ? " (unsupported format)"
+              : " — not m4a; install ffmpeg to read this format")
+        );
         skipped++;
         continue;
       }
