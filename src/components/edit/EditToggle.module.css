@@ -1,0 +1,32 @@
+.edit,
+.save,
+.cancel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  background: rgba(128, 128, 128, 0.08);
+  color: inherit;
+}
+
+.actions {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.save {
+  background: #5b8cff;
+  border-color: #5b8cff;
+  color: #fff;
+}
+
+.save:disabled,
+.cancel:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

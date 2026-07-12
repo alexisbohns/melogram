@@ -1,0 +1,77 @@
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(91, 140, 255, 0.15);
+  color: #5b8cff;
+}
+.chip button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+}
+.inputWrap {
+  position: relative;
+}
+.input {
+  font: inherit;
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  background: transparent;
+  color: inherit;
+  width: 100%;
+  max-width: 220px;
+}
+.menu {
+  position: absolute;
+  z-index: 20;
+  margin-top: 2px;
+  list-style: none;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--album-deep, #1c1420);
+  color: var(--album-light, #f2eff5);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  max-height: 200px;
+  overflow-y: auto;
+  min-width: 200px;
+}
+.menu button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 8px;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.menu button:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.create {
+  color: #5b8cff;
+}

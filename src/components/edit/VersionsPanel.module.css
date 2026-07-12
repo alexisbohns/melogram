@@ -1,0 +1,73 @@
+.panel {
+  padding: 8px 10px;
+  margin: 2px 0 6px 26px;
+  border-left: 2px solid rgba(91, 140, 255, 0.3);
+}
+.muted {
+  color: rgba(128, 128, 128, 0.85);
+  font-size: 12px;
+}
+.versions {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.version {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.vName {
+  flex: 1;
+}
+.date {
+  color: rgba(128, 128, 128, 0.8);
+  font-size: 12px;
+}
+.ok {
+  color: #30a46c;
+}
+.del {
+  background: none;
+  border: none;
+  color: #e5484d;
+  cursor: pointer;
+  display: inline-flex;
+}
+.add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.add input[type="text"],
+.add input:not([type]),
+.add select {
+  font: inherit;
+  font-size: 13px;
+  padding: 5px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  background: transparent;
+  color: inherit;
+}
+.add button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: inherit;
+  font-size: 13px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #5b8cff;
+  background: #5b8cff;
+  color: #fff;
+  cursor: pointer;
+}
+.add button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

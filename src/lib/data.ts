@@ -1,8 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "./supabase/anon";
-import type { Album, AlbumWithTracks, Track, TrackLyrics } from "./types";
+import type { Album, AlbumWithTracks, Genre, Track, TrackLyrics } from "./types";
 
-const ALBUM_COLS = "id,name,description,type,cover_url,created_at";
+const ALBUM_COLS = "id,artist_id,name,description,type,cover_url,created_at";
 
 /** Supabase errors are plain objects; wrap them so logs show a real message. */
 function fail(context: string, error: { message?: string }): never {
@@ -22,6 +22,7 @@ function groupTracks(albums: Album[], tracks: Track[]): AlbumWithTracks[] {
   return albums.map((album) => ({
     ...album,
     tracks: byAlbum.get(album.id) ?? [],
+    genres: [],
   }));
 }
 
@@ -50,22 +51,46 @@ export async function getAlbumsWithTracks(): Promise<AlbumWithTracks[]> {
 export async function getAlbumWithTracks(
   id: string
 ): Promise<AlbumWithTracks | null> {
-  const [albumRes, tracksRes] = await Promise.all([
+  const [albumRes, tracksRes, orderRes, genresRes] = await Promise.all([
     supabase.from("albums").select(ALBUM_COLS).eq("id", id).maybeSingle(),
+    supabase.from("track_overview").select(TRACK_COLS).eq("album_id", id),
+    supabase.from("album_tracks").select("track_id,position").eq("album_id", id),
     supabase
-      .from("track_overview")
-      .select(TRACK_COLS)
-      .eq("album_id", id)
-      .order("latest_release_date", { ascending: false }),
+      .from("album_genres")
+      .select("genres(id,name,slug)")
+      .eq("album_id", id),
   ]);
 
   if (albumRes.error || !albumRes.data) return null;
   if (tracksRes.error) fail("Failed to load album tracks", tracksRes.error);
 
-  return {
-    ...(albumRes.data as Album),
-    tracks: (tracksRes.data ?? []) as Track[],
-  };
+  const position = new Map(
+    (orderRes.data ?? []).map((r) => [
+      r.track_id as string,
+      r.position as number,
+    ])
+  );
+  const tracks = ((tracksRes.data ?? []) as Track[]).slice().sort(
+    (a, b) =>
+      (position.get(a.track_id) ?? Number.MAX_SAFE_INTEGER) -
+      (position.get(b.track_id) ?? Number.MAX_SAFE_INTEGER)
+  );
+
+  const genres = (genresRes.data ?? [])
+    .map((row) => (row as unknown as { genres: Genre | null }).genres)
+    .filter((g): g is Genre => Boolean(g));
+
+  return { ...(albumRes.data as Album), tracks, genres };
+}
+
+/** All genres, alphabetical — powers the edit combobox. */
+export async function getGenres(): Promise<Genre[]> {
+  const { data, error } = await supabase
+    .from("genres")
+    .select("id,name,slug")
+    .order("name");
+  if (error) fail("Failed to load genres", error);
+  return (data ?? []) as Genre[];
 }
 
 export async function getLyrics(trackIds: string[]): Promise<TrackLyrics> {

@@ -1,0 +1,35 @@
+.wrap {
+  position: relative;
+  display: inline-block;
+}
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--size);
+  height: var(--size);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: none;
+  cursor: pointer;
+  border-radius: calc(var(--size) * 0.05) calc(var(--size) * 0.1)
+    calc(var(--size) * 0.1) calc(var(--size) * 0.05);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.overlay:hover,
+.overlay:focus-visible {
+  opacity: 1;
+}
+.overlay:disabled {
+  opacity: 1;
+  cursor: default;
+}
