@@ -17,6 +17,15 @@ export type AlbumVersion = {
   status: string;
   release_date: string;
   resource_url: string | null;
+  created_at: string;
+};
+
+/** Authoritative editable fields of a public.tracks row (edit view). */
+export type TrackDetails = {
+  id: string;
+  name: string;
+  description: string | null;
+  lyrics: string | null;
 };
 
 /** One row of the `track_overview` Supabase view. */

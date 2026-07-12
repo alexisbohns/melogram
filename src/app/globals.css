@@ -11,6 +11,9 @@
   --radius-cover: 16px;
   --radius-card: 20px;
 
+  /* destructive actions (edit UI) — palette-independent, like the sheet bg */
+  --danger: #e5747e;
+
   color-scheme: dark;
 }
 

@@ -1,59 +1,86 @@
 .picker {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
+
 .chips {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
 }
+
+/* eyebrow type on the accent tint pill — echoes AlbumInfos' read-mode genres */
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 12px;
-  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(91, 140, 255, 0.15);
-  color: #5b8cff;
+  background: color-mix(in srgb, var(--album-accent) 10%, transparent);
+  color: var(--album-accent);
 }
+
 .chip button {
-  background: none;
-  border: none;
-  color: inherit;
-  cursor: pointer;
   display: inline-flex;
+  color: inherit;
+  transition: color 0.15s ease-out;
 }
+
+.chip button:hover {
+  color: var(--album-light);
+}
+
 .inputWrap {
   position: relative;
 }
+
 .input {
   font: inherit;
-  font-size: 13px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid rgba(128, 128, 128, 0.35);
+  font-size: 16px;
+  line-height: 20px;
+  padding: 8px 12px;
+  border-radius: var(--radius-button);
+  border: 1px solid color-mix(in srgb, var(--album-light) 14%, transparent);
   background: transparent;
-  color: inherit;
+  color: var(--album-light);
   width: 100%;
   max-width: 220px;
+  transition: border-color 0.15s ease-out;
 }
+
+.input::placeholder {
+  color: var(--album-light);
+  opacity: 0.35;
+}
+
+.input:focus-visible {
+  outline: none;
+  border-color: var(--album-accent);
+}
+
 .menu {
   position: absolute;
-  z-index: 20;
-  margin-top: 2px;
+  /* overlay tier (with the sheets), above the fixed PlayerBar at 40 */
+  z-index: 50;
+  margin-top: 4px;
   list-style: none;
   padding: 4px;
-  border-radius: 8px;
-  background: var(--album-deep, #1c1420);
-  color: var(--album-light, #f2eff5);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-button);
+  background: color-mix(in srgb, var(--album-light) 6%, #1a1118);
+  color: var(--album-light);
+  border: 1px solid color-mix(in srgb, var(--album-light) 14%, transparent);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   max-height: 200px;
   overflow-y: auto;
   min-width: 200px;
 }
+
 .menu button {
   display: flex;
   align-items: center;
@@ -61,17 +88,19 @@
   width: 100%;
   text-align: left;
   font: inherit;
-  font-size: 13px;
-  padding: 6px 8px;
-  border: none;
-  background: none;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 20px;
+  padding: 8px 10px;
   color: inherit;
-  cursor: pointer;
-  border-radius: 6px;
+  border-radius: calc(var(--radius-button) - 4px);
+  transition: background 0.15s ease-out;
 }
+
 .menu button:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: color-mix(in srgb, var(--album-accent) 10%, transparent);
 }
-.create {
-  color: #5b8cff;
+
+.menu button.create {
+  color: var(--album-accent);
 }

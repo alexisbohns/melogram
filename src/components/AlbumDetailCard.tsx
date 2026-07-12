@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { AlbumWithTracks, TrackLyrics } from "@/lib/types";
 import { getPalette, paletteVars } from "@/lib/palettes";
 import AlbumCover from "./AlbumCover";
@@ -13,6 +14,7 @@ import AlbumTypeSelect from "./edit/AlbumTypeSelect";
 import GenrePicker from "./edit/GenrePicker";
 import CoverUploader from "./edit/CoverUploader";
 import EditableSetlist from "./edit/EditableSetlist";
+import TrackDrawer from "./edit/TrackDrawer";
 import { useAlbumEdit } from "./edit/AlbumEditProvider";
 import styles from "./AlbumDetailCard.module.css";
 
@@ -25,6 +27,10 @@ type Props = {
 export default function AlbumDetailCard({ album, lyrics }: Props) {
   const { editing, draft, setField } = useAlbumEdit();
   const palette = getPalette(album);
+  // Track drawer target: null = closed, { trackId: null } = create mode.
+  // Mounted at card level (not inside the setlist) so a setlist resync or a
+  // staged row removal can't unmount it mid-upload.
+  const [drawer, setDrawer] = useState<{ trackId: string | null } | null>(null);
 
   return (
     <article className={styles.card} style={paletteVars(palette)}>
@@ -98,9 +104,19 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
         </div>
       </div>
       {editing ? (
-        <EditableSetlist />
+        <EditableSetlist
+          onEditTrack={(trackId) => setDrawer({ trackId })}
+          onAddTrack={() => setDrawer({ trackId: null })}
+        />
       ) : (
         <AlbumPlaylist tracks={album.tracks} variant="detailed" lyrics={lyrics} />
+      )}
+      {drawer && (
+        <TrackDrawer
+          key={drawer.trackId ?? "new"}
+          trackId={drawer.trackId}
+          onClose={() => setDrawer(null)}
+        />
       )}
     </article>
   );

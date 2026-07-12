@@ -1,92 +1,73 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
 }
+
 .row {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 8px;
-  border-radius: 6px;
-  background: rgba(91, 140, 255, 0.06);
+  padding: 6px 8px 6px 12px;
+  border-radius: var(--radius-button);
+  background: color-mix(in srgb, var(--album-light) 5%, transparent);
 }
-.expand {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: inherit;
-  padding: 4px;
-  display: inline-flex;
-  border-radius: 4px;
-}
-.expand:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
+
 .num {
   width: 18px;
-  color: rgba(128, 128, 128, 0.8);
-  font-size: 13px;
+  flex-shrink: 0;
+  color: var(--album-deep);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
 }
-.name {
+
+.nameButton {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  border-radius: var(--radius-button);
 }
-.pending {
-  color: #5b8cff;
-  font-style: italic;
-  font-size: 12px;
+
+.name {
+  color: var(--album-light);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
+.noAudio {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--album-light);
+  opacity: 0.45;
+  white-space: nowrap;
+}
+
 .controls {
   display: inline-flex;
   gap: 2px;
+  flex-shrink: 0;
 }
-.controls button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: inherit;
-  padding: 4px;
-  display: inline-flex;
-  border-radius: 4px;
-}
-.controls button:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
-.remove {
-  color: #e5484d;
-}
+
 .add {
-  display: flex;
-  gap: 6px;
+  align-self: flex-start;
   margin-top: 8px;
 }
-.add input {
-  flex: 1;
-  font: inherit;
-  font-size: 13px;
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid rgba(128, 128, 128, 0.35);
-  background: transparent;
-  color: inherit;
-}
-.add button {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font: inherit;
-  font-size: 13px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(128, 128, 128, 0.35);
-  background: rgba(128, 128, 128, 0.08);
-  color: inherit;
-  cursor: pointer;
-}
+
 .hint {
-  font-size: 12px;
-  color: rgba(128, 128, 128, 0.85);
-  margin-top: 6px;
+  font-size: 14px;
+  line-height: 18px;
+  color: var(--album-light);
+  opacity: 0.5;
 }

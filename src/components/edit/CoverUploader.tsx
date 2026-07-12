@@ -27,9 +27,8 @@ export default function CoverUploader({
     if (!file) return;
     setBusy(true);
     try {
-      const next = await uploadAlbumCover(albumId, file);
-      // cache-bust so the <img> re-fetches the replaced object
-      setUrl(`${next}?v=${Date.now()}`);
+      // the stored URL is already cache-busted by uploadAlbumCover
+      setUrl(await uploadAlbumCover(albumId, file));
     } catch (err) {
       console.error("cover upload", err);
       alert("Cover upload failed: " + (err as Error).message);

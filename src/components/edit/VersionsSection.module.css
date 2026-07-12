@@ -1,0 +1,129 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--album-light) 8%, transparent);
+  padding-top: 24px;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  background: color-mix(in srgb, var(--album-light) 5%, transparent);
+  border-radius: var(--radius-button);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rowMain {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.rowBody {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rowName {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--album-light);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rowDate {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--album-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+.noAudio {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--album-light);
+  opacity: 0.45;
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--album-light) 8%, transparent);
+  padding-top: 12px;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.spanFields {
+  grid-column: 1 / -1;
+}
+
+.editorActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.editorSpacer {
+  flex: 1;
+}
+
+.addForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px dashed color-mix(in srgb, var(--album-light) 14%, transparent);
+  border-radius: var(--radius-button);
+  padding: 12px;
+}
+
+.addTrigger {
+  align-self: flex-start;
+}
+
+@media (max-width: 400px) {
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .spanFields {
+    grid-column: auto;
+  }
+}
