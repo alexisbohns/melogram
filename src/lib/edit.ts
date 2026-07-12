@@ -39,6 +39,20 @@ export async function setAlbumGenres(
   if (error) throw new Error(error.message);
 }
 
+/** Persist an album's color theme (a catalog key, or 'auto'). Powers the
+    edit-mode theme picker; validate the key against THEMES before calling. */
+export async function setAlbumTheme(
+  albumId: string,
+  theme: string
+): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc("set_album_theme", {
+    _album_id: albumId,
+    _theme: theme,
+  });
+  if (error) throw new Error(error.message);
+}
+
 export async function createGenre(name: string): Promise<Genre> {
   const supabase = createClient();
   const { data, error } = await supabase.rpc("create_genre", { _name: name });

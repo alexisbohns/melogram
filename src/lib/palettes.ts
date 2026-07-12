@@ -1,5 +1,9 @@
 import type { CSSProperties } from "react";
 
+/**
+ * Resolved album colors — the CSS custom properties every album-scoped
+ * component reads. Produced from a theme (below); not stored directly.
+ */
 export type AlbumPalette = {
   /** Text on album content (names, descriptions). */
   light: string;
@@ -7,43 +11,91 @@ export type AlbumPalette = {
   accent: string;
   /** Deep shade: times, meta tile icons. */
   deep: string;
-  /** Display genre for the meta tile (not stored in Supabase yet). */
+  /**
+   * Display genre for the meta tile. Album-specific, NOT part of the theme —
+   * a temporary override kept from the pre-theme palette map until real album
+   * genres flow through every view (the list view doesn't load them yet).
+   */
   genre?: string;
 };
 
-const FALLBACK: AlbumPalette = {
-  light: "#F2EFF5",
-  accent: "#7B5E99",
-  deep: "#56426B",
+/** A named, selectable color theme — one option in the edit-mode picker. */
+export type AlbumTheme = {
+  /** Stable key persisted in `albums.theme` and selected in the picker. */
+  key: string;
+  /** Human-readable label shown in the picker. */
+  name: string;
+  /** The three colors this theme paints. */
+  palette: { light: string; accent: string; deep: string };
 };
 
 /**
- * Hardcoded per-album themes (step 1 — no Supabase model change).
- * Keyed by album name; an id key takes precedence when present.
+ * Sentinel stored in `albums.theme` when the palette should be derived from
+ * the cover art. The nearest-theme match is computed client-side (added in a
+ * later step); until then such albums fall back to the legacy map / default.
  */
-const PALETTES: Record<string, AlbumPalette> = {
-  "Dawn from the Semicolon": {
-    light: "#F6EFE6",
-    accent: "#A15C08",
-    deep: "#714006",
-    genre: "Folk",
+export const AUTO_THEME = "auto";
+
+/**
+ * The theme catalog — the single source of truth for album colors. Add a
+ * theme here and the picker lists it automatically. More themes to come.
+ */
+export const THEMES: AlbumTheme[] = [
+  {
+    key: "amber",
+    name: "Amber",
+    palette: { light: "#F6EFE6", accent: "#A15C08", deep: "#714006" },
   },
-  Bones: {
-    light: "#F2EFF5",
-    accent: "#7B5E99",
-    deep: "#56426B",
-    genre: "Folk",
+  {
+    key: "violet",
+    name: "Violet",
+    palette: { light: "#F2EFF5", accent: "#7B5E99", deep: "#56426B" },
   },
-  Celesta: {
-    light: "#EEF0F3",
-    accent: "#59658A",
-    deep: "#3E4761",
-    genre: "Cinematic",
+  {
+    key: "slate",
+    name: "Slate",
+    palette: { light: "#EEF0F3", accent: "#59658A", deep: "#3E4761" },
   },
+];
+
+const THEME_BY_KEY: Record<string, AlbumTheme> = Object.fromEntries(
+  THEMES.map((theme) => [theme.key, theme])
+);
+
+/** Ultimate fallback when an album has no theme and no legacy match. */
+const FALLBACK = THEME_BY_KEY.violet.palette;
+
+/**
+ * Legacy album-name → theme key, so albums whose stored theme is still 'auto'
+ * keep rendering their original hand-picked palette until cover-based
+ * detection lands. Also serves callers that only know an album's id/name (e.g.
+ * the player bar) and not its stored theme.
+ */
+const LEGACY_THEME: Record<string, string> = {
+  "Dawn from the Semicolon": "amber",
+  Bones: "violet",
+  Celesta: "slate",
 };
 
-export function getPalette(album: { id: string; name: string }): AlbumPalette {
-  return PALETTES[album.id] ?? PALETTES[album.name] ?? FALLBACK;
+/** Album-specific display genre — see AlbumPalette.genre. */
+const LEGACY_GENRE: Record<string, string> = {
+  "Dawn from the Semicolon": "Folk",
+  Bones: "Folk",
+  Celesta: "Cinematic",
+};
+
+type AlbumLike = { id?: string; name?: string; theme?: string | null };
+
+/** Resolve an album's palette: its stored theme, else the legacy match, else
+    the default. `theme` may be absent when the caller only has id/name. */
+export function getPalette(album: AlbumLike): AlbumPalette {
+  const key =
+    album.theme && album.theme !== AUTO_THEME
+      ? album.theme
+      : LEGACY_THEME[album.name ?? ""];
+  const base = (key ? THEME_BY_KEY[key]?.palette : undefined) ?? FALLBACK;
+  const genre = LEGACY_GENRE[album.name ?? ""];
+  return genre ? { ...base, genre } : { ...base };
 }
 
 /** Inline CSS custom properties consumed by every album-scoped component. */
