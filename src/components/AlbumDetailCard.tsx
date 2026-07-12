@@ -10,6 +10,7 @@ import AlbumPlaylist from "./AlbumPlaylist";
 import EditToggle from "./edit/EditToggle";
 import EditableText from "./edit/EditableText";
 import AlbumTypeSelect from "./edit/AlbumTypeSelect";
+import GenrePicker from "./edit/GenrePicker";
 import { useAlbumEdit } from "./edit/AlbumEditProvider";
 import styles from "./AlbumDetailCard.module.css";
 
@@ -66,10 +67,16 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
           )}
 
           {editing ? (
-            <AlbumTypeSelect
-              value={draft.type}
-              onChange={(v) => setField("type", v)}
-            />
+            <>
+              <AlbumTypeSelect
+                value={draft.type}
+                onChange={(v) => setField("type", v)}
+              />
+              <GenrePicker
+                selected={draft.genres}
+                onChange={(g) => setField("genres", g)}
+              />
+            </>
           ) : (
             <AlbumMetaTiles
               genre={palette.genre ?? capitalize(album.type)}

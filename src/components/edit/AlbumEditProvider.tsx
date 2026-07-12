@@ -8,10 +8,15 @@ import {
   useMemo,
   useState,
 } from "react";
-import type { AlbumWithTracks } from "@/lib/types";
-import { getMyArtistIds, updateAlbum } from "@/lib/edit";
+import type { AlbumWithTracks, Genre } from "@/lib/types";
+import { getMyArtistIds, setAlbumGenres, updateAlbum } from "@/lib/edit";
 
-type Draft = { name: string; description: string; type: string };
+type Draft = {
+  name: string;
+  description: string;
+  type: string;
+  genres: Genre[];
+};
 
 type EditContextValue = {
   canEdit: boolean;
@@ -39,6 +44,7 @@ function draftFrom(album: AlbumWithTracks): Draft {
     name: album.name,
     description: album.description ?? "",
     type: album.type ?? "album",
+    genres: album.genres,
   };
 }
 
@@ -68,13 +74,16 @@ export function AlbumEditProvider({
     };
   }, [album.artist_id]);
 
-  const dirty = useMemo(
-    () =>
+  const dirty = useMemo(() => {
+    const a = draft.genres.map((g) => g.id).slice().sort().join(",");
+    const b = album.genres.map((g) => g.id).slice().sort().join(",");
+    return (
       draft.name !== album.name ||
       draft.description !== (album.description ?? "") ||
-      draft.type !== (album.type ?? "album"),
-    [draft, album]
-  );
+      draft.type !== (album.type ?? "album") ||
+      a !== b
+    );
+  }, [draft, album]);
 
   const startEditing = useCallback(() => setEditing(true), []);
 
@@ -94,12 +103,14 @@ export function AlbumEditProvider({
     try {
       if (dirty) {
         await updateAlbum(album.id, draft.name, draft.description || null, draft.type);
+        await setAlbumGenres(album.id, draft.genres.map((g) => g.id));
       }
       setEditing(false);
       // Reflect the saved values without a full reload.
       album.name = draft.name;
       album.description = draft.description || null;
       album.type = draft.type;
+      album.genres = draft.genres;
     } catch (err) {
       console.error("Save failed", err);
       alert("Save failed: " + (err as Error).message);
