@@ -3,7 +3,7 @@
   --vinyl: 0.94; /* vinyl diameter */
   --peek: 0.16; /* resting: vinyl overhang beyond the cover's right edge */
   --slide: 0.46; /* active: extra rightward slide (~66% of the disc exposed) */
-  --tilt: 2deg; /* active: cover rotation */
+  --tilt: -2deg; /* active: cover rotation */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   position: relative;
