@@ -6,10 +6,15 @@
 // New uploads already store their duration (set_version_file). This walks the
 // rows still missing it, reads each file's length, and writes it back.
 //
-// Usage:
-//   NEXT_PUBLIC_SUPABASE_URL=... \
-//   SUPABASE_SERVICE_ROLE_KEY=... \
-//   node scripts/backfill-version-durations.mjs
+// Credentials are read from the environment, or from a .env.local / .env file
+// in the repo root (both are git-ignored) so you don't have to pass them inline
+// — inline `VAR=value` prefixes are silently ignored on Windows shells.
+//
+//   1. Put these two lines in .env.local (NEXT_PUBLIC_SUPABASE_URL may already
+//      be there):
+//        NEXT_PUBLIC_SUPABASE_URL=https://YOURPROJECT.supabase.co
+//        SUPABASE_SERVICE_ROLE_KEY=your-service-role-secret
+//   2. node scripts/backfill-version-durations.mjs
 //
 // The service-role key bypasses RLS to update versions directly; keep it out of
 // the browser and out of git. Re-runnable: it only touches rows where
@@ -17,14 +22,39 @@
 // from the MP4 `mvhd` atom (no external tools or npm deps). Anything that
 // doesn't parse is logged and left null for a manual pass.
 
+import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
+
+// Best-effort load of .env.local then .env (real env vars still win). Minimal
+// parser: KEY=VALUE lines, ignores blanks/comments, strips surrounding quotes.
+for (const file of [".env.local", ".env"]) {
+  let text;
+  try {
+    text = readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
+  } catch {
+    continue;
+  }
+  for (const line of text.split("\n")) {
+    const m = line.match(/^\s*([\w.]+)\s*=\s*(.*)\s*$/);
+    if (!m || line.trimStart().startsWith("#")) continue;
+    const name = m[1];
+    const value = m[2].replace(/^(['"])(.*)\1$/, "$2");
+    if (process.env[name] === undefined) process.env[name] = value;
+  }
+}
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!url || !key) {
+  const missing = [
+    !url && "NEXT_PUBLIC_SUPABASE_URL",
+    !key && "SUPABASE_SERVICE_ROLE_KEY",
+  ].filter(Boolean);
   console.error(
-    "Missing env. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY."
+    `Missing ${missing.join(" and ")}.\n` +
+      "Add it to .env.local in the repo root (see the header of this file), " +
+      "or export it in your shell, then re-run."
   );
   process.exit(1);
 }
