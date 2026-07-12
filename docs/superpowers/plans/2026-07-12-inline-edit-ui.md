@@ -936,12 +936,13 @@ export default function GenrePicker({
 .input { font: inherit; font-size: 13px; padding: 4px 8px; border-radius: 6px;
   border: 1px solid rgba(128,128,128,0.35); background: transparent; color: inherit; width: 100%; max-width: 220px; }
 .menu { position: absolute; z-index: 20; margin-top: 2px; list-style: none; padding: 4px;
-  border-radius: 8px; background: var(--background, #fff); box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  border-radius: 8px; background: var(--album-deep, #1c1420); color: var(--album-light, #f2eff5);
+  border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   max-height: 200px; overflow-y: auto; min-width: 200px; }
 .menu button { display: flex; align-items: center; gap: 6px; width: 100%; text-align: left;
   font: inherit; font-size: 13px; padding: 6px 8px; border: none; background: none; color: inherit;
   cursor: pointer; border-radius: 6px; }
-.menu button:hover { background: rgba(128,128,128,0.12); }
+.menu button:hover { background: rgba(255,255,255,0.12); }
 .create { color: #5b8cff; }
 ```
 
