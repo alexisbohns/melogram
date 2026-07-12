@@ -6,15 +6,19 @@
 // New uploads already store their duration (set_version_file). This walks the
 // rows still missing it, reads each file's length, and writes it back.
 //
-// Credentials are read from the environment, or from a .env.local / .env file
-// in the repo root (both are git-ignored) so you don't have to pass them inline
-// — inline `VAR=value` prefixes are silently ignored on Windows shells.
+// Provide the Supabase URL and service-role key any one of these ways — the
+// simplest and most shell-proof is the first (arguments work identically on
+// macOS, Linux, and every Windows shell):
 //
-//   1. Put these two lines in .env.local (NEXT_PUBLIC_SUPABASE_URL may already
-//      be there):
+//   A. As arguments:
+//        node scripts/backfill-version-durations.mjs <URL> <SERVICE_ROLE_KEY>
+//
+//   B. In .env.local / .env at the repo root (both git-ignored):
 //        NEXT_PUBLIC_SUPABASE_URL=https://YOURPROJECT.supabase.co
 //        SUPABASE_SERVICE_ROLE_KEY=your-service-role-secret
-//   2. node scripts/backfill-version-durations.mjs
+//      then: node scripts/backfill-version-durations.mjs
+//
+//   C. As real environment variables you exported in the shell.
 //
 // The service-role key bypasses RLS to update versions directly; keep it out of
 // the browser and out of git. Re-runnable: it only touches rows where
@@ -23,38 +27,59 @@
 // doesn't parse is logged and left null for a manual pass.
 
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { createClient } from "@supabase/supabase-js";
 
 // Best-effort load of .env.local then .env (real env vars still win). Minimal
-// parser: KEY=VALUE lines, ignores blanks/comments, strips surrounding quotes.
+// parser: KEY=VALUE lines, ignores blanks/comments, strips surrounding quotes
+// and a UTF-8 BOM. Records where it looked, for the diagnostic below.
+const envFiles = [];
 for (const file of [".env.local", ".env"]) {
+  const path = fileURLToPath(new URL(`../${file}`, import.meta.url));
   let text;
   try {
-    text = readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
+    text = readFileSync(path, "utf8");
   } catch {
+    envFiles.push({ file, path, found: false, keys: [] });
     continue;
   }
-  for (const line of text.split("\n")) {
-    const m = line.match(/^\s*([\w.]+)\s*=\s*(.*)\s*$/);
-    if (!m || line.trimStart().startsWith("#")) continue;
+  const keys = [];
+  for (const raw of text.split("\n")) {
+    const line = raw.replace(/^﻿/, "").replace(/\r$/, "");
+    if (!line.trim() || line.trimStart().startsWith("#")) continue;
+    const m = line.match(/^\s*([\w.]+)\s*=\s*(.*?)\s*$/);
+    if (!m) continue;
     const name = m[1];
     const value = m[2].replace(/^(['"])(.*)\1$/, "$2");
+    keys.push(name);
     if (process.env[name] === undefined) process.env[name] = value;
   }
+  envFiles.push({ file, path, found: true, keys });
 }
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const [argUrl, argKey] = process.argv.slice(2);
+const url =
+  argUrl || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const key = argKey || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!url || !key) {
   const missing = [
     !url && "NEXT_PUBLIC_SUPABASE_URL",
     !key && "SUPABASE_SERVICE_ROLE_KEY",
   ].filter(Boolean);
+  console.error(`\nMissing ${missing.join(" and ")}.\n`);
+  console.error("Where I looked for a .env file:");
+  for (const e of envFiles) {
+    console.error(
+      e.found
+        ? `  • ${e.path} — found, keys: ${e.keys.join(", ") || "(none parsed)"}`
+        : `  • ${e.path} — not found`
+    );
+  }
   console.error(
-    `Missing ${missing.join(" and ")}.\n` +
-      "Add it to .env.local in the repo root (see the header of this file), " +
-      "or export it in your shell, then re-run."
+    "\nQuickest fix — pass them as arguments (works in any shell):\n" +
+      "  node scripts/backfill-version-durations.mjs " +
+      '"https://YOURPROJECT.supabase.co" "your-service-role-key"\n'
   );
   process.exit(1);
 }
