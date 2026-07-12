@@ -11,6 +11,19 @@
   border-radius: 6px;
   background: rgba(91, 140, 255, 0.06);
 }
+.expand {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 4px;
+  display: inline-flex;
+  border-radius: 4px;
+}
+.expand:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
 .num {
   width: 18px;
   color: rgba(128, 128, 128, 0.8);
