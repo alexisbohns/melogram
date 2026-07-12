@@ -56,6 +56,31 @@ export const THEMES: AlbumTheme[] = [
     name: "Slate",
     palette: { light: "#EEF0F3", accent: "#59658A", deep: "#3E4761" },
   },
+  {
+    key: "brick",
+    name: "Brick",
+    palette: { light: "#F4ECEC", accent: "#8E4242", deep: "#632E2E" },
+  },
+  {
+    key: "iron",
+    name: "Iron",
+    palette: { light: "#F3F3F3", accent: "#868686", deep: "#5E5E5E" },
+  },
+  {
+    key: "amethyst",
+    name: "Amethyst",
+    palette: { light: "#F6EDF3", accent: "#A9478A", deep: "#763261" },
+  },
+  {
+    key: "forest",
+    name: "Forest",
+    palette: { light: "#EDF2EE", accent: "#487C5A", deep: "#32573F" },
+  },
+  {
+    key: "linen",
+    name: "Linen",
+    palette: { light: "#E9E2E4", accent: "#7A5E64", deep: "#4A3639" },
+  }
 ];
 
 const THEME_BY_KEY: Record<string, AlbumTheme> = Object.fromEntries(
