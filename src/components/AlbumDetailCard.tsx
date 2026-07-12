@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { AlbumWithTracks, TrackLyrics } from "@/lib/types";
 import { getPalette, paletteVars } from "@/lib/palettes";
-import AlbumCover from "./AlbumCover";
+import AlbumCoverLive from "./AlbumCoverLive";
 import AlbumHeader from "./AlbumHeader";
 import AlbumInfos from "./AlbumInfos";
 import AlbumMetaTiles from "./AlbumMetaTiles";
@@ -46,11 +46,13 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
             size={165}
           />
         ) : (
-          <AlbumCover
+          <AlbumCoverLive
+            albumId={album.id}
             coverUrl={album.cover_url}
             alt={album.name}
             size={165}
             priority
+            reserve
           />
         )}
         <div className={styles.heroBody}>

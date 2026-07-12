@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { AlbumWithTracks } from "@/lib/types";
 import { getPalette, paletteVars } from "@/lib/palettes";
-import AlbumCover from "./AlbumCover";
+import AlbumCoverLive from "./AlbumCoverLive";
 import AlbumInfos from "./AlbumInfos";
 import styles from "./AlbumSwitcher.module.css";
 
@@ -29,7 +29,13 @@ export default function AlbumSwitcher({ albums, activeId }: Props) {
             aria-current={active ? "page" : undefined}
             style={paletteVars(getPalette(album))}
           >
-            <AlbumCover coverUrl={album.cover_url} alt="" size={67} />
+            <AlbumCoverLive
+              albumId={album.id}
+              coverUrl={album.cover_url}
+              alt=""
+              size={67}
+              reserve
+            />
             <span className={styles.text}>
               <span className={styles.name}>{album.name}</span>
               <AlbumInfos tracks={album.tracks} />
