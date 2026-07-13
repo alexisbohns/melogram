@@ -1,0 +1,125 @@
+.wrapper {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 50;
+  display: inline-flex;
+}
+
+.link {
+  position: relative; /* anchors the pastille */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  color: var(--album-light);
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, var(--album-light) 14%, transparent);
+  transition: transform 0.2s ease-out, background 0.2s ease-out;
+}
+
+.link:hover {
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  transform: translateY(1px);
+}
+
+/* current-locale flag, punched out of the button with a bg-colored ring */
+.pastille {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 2px solid var(--bg);
+  pointer-events: none;
+}
+
+/* popover — mirrors the GenrePicker floating menu, anchored under the trigger */
+.menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 50;
+  min-width: 220px;
+  padding: 6px;
+  border-radius: var(--radius-button);
+  background: color-mix(in srgb, var(--album-light) 6%, #1a1118);
+  color: var(--album-light);
+  border: 1px solid color-mix(in srgb, var(--album-light) 14%, transparent);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0;
+}
+
+.section + .section {
+  border-top: 1px solid color-mix(in srgb, var(--album-light) 10%, transparent);
+}
+
+/* eyebrow label — echoes controls.module.css .label */
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--album-accent);
+  padding: 4px 10px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--album-light);
+  padding: 8px 10px;
+  border-radius: calc(var(--radius-button) - 4px);
+  transition: background 0.15s ease-out, color 0.15s ease-out;
+}
+
+.item:hover,
+.item:focus-visible {
+  outline: none;
+  background: color-mix(in srgb, var(--album-accent) 10%, transparent);
+}
+
+.itemActive {
+  color: var(--album-accent);
+}
+
+.itemDanger {
+  color: var(--danger);
+}
+
+.itemDanger:hover,
+.itemDanger:focus-visible {
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+}
+
+.langFlag {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.check {
+  margin-left: auto;
+  color: var(--album-accent);
+}

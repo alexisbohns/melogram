@@ -1,23 +1,24 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { ARTIST, MENU_ITEMS, SOCIAL_LINKS } from "@/lib/site";
+import { getLocale, getMessages, type Messages } from "@/lib/i18n";
 import styles from "./Header.module.css";
 
 type Props = {
   variant: "home" | "compact";
 };
 
-function Menu({ className }: { className?: string }) {
+function Menu({ nav, className }: { nav: Messages["nav"]; className?: string }) {
   return (
     <nav className={`${styles.menu} ${className ?? ""}`}>
       {MENU_ITEMS.map((item) =>
         item.href ? (
-          <Link key={item.label} href={item.href} className={styles.menuActive}>
-            {item.label}
+          <Link key={item.key} href={item.href} className={styles.menuActive}>
+            {nav[item.key]}
           </Link>
         ) : (
-          <span key={item.label} className={styles.menuItem}>
-            {item.label}
+          <span key={item.key} className={styles.menuItem}>
+            {nav[item.key]}
           </span>
         )
       )}
@@ -45,8 +46,9 @@ function Social({ withLabels }: { withLabels: boolean }) {
   );
 }
 
-export default function Header({ variant }: Props) {
+export default async function Header({ variant }: Props) {
   const isHome = variant === "home";
+  const m = getMessages(await getLocale());
 
   return (
     /* the whole header composites over the page background */
@@ -61,12 +63,12 @@ export default function Header({ variant }: Props) {
       <div className={styles.body}>
         <p className={styles.name}>{ARTIST.name}</p>
         {isHome && <p className={styles.bio}>{ARTIST.bio}</p>}
-        <Menu className={styles.bodyMenu} />
+        <Menu nav={m.nav} className={styles.bodyMenu} />
       </div>
 
       <Social withLabels={isHome} />
 
-      {isHome && <Menu className={styles.bottomMenu} />}
+      {isHome && <Menu nav={m.nav} className={styles.bottomMenu} />}
     </header>
   );
 }

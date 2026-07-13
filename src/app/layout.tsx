@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Gloock, Space_Grotesk } from "next/font/google";
 import { PlayerProvider } from "@/player/PlayerProvider";
 import PlayerBar from "@/components/PlayerBar";
-import AuthStatus from "@/components/AuthStatus";
+import AccountMenu from "@/components/AccountMenu";
 import { LikesProvider } from "@/components/LikesProvider";
+import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
+import { getLocale, getMessages } from "@/lib/i18n";
 import "./globals.css";
 
 const gloock = Gloock({
@@ -17,27 +19,31 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Bohns — Melogram",
-  description:
-    "Music is my most intuitive way of expressing what words can't hold.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const m = getMessages(await getLocale());
+  return { title: m.meta.homeTitle, description: m.meta.homeDescription };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = getMessages(locale);
+
   return (
-    <html lang="en" className={`${gloock.variable} ${spaceGrotesk.variable}`}>
+    <html lang={locale} className={`${gloock.variable} ${spaceGrotesk.variable}`}>
       <body>
-        <LikesProvider>
-          <PlayerProvider>
-            <AuthStatus />
-            {children}
-            <PlayerBar />
-          </PlayerProvider>
-        </LikesProvider>
+        <LocaleProvider locale={locale} messages={messages}>
+          <LikesProvider>
+            <PlayerProvider>
+              <AccountMenu />
+              {children}
+              <PlayerBar />
+            </PlayerProvider>
+          </LikesProvider>
+        </LocaleProvider>
       </body>
     </html>
   );
