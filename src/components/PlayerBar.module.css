@@ -191,15 +191,41 @@
   width: 40px;
   height: 40px;
   border-radius: var(--radius-button);
-  background: var(--album-accent);
+  /* Album-toned gradient (accent → deep). Oversized so it can drift while the
+     track plays; static and calm when paused. */
+  background: linear-gradient(
+    150deg,
+    var(--album-accent),
+    color-mix(in srgb, var(--album-deep) 65%, var(--album-accent))
+  );
+  background-size: 160% 160%;
   color: var(--album-light);
   display: grid;
   place-items: center;
 }
 
+/* The pause button breathes while playing: the gradient drifts slowly and a
+   soft accent halo swells and fades — the same heartbeat as the bar glow. */
+.bar[data-playing="true"] .playButton {
+  animation: breatheButton 5s ease-in-out infinite;
+}
+
+@keyframes breatheButton {
+  0%,
+  100% {
+    background-position: 0% 0%;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--album-accent) 0%, transparent);
+  }
+  50% {
+    background-position: 100% 100%;
+    box-shadow: 0 0 12px 1px color-mix(in srgb, var(--album-accent) 55%, transparent);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .disc[data-playing="true"],
-  .bar[data-playing="true"]::before {
+  .bar[data-playing="true"]::before,
+  .bar[data-playing="true"] .playButton {
     animation: none;
   }
 }
