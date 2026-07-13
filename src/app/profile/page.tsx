@@ -5,9 +5,13 @@ import { Heart } from "lucide-react";
 import Header from "@/components/Header";
 import UserAvatar from "@/components/UserAvatar";
 import { createClient } from "@/lib/supabase/server";
+import { getLocale, getMessages } from "@/lib/i18n";
 import styles from "./page.module.css";
 
-export const metadata: Metadata = { title: "Profile — Bohns" };
+export async function generateMetadata(): Promise<Metadata> {
+  const m = getMessages(await getLocale());
+  return { title: m.meta.profileTitle };
+}
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -17,8 +21,10 @@ export default async function ProfilePage() {
 
   if (!user) redirect("/");
 
+  const m = getMessages(await getLocale());
   const meta = user.user_metadata ?? {};
-  const name: string = meta.full_name ?? meta.name ?? user.email ?? "You";
+  const name: string =
+    meta.full_name ?? meta.name ?? user.email ?? m.profile.nameFallback;
 
   return (
     <div className={styles.page}>
@@ -33,12 +39,12 @@ export default async function ProfilePage() {
 
           <Link href="/likes" className={styles.likesLink}>
             <Heart size={18} strokeWidth={2} />
-            <span>My likes</span>
+            <span>{m.account.myLikes}</span>
           </Link>
 
           <form action="/auth/signout" method="post">
             <button type="submit" className={styles.signout}>
-              Sign out
+              {m.account.signOut}
             </button>
           </form>
         </section>

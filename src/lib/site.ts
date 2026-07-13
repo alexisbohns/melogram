@@ -22,14 +22,15 @@ export const SOCIAL_LINKS: SocialLink[] = [
 ];
 
 export type MenuItem = {
-  label: string;
+  /** Dictionary key under `nav.*`; the label text lives in src/lib/i18n. */
+  key: "home" | "top" | "bio";
   href: string | null;
 };
 
 export const MENU_ITEMS: MenuItem[] = [
-  { label: "Home", href: "/" },
-  { label: "Top", href: null },
-  { label: "Bio", href: null },
+  { key: "home", href: "/" },
+  { key: "top", href: null },
+  { key: "bio", href: null },
 ];
 
 /** Label of the hardcoded "source" meta tile. */
