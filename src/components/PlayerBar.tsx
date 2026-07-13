@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import {
   Pause,
@@ -14,6 +13,7 @@ import type WaveSurfer from "wavesurfer.js";
 import { getPalette, paletteVars } from "@/lib/palettes";
 import { formatTime } from "@/player/durations";
 import { usePlayer } from "@/player/PlayerProvider";
+import VinylDisc from "./VinylDisc";
 import styles from "./PlayerBar.module.css";
 
 /** Rounded-pill waveform bars — carried over from the previous app's player. */
@@ -73,7 +73,11 @@ export default function PlayerBar() {
   }, [player.seek]);
 
   const palette = current
-    ? getPalette({ id: current.albumId ?? "", name: current.albumName ?? "" })
+    ? getPalette({
+        id: current.albumId ?? "",
+        name: current.albumName ?? "",
+        theme: current.theme,
+      })
     : null;
 
   // Create the render-only wavesurfer on first playback. Playback stays on
@@ -117,6 +121,7 @@ export default function PlayerBar() {
     const trackPalette = getPalette({
       id: current.albumId ?? "",
       name: current.albumName ?? "",
+      theme: current.theme,
     });
     ws.setOptions({
       waveColor: alpha(trackPalette.accent, 0.4),
@@ -140,47 +145,11 @@ export default function PlayerBar() {
       aria-hidden={current ? undefined : true}
       style={palette ? paletteVars(palette) : undefined}
     >
-      {/* Animated turbulence used to "boil" the pause icon while playing —
-          the wobbling seed gives the icon edges a gentle wavy, alive motion. */}
-      <svg className={styles.boilFilter} aria-hidden="true" focusable="false">
-        <filter id="pause-boil" x="-30%" y="-30%" width="160%" height="160%">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.018 0.03"
-            numOctaves={1}
-            result="noise"
-            seed={1}
-          >
-            <animate
-              attributeName="seed"
-              values="1;8;1"
-              dur="1.6s"
-              repeatCount="indefinite"
-            />
-          </feTurbulence>
-          <feDisplacementMap
-            in="SourceGraphic"
-            in2="noise"
-            scale={2.2}
-            xChannelSelector="R"
-            yChannelSelector="G"
-          />
-        </filter>
-      </svg>
-
       <div className={styles.inner}>
         <div className={styles.meta}>
-          {current?.coverUrl ? (
-            <Image
-              src={current.coverUrl}
-              alt=""
-              width={48}
-              height={48}
-              className={styles.cover}
-            />
-          ) : (
-            <div className={styles.cover} />
-          )}
+          <div className={styles.disc} data-playing={isPlaying ? "true" : "false"}>
+            <VinylDisc coverUrl={current?.coverUrl ?? null} size={48} />
+          </div>
           <div className={styles.titles}>
             <span className={styles.trackName}>{current?.name}</span>
             <span className={styles.albumName}>{current?.albumName}</span>

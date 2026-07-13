@@ -42,13 +42,23 @@
   min-width: 0;
 }
 
-.cover {
+/* The album's vinyl disc replaces the flat cover — it turns gently while the
+   track plays and rests when paused. VinylDisc fills this positioned box. */
+.disc {
+  position: relative;
   width: 48px;
   height: 48px;
   flex-shrink: 0;
-  border-radius: 8px;
-  object-fit: cover;
-  background: color-mix(in srgb, var(--album-accent) 10%, transparent);
+}
+
+.disc[data-playing="true"] {
+  animation: spin 5s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .titles {
@@ -141,15 +151,11 @@
   filter: url(#pause-boil);
 }
 
-/* Off-screen carrier for the reusable SVG filter definition. */
-.boilFilter {
-  position: absolute;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
+  .disc[data-playing="true"] {
+    animation: none;
+  }
+
   .playButton[data-playing="true"] svg {
     filter: none;
   }

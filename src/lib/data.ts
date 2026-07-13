@@ -60,6 +60,50 @@ async function attachDurations(
   }
 }
 
+/**
+ * Attach each track's album theme from the album rows we already hold. The
+ * `track_overview` view doesn't expose it, so without this the global player
+ * can't resolve a Supabase-set theme and falls back to a default palette.
+ */
+function attachThemesFromAlbums(albums: Album[], tracks: Track[]): void {
+  const themeById = new Map(albums.map((a) => [a.id, a.theme]));
+  for (const track of tracks) {
+    if (track.album_id) track.album_theme = themeById.get(track.album_id) ?? null;
+  }
+}
+
+/** Likes come without album rows — fetch the themes for the tracks' albums. */
+async function attachAlbumThemes(
+  client: SupabaseClient,
+  tracks: Track[]
+): Promise<void> {
+  const ids = [
+    ...new Set(
+      tracks
+        .map((t) => t.album_id)
+        .filter((id): id is string => Boolean(id))
+    ),
+  ];
+  if (ids.length === 0) return;
+  const { data, error } = await client
+    .from("albums")
+    .select("id,theme")
+    .in("id", ids);
+  if (error) {
+    console.error("Failed to load album themes", error.message);
+    return;
+  }
+  const byId = new Map(
+    (data ?? []).map((row) => [
+      row.id as string,
+      (row.theme as string | null) ?? null,
+    ])
+  );
+  for (const track of tracks) {
+    if (track.album_id) track.album_theme = byId.get(track.album_id) ?? null;
+  }
+}
+
 function groupTracks(albums: Album[], tracks: Track[]): AlbumWithTracks[] {
   const byAlbum = new Map<string, Track[]>();
   for (const track of tracks) {
@@ -93,11 +137,11 @@ export async function getAlbumsWithTracks(): Promise<AlbumWithTracks[]> {
 
   // Listener view: drop versionless tracks, then albums left with none. Owners
   // reach an album's full track list through getAlbumWithTracks (edit mode).
+  const albums = (albumsRes.data ?? []) as Album[];
   const tracks = ((tracksRes.data ?? []) as Track[]).filter(hasVersion);
+  attachThemesFromAlbums(albums, tracks);
   await attachDurations(supabase, tracks);
-  return groupTracks((albumsRes.data ?? []) as Album[], tracks).filter(
-    (album) => album.tracks.length > 0
-  );
+  return groupTracks(albums, tracks).filter((album) => album.tracks.length > 0);
 }
 
 export async function getAlbumWithTracks(
@@ -132,8 +176,10 @@ export async function getAlbumWithTracks(
     .map((row) => (row as unknown as { genres: Genre | null }).genres)
     .filter((g): g is Genre => Boolean(g));
 
+  const album = albumRes.data as Album;
+  attachThemesFromAlbums([album], tracks);
   await attachDurations(supabase, tracks);
-  return { ...(albumRes.data as Album), tracks, genres };
+  return { ...album, tracks, genres };
 }
 
 /** All genres, alphabetical — powers the edit combobox. */
@@ -189,6 +235,9 @@ export async function getLikedTracks(
   const ordered = likedIds
     .map((id) => byId.get(id))
     .filter((track): track is Track => Boolean(track));
-  await attachDurations(client, ordered);
+  await Promise.all([
+    attachDurations(client, ordered),
+    attachAlbumThemes(client, ordered),
+  ]);
   return ordered;
 }

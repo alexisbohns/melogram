@@ -20,6 +20,8 @@ export type PlayerTrack = {
   albumId: string | null;
   albumName: string | null;
   coverUrl: string | null;
+  /** Album theme key, so the player resolves the same palette as the album. */
+  theme: string | null;
 };
 
 export type RepeatMode = "none" | "one" | "all";
@@ -54,6 +56,7 @@ export function toPlayerTrack(track: Track): PlayerTrack {
     albumId: track.album_id,
     albumName: track.album_name,
     coverUrl: track.album_cover_url,
+    theme: track.album_theme ?? null,
   };
 }
 

@@ -25,6 +25,18 @@
   color: var(--album-light);
 }
 
+/* While this row is the one playing, its pause icon "boils" — same shared
+   turbulence filter the player bar uses (see BoilFilter). */
+.playing svg {
+  filter: url(#pause-boil);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .playing svg {
+    filter: none;
+  }
+}
+
 .name {
   color: var(--album-light);
   font-size: 16px;
