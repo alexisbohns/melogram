@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Gloock, Space_Grotesk } from "next/font/google";
 import { PlayerProvider } from "@/player/PlayerProvider";
 import PlayerBar from "@/components/PlayerBar";
-import BoilFilter from "@/components/BoilFilter";
 import AuthStatus from "@/components/AuthStatus";
 import { LikesProvider } from "@/components/LikesProvider";
 import "./globals.css";
@@ -37,7 +36,6 @@ export default function RootLayout({
             <AuthStatus />
             {children}
             <PlayerBar />
-            <BoilFilter />
           </PlayerProvider>
         </LikesProvider>
       </body>

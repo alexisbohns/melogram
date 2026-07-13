@@ -16,6 +16,44 @@
   transition: translate 0.3s ease, visibility 0s linear 0s;
 }
 
+/* Album-coloured glow tinting the card. It sits above the dark backdrop and
+   below the content, and breathes slowly (opacity + a gentle swell) while the
+   track plays — a soft heartbeat in the album's accent and deep tones. */
+.bar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+      120% 180% at 12% 8%,
+      color-mix(in srgb, var(--album-accent) 40%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      120% 180% at 88% 96%,
+      color-mix(in srgb, var(--album-deep) 60%, transparent),
+      transparent 62%
+    );
+  opacity: 0.5;
+}
+
+.bar[data-playing="true"]::before {
+  animation: breathe 8s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.72;
+    transform: scale(1.06);
+  }
+}
+
 .bar[data-player-visible="false"] {
   /* fully off-screen AND unrendered — iOS Safari's translucent toolbar
      otherwise reveals the area below the viewport */
@@ -26,6 +64,8 @@
 }
 
 .inner {
+  position: relative;
+  z-index: 1;
   max-width: 1296px;
   margin-inline: auto;
   padding: 12px 24px;
@@ -146,18 +186,10 @@
   place-items: center;
 }
 
-/* Wavy "boiling" motion on the pause icon while the track is playing. */
-.playButton[data-playing="true"] svg {
-  filter: url(#pause-boil);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .disc[data-playing="true"] {
+  .disc[data-playing="true"],
+  .bar[data-playing="true"]::before {
     animation: none;
-  }
-
-  .playButton[data-playing="true"] svg {
-    filter: none;
   }
 }
 

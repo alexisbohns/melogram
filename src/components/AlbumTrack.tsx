@@ -60,7 +60,9 @@ export default function AlbumTrack({
         )}
       </button>
 
-      <span className={styles.name}>{track.track_name}</span>
+      <span className={`${styles.name} ${active ? "shimmer" : ""}`}>
+        {track.track_name}
+      </span>
 
       <div className={styles.footer}>
         <span className={styles.time}>

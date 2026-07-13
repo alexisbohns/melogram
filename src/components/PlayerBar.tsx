@@ -142,6 +142,7 @@ export default function PlayerBar() {
     <div
       className={styles.bar}
       data-player-visible={current ? "true" : "false"}
+      data-playing={isPlaying ? "true" : "false"}
       aria-hidden={current ? undefined : true}
       style={palette ? paletteVars(palette) : undefined}
     >
@@ -151,7 +152,11 @@ export default function PlayerBar() {
             <VinylDisc coverUrl={current?.coverUrl ?? null} size={48} />
           </div>
           <div className={styles.titles}>
-            <span className={styles.trackName}>{current?.name}</span>
+            <span
+              className={`${styles.trackName} ${isPlaying ? "shimmer" : ""}`}
+            >
+              {current?.name}
+            </span>
             <span className={styles.albumName}>{current?.albumName}</span>
           </div>
         </div>
@@ -176,7 +181,6 @@ export default function PlayerBar() {
           <button
             type="button"
             className={styles.playButton}
-            data-playing={isPlaying ? "true" : "false"}
             aria-label={isPlaying ? "Pause" : "Play"}
             onClick={player.toggle}
           >

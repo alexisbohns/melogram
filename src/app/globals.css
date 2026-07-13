@@ -64,3 +64,42 @@ img {
 body:has([data-player-visible="true"]) {
   padding-bottom: calc(132px + env(safe-area-inset-bottom));
 }
+
+/* Slow, subtle highlight sweeping across the currently-playing track title —
+   the same idea as Claude's "thinking" shimmer. A brighter band travels over
+   a dimmed base of the album's light tone; the tile is dim at both edges so it
+   loops seamlessly. Applied wherever the active track's name is shown. */
+.shimmer {
+  background-image: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--album-light) 45%, transparent) 0%,
+    color-mix(in srgb, var(--album-light) 45%, transparent) 35%,
+    var(--album-light) 50%,
+    color-mix(in srgb, var(--album-light) 45%, transparent) 65%,
+    color-mix(in srgb, var(--album-light) 45%, transparent) 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3.6s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer {
+    animation: none;
+    background: none;
+    color: var(--album-light);
+    -webkit-text-fill-color: var(--album-light);
+  }
+}
