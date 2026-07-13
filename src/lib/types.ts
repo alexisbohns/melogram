@@ -38,6 +38,12 @@ export type Track = {
   album_id: string | null;
   album_name: string | null;
   album_cover_url: string | null;
+  /**
+   * Album color theme key (see src/lib/palettes.ts). Not part of the
+   * `track_overview` view — the data layer attaches it from the album row so
+   * the queued track carries its palette into the global player.
+   */
+  album_theme?: string | null;
   latest_version_id: string | null;
   latest_status: string | null;
   latest_resource_url: string | null;

@@ -245,6 +245,7 @@ export default function VersionsSection({
         albumId: album.id,
         albumName: album.name,
         coverUrl: album.cover_url,
+        theme: album.theme,
       })),
       playable.findIndex((v) => v.id === version.id)
     );
