@@ -16,11 +16,11 @@
     color-mix(in srgb, var(--album-deep) 40%, #120a0e) 78%,
     transparent
   );
+  /* Only the standard property — Turbopack's Lightning CSS auto-adds the
+     -webkit- prefix from the browser targets (as it does for AuthStatus).
+     Hand-writing the prefix here made Lightning drop the unprefixed property,
+     leaving Chrome with no blur. */
   backdrop-filter: blur(14px);
-  /* Safari (incl. iOS) still needs the prefix; Chrome/Firefox use the
-     unprefixed property above and flag this one as unknown — that's expected,
-     not the reason a backdrop may look unblurred. */
-  -webkit-backdrop-filter: blur(14px);
   border: 1px solid color-mix(in srgb, var(--album-light) 8%, transparent);
   border-radius: var(--radius-card);
   overflow: hidden;
