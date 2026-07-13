@@ -56,4 +56,14 @@ export type AlbumWithTracks = Album & {
   genres: Genre[];
 };
 
+/**
+ * A track is publicly visible once it carries at least one version. Versionless
+ * tracks — and albums composed only of them — are hidden from listeners; owners
+ * still see them (in read mode when signed in, and always in edit mode) so they
+ * can attach a first version.
+ */
+export function hasVersion(track: Track): boolean {
+  return track.latest_version_id !== null;
+}
+
 export type TrackLyrics = Record<string, string | null>;

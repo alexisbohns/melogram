@@ -1,6 +1,13 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "./supabase/anon";
-import type { Album, AlbumWithTracks, Genre, Track, TrackLyrics } from "./types";
+import {
+  hasVersion,
+  type Album,
+  type AlbumWithTracks,
+  type Genre,
+  type Track,
+  type TrackLyrics,
+} from "./types";
 
 const ALBUM_COLS =
   "id,artist_id,name,description,type,cover_url,theme,created_at";
@@ -84,9 +91,13 @@ export async function getAlbumsWithTracks(): Promise<AlbumWithTracks[]> {
   if (albumsRes.error) fail("Failed to load albums", albumsRes.error);
   if (tracksRes.error) fail("Failed to load tracks", tracksRes.error);
 
-  const tracks = (tracksRes.data ?? []) as Track[];
+  // Listener view: drop versionless tracks, then albums left with none. Owners
+  // reach an album's full track list through getAlbumWithTracks (edit mode).
+  const tracks = ((tracksRes.data ?? []) as Track[]).filter(hasVersion);
   await attachDurations(supabase, tracks);
-  return groupTracks((albumsRes.data ?? []) as Album[], tracks);
+  return groupTracks((albumsRes.data ?? []) as Album[], tracks).filter(
+    (album) => album.tracks.length > 0
+  );
 }
 
 export async function getAlbumWithTracks(

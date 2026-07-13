@@ -24,6 +24,14 @@
   line-height: 22px;
 }
 
+.unavailable {
+  color: var(--album-light);
+  font-size: 16px;
+  line-height: 22px;
+  text-align: center;
+  padding: 32px 0;
+}
+
 .editBar {
   display: flex;
   justify-content: flex-end;

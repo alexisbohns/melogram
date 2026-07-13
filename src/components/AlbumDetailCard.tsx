@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import type { AlbumWithTracks, TrackLyrics } from "@/lib/types";
+import { useMemo, useState } from "react";
+import { hasVersion, type AlbumWithTracks, type TrackLyrics } from "@/lib/types";
 import { getPalette, paletteVars } from "@/lib/palettes";
 import AlbumCoverLive from "./AlbumCoverLive";
 import AlbumHeader from "./AlbumHeader";
@@ -25,12 +25,31 @@ type Props = {
 
 /** Album page main card (Figma "AlbumCard" on Album frames). */
 export default function AlbumDetailCard({ album, lyrics }: Props) {
-  const { editing, draft, setField } = useAlbumEdit();
+  const { editing, canEdit, draft, setField } = useAlbumEdit();
   const palette = getPalette(album);
   // Track drawer target: null = closed, { trackId: null } = create mode.
   // Mounted at card level (not inside the setlist) so a setlist resync or a
   // staged row removal can't unmount it mid-upload.
   const [drawer, setDrawer] = useState<{ trackId: string | null } | null>(null);
+
+  // Read mode shows the listener view (versioned tracks only); a signed-in
+  // owner sees the full list, matching what they'd manage in edit mode.
+  const versioned = useMemo(() => album.tracks.filter(hasVersion), [album.tracks]);
+  const readTracks = canEdit ? album.tracks : versioned;
+  const readAlbum = useMemo(
+    () => ({ ...album, tracks: readTracks }),
+    [album, readTracks]
+  );
+
+  // An album composed only of versionless tracks is hidden from listeners even
+  // on a direct link (it never appears in any listing). Owners still reach it.
+  if (versioned.length === 0 && !canEdit) {
+    return (
+      <article className={styles.card} style={paletteVars(palette)}>
+        <p className={styles.unavailable}>This album isn’t available yet.</p>
+      </article>
+    );
+  }
 
   return (
     <article className={styles.card} style={paletteVars(palette)}>
@@ -67,7 +86,7 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
               <AlbumInfos tracks={album.tracks} />
             </div>
           ) : (
-            <AlbumHeader album={album} />
+            <AlbumHeader album={readAlbum} />
           )}
 
           {editing ? (
@@ -111,7 +130,7 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
           onAddTrack={() => setDrawer({ trackId: null })}
         />
       ) : (
-        <AlbumPlaylist tracks={album.tracks} variant="detailed" lyrics={lyrics} />
+        <AlbumPlaylist tracks={readTracks} variant="detailed" lyrics={lyrics} />
       )}
       {drawer && (
         <TrackDrawer
