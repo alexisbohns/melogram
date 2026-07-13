@@ -21,8 +21,10 @@
   cursor: default;
 }
 
+/* Liked keeps the same color as the resting state — the filled heart is the
+   only distinction, so the accent never flips to the brighter light tone. */
 .liked {
-  color: var(--album-light);
+  color: var(--album-accent);
 }
 
 .count {

@@ -140,6 +140,34 @@ export default function PlayerBar() {
       aria-hidden={current ? undefined : true}
       style={palette ? paletteVars(palette) : undefined}
     >
+      {/* Animated turbulence used to "boil" the pause icon while playing —
+          the wobbling seed gives the icon edges a gentle wavy, alive motion. */}
+      <svg className={styles.boilFilter} aria-hidden="true" focusable="false">
+        <filter id="pause-boil" x="-30%" y="-30%" width="160%" height="160%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.018 0.03"
+            numOctaves={1}
+            result="noise"
+            seed={1}
+          >
+            <animate
+              attributeName="seed"
+              values="1;8;1"
+              dur="1.6s"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="noise"
+            scale={2.2}
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+      </svg>
+
       <div className={styles.inner}>
         <div className={styles.meta}>
           {current?.coverUrl ? (
@@ -179,6 +207,7 @@ export default function PlayerBar() {
           <button
             type="button"
             className={styles.playButton}
+            data-playing={isPlaying ? "true" : "false"}
             aria-label={isPlaying ? "Pause" : "Play"}
             onClick={player.toggle}
           >

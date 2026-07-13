@@ -136,6 +136,25 @@
   place-items: center;
 }
 
+/* Wavy "boiling" motion on the pause icon while the track is playing. */
+.playButton[data-playing="true"] svg {
+  filter: url(#pause-boil);
+}
+
+/* Off-screen carrier for the reusable SVG filter definition. */
+.boilFilter {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .playButton[data-playing="true"] svg {
+    filter: none;
+  }
+}
+
 @media (max-width: 767px) {
   .inner {
     grid-template-columns: minmax(0, 1fr) auto;
