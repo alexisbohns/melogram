@@ -7,9 +7,20 @@
   max-width: 1296px;
   margin-inline: auto;
   z-index: 40;
-  background: color-mix(in srgb, #1a1118 92%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* Dark, album-tinted glass. Translucent enough (~78%) that the backdrop
+     blur actually reads — at the old 92% almost nothing showed through, so
+     Chrome looked unblurred even though the filter was applied. The deep tone
+     keeps the bar consistent with the rest of the palette. */
+  background: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--album-deep) 40%, #120a0e) 78%,
+    transparent
+  );
+  backdrop-filter: blur(14px);
+  /* Safari (incl. iOS) still needs the prefix; Chrome/Firefox use the
+     unprefixed property above and flag this one as unknown — that's expected,
+     not the reason a backdrop may look unblurred. */
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid color-mix(in srgb, var(--album-light) 8%, transparent);
   border-radius: var(--radius-card);
   overflow: hidden;
