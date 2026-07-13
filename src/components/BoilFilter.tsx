@@ -12,25 +12,25 @@ export default function BoilFilter() {
       focusable="false"
       style={{ position: "absolute", width: 0, height: 0 }}
     >
-      <filter id="pause-boil" x="-30%" y="-30%" width="160%" height="160%">
+      <filter id="pause-boil" x="-40%" y="-40%" width="180%" height="180%">
         <feTurbulence
           type="fractalNoise"
-          baseFrequency="0.018 0.03"
+          baseFrequency="0.011 0.014"
           numOctaves={1}
           result="noise"
           seed={1}
         >
           <animate
             attributeName="seed"
-            values="1;8;1"
-            dur="1.6s"
+            values="1;5;1"
+            dur="3.6s"
             repeatCount="indefinite"
           />
         </feTurbulence>
         <feDisplacementMap
           in="SourceGraphic"
           in2="noise"
-          scale={1.6}
+          scale={3}
           xChannelSelector="R"
           yChannelSelector="G"
         />
