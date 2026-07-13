@@ -9,6 +9,15 @@
      composites against the colour + cover — never the page behind it. */
   isolation: isolate;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  /* Pin the disc to its own permanent compositing layer so the luminosity blend
+     always rasterizes against its own colour + cover backdrop. Without it, an
+     ancestor's one-shot transform *transition* (the cover's slide-out) briefly
+     promotes then demotes the disc, and Android Chrome mis-composites the nested
+     mix-blend-mode during that churn — the grooves lose their colour for a frame
+     or two, intermittently. The player's disc never shows this because its
+     infinite spin keeps the layer permanently promoted; this makes every disc
+     behave the same, stable way. */
+  transform: translateZ(0);
 }
 
 /* 1. Solid fill in the album's primary theme colour. */
