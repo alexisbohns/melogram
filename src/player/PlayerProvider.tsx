@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Track } from "@/lib/types";
+import { recordPlay } from "@/lib/plays";
 
 export type PlayerTrack = {
   id: string;
@@ -176,7 +177,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       setDuration(0);
       setTime(0);
       audio.src = track.url;
-      if (autoplay) void audio.play();
+      if (autoplay) {
+        void audio.play();
+        void recordPlay(track.id, "web");
+      }
       syncMetadata(track);
       syncPositionState(true);
     },
