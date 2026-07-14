@@ -165,10 +165,7 @@ export async function uploadAlbumCover(
   const supabase = createClient();
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
   const path = `${albumId}/cover.${ext}`;
-  const up = await supabase.storage
-    .from("covers")
-    .upload(path, file, { upsert: true });
-  if (up.error) throw new Error(up.error.message);
+  await uploadObject("covers", path, file);
   const base = supabase.storage.from("covers").getPublicUrl(path).data.publicUrl;
   const url = `${base}?v=${Date.now()}`;
   const { error } = await supabase.rpc("set_album_cover", {
@@ -232,21 +229,30 @@ export async function deleteVersionAndFile(
 }
 
 /** Best-effort storage cleanup: never throws (the DB delete already
-    committed), but logs what was left behind. remove() resolves without an
-    error even when RLS filters the delete, so compare against the request. */
+    committed), but logs what was left behind. Goes through the server route
+    (service role) because Storage RLS rejects the browser's identity — see
+    uploadObject. */
 async function removeVersionObjects(paths: string[]): Promise<void> {
   if (!paths.length) return;
-  const supabase = createClient();
-  const { data, error } = await supabase.storage
-    .from("versions")
-    .remove(paths);
-  const removed = new Set((data ?? []).map((o) => o.name));
+  let removed = new Set<string>();
+  try {
+    const res = await fetch("/api/storage", {
+      method: "DELETE",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ bucket: "versions", paths }),
+    });
+    const body = (await res.json().catch(() => null)) as {
+      removed?: string[];
+    } | null;
+    removed = new Set(body?.removed ?? []);
+  } catch {
+    // network/parse failure — treat as nothing removed, logged below
+  }
   const missed = paths.filter((p) => !removed.has(p));
-  if (error || missed.length) {
+  if (missed.length) {
     console.warn(
       "[edit] versions storage cleanup incomplete; orphaned objects:",
-      missed,
-      error?.message ?? "(no error — likely RLS-filtered)"
+      missed
     );
   }
 }
@@ -307,10 +313,7 @@ async function uploadToPath(
 ): Promise<void> {
   const supabase = createClient();
   const duration = await audioDurationFromFile(file);
-  const up = await supabase.storage
-    .from("versions")
-    .upload(path, file, { upsert: true });
-  if (up.error) throw new Error(up.error.message);
+  await uploadObject("versions", path, file);
   const base = supabase.storage
     .from("versions")
     .getPublicUrl(path).data.publicUrl;
@@ -342,6 +345,29 @@ function audioDurationFromFile(file: File): Promise<number | null> {
     audio.addEventListener("error", () => finish(null));
     audio.src = url;
   });
+}
+
+/** Put an object into a member-writable bucket via the server route.
+    The browser can't write to Storage directly: uploads arrive at Postgres as
+    role `authenticated` but with `auth.uid()` unset, so the member-gated
+    `storage.objects` policies reject them. The route re-checks membership from
+    the cookie session and writes with the service role. */
+async function uploadObject(
+  bucket: "versions" | "covers",
+  path: string,
+  file: File
+): Promise<void> {
+  const form = new FormData();
+  form.append("bucket", bucket);
+  form.append("path", path);
+  form.append("file", file);
+  const res = await fetch("/api/storage", { method: "POST", body: form });
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as {
+      error?: string;
+    } | null;
+    throw new Error(body?.error ?? `Upload failed (${res.status})`);
+  }
 }
 
 /** Storage object path from a `versions` bucket public URL (query stripped). */
