@@ -45,10 +45,20 @@ export default function LikeButton({ trackId, likeCount }: Props) {
       onClick={onClick}
       disabled={busy}
       aria-pressed={liked}
-      aria-label={liked ? "Unlike" : "Like"}
+      aria-label={
+        count > 0
+          ? `${liked ? "Unlike" : "Like"} — ${count} ${count === 1 ? "like" : "likes"}`
+          : liked
+            ? "Unlike"
+            : "Like"
+      }
     >
       <Heart size={20} strokeWidth={2} fill={liked ? "currentColor" : "none"} />
-      {count > 0 && <span className={styles.count}>{count}</span>}
+      {count > 0 && (
+        <span className={styles.tooltip} role="tooltip">
+          {count} {count === 1 ? "like" : "likes"}
+        </span>
+      )}
     </button>
   );
 }

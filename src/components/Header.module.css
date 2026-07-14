@@ -236,4 +236,15 @@
   .compact .body {
     padding: 24px 16px;
   }
+
+  /* Stack the social row below the logo + name instead of squeezing it
+     alongside them: let the header wrap and give social a full-width line. */
+  .compact {
+    flex-wrap: wrap;
+  }
+
+  .compact .social {
+    flex-basis: 100%;
+    padding: 0 16px 16px;
+  }
 }
