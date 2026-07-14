@@ -69,12 +69,11 @@ export default function AlbumTrack({
           {duration !== null ? formatTime(duration) : "–:–"}
         </span>
         <LikeButton trackId={track.track_id} likeCount={track.like_count ?? 0} />
-        {detailed && (
+        {detailed && lyrics && (
           <button
             type="button"
             className={styles.iconButton}
             aria-label={`Lyrics of ${track.track_name}`}
-            disabled={!lyrics}
             onClick={() => setLyricsOpen(true)}
           >
             <Mic size={20} strokeWidth={2} />

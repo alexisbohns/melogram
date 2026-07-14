@@ -104,13 +104,26 @@ async function attachAlbumThemes(
   }
 }
 
-function groupTracks(albums: Album[], tracks: Track[]): AlbumWithTracks[] {
+function groupTracks(
+  albums: Album[],
+  tracks: Track[],
+  position: Map<string, number>
+): AlbumWithTracks[] {
   const byAlbum = new Map<string, Track[]>();
   for (const track of tracks) {
     if (!track.album_id) continue;
     const list = byAlbum.get(track.album_id) ?? [];
     list.push(track);
     byAlbum.set(track.album_id, list);
+  }
+  // Respect the artist-set order from album_tracks.position; tracks without a
+  // recorded position fall to the end, keeping the query's release-date order.
+  for (const list of byAlbum.values()) {
+    list.sort(
+      (a, b) =>
+        (position.get(a.track_id) ?? Number.MAX_SAFE_INTEGER) -
+        (position.get(b.track_id) ?? Number.MAX_SAFE_INTEGER)
+    );
   }
   return albums.map((album) => ({
     ...album,
@@ -120,7 +133,7 @@ function groupTracks(albums: Album[], tracks: Track[]): AlbumWithTracks[] {
 }
 
 export async function getAlbumsWithTracks(): Promise<AlbumWithTracks[]> {
-  const [albumsRes, tracksRes] = await Promise.all([
+  const [albumsRes, tracksRes, orderRes] = await Promise.all([
     supabase
       .from("albums")
       .select(ALBUM_COLS)
@@ -130,10 +143,19 @@ export async function getAlbumsWithTracks(): Promise<AlbumWithTracks[]> {
       .select(TRACK_COLS)
       .not("album_id", "is", null)
       .order("latest_release_date", { ascending: false }),
+    supabase.from("album_tracks").select("track_id,position"),
   ]);
 
   if (albumsRes.error) fail("Failed to load albums", albumsRes.error);
   if (tracksRes.error) fail("Failed to load tracks", tracksRes.error);
+  if (orderRes.error) fail("Failed to load track order", orderRes.error);
+
+  const position = new Map(
+    (orderRes.data ?? []).map((r) => [
+      r.track_id as string,
+      r.position as number,
+    ])
+  );
 
   // Listener view: drop versionless tracks, then albums left with none. Owners
   // reach an album's full track list through getAlbumWithTracks (edit mode).
@@ -141,7 +163,9 @@ export async function getAlbumsWithTracks(): Promise<AlbumWithTracks[]> {
   const tracks = ((tracksRes.data ?? []) as Track[]).filter(hasVersion);
   attachThemesFromAlbums(albums, tracks);
   await attachDurations(supabase, tracks);
-  return groupTracks(albums, tracks).filter((album) => album.tracks.length > 0);
+  return groupTracks(albums, tracks, position).filter(
+    (album) => album.tracks.length > 0
+  );
 }
 
 export async function getAlbumWithTracks(
