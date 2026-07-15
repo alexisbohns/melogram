@@ -286,6 +286,23 @@ export async function getAlbumWithTracks(
   return { ...album, tracks, genres };
 }
 
+/**
+ * Minimal album fields for the social-share image (name, cover, theme). A
+ * lightweight read for the `opengraph-image`/`twitter-image` routes, which
+ * don't need the tracks, order, genres, and durations getAlbumWithTracks loads.
+ */
+export async function getAlbumBasics(
+  id: string
+): Promise<Pick<Album, "id" | "name" | "cover_url" | "theme"> | null> {
+  const { data, error } = await supabase
+    .from("albums")
+    .select("id,name,cover_url,theme")
+    .eq("id", id)
+    .maybeSingle();
+  if (error || !data) return null;
+  return data as Pick<Album, "id" | "name" | "cover_url" | "theme">;
+}
+
 /** All genres, alphabetical — powers the edit combobox. */
 export async function getGenres(): Promise<Genre[]> {
   const { data, error } = await supabase

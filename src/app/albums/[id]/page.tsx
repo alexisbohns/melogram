@@ -17,7 +17,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const albums = await getAlbumsWithTracks();
   const album = albums.find((a) => a.id === id);
-  return { title: album ? `${album.name} — Bohns` : "Bohns — Melogram" };
+  if (!album) return { title: "Bohns — Melogram" };
+
+  const title = `${album.name} — Bohns`;
+  const description = album.description ?? `${album.name} on Melogram.`;
+  // The cover image itself is supplied by the opengraph-image / twitter-image
+  // route conventions; here we just enrich the surrounding card text.
+  return {
+    title,
+    description,
+    openGraph: { title, description, type: "music.album" },
+    twitter: { card: "summary_large_image", title, description },
+  };
 }
 
 export default async function AlbumPage({ params }: Props) {

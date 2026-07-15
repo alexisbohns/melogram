@@ -6,6 +6,7 @@ import AccountMenu from "@/components/AccountMenu";
 import { LikesProvider } from "@/components/LikesProvider";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 import { getLocale, getMessages } from "@/lib/i18n";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const gloock = Gloock({
@@ -28,6 +29,7 @@ export const viewport: Viewport = {
 export async function generateMetadata(): Promise<Metadata> {
   const m = getMessages(await getLocale());
   return {
+    metadataBase: new URL(siteUrl()),
     title: m.meta.homeTitle,
     description: m.meta.homeDescription,
     applicationName: "Melogram",

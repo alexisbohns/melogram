@@ -35,3 +35,16 @@ export const MENU_ITEMS: MenuItem[] = [
 
 /** Label of the hardcoded "source" meta tile. */
 export const SOURCE_LABEL = "Soundcloud";
+
+/**
+ * Canonical site origin, used as `metadataBase` so Open Graph / Twitter image
+ * URLs resolve to absolute links crawlers can fetch. Prefers an explicit
+ * `NEXT_PUBLIC_SITE_URL`, falls back to Vercel's deploy URL, then localhost.
+ */
+export function siteUrl(): string {
+  const raw =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
+    "http://localhost:3000";
+  return raw.replace(/\/+$/, "");
+}
