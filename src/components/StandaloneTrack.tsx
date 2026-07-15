@@ -40,7 +40,7 @@ export default function StandaloneTrack({ track, queue }: Props) {
     }
     const playableTracks = queue.filter((t) => t.latest_resource_url);
     playFrom(
-      playableTracks.map(toPlayerTrack),
+      playableTracks.map((t) => toPlayerTrack(t)),
       playableTracks.findIndex((t) => t.track_id === track.track_id)
     );
   };
