@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Gloock, Space_Grotesk } from "next/font/google";
 import { PlayerProvider } from "@/player/PlayerProvider";
 import PlayerBar from "@/components/PlayerBar";
@@ -19,9 +19,26 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
 });
 
+// Matches the app shell background (`--bg`) so the mobile browser chrome and
+// the PWA splash/status bar blend into the dark theme.
+export const viewport: Viewport = {
+  themeColor: "#11090c",
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   const m = getMessages(await getLocale());
-  return { title: m.meta.homeTitle, description: m.meta.homeDescription };
+  return {
+    title: m.meta.homeTitle,
+    description: m.meta.homeDescription,
+    applicationName: "Melogram",
+    // Installed (Add to Home Screen) behaviour on iOS: run standalone with a
+    // dark status bar and the app name under the icon.
+    appleWebApp: {
+      capable: true,
+      title: "Melogram",
+      statusBarStyle: "black-translucent",
+    },
+  };
 }
 
 export default async function RootLayout({
