@@ -22,6 +22,14 @@ export type PlayerTrack = {
   coverUrl: string | null;
   /** Album theme key, so the player resolves the same palette as the album. */
   theme: string | null;
+  /** Track blurb shown in the player's expanded details drawer. */
+  description: string | null;
+  /**
+   * Track lyrics. Not part of the `track_overview` view, so callers that have
+   * them (the album page) pass them through; null everywhere else, which hides
+   * the expanded player's Lyrics action.
+   */
+  lyrics: string | null;
 };
 
 export type RepeatMode = "none" | "one" | "all";
@@ -47,8 +55,15 @@ type PlayerContextValue = {
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
 
-/** Map a `track_overview` row (with a playable URL) to a queue entry. */
-export function toPlayerTrack(track: Track): PlayerTrack {
+/**
+ * Map a `track_overview` row (with a playable URL) to a queue entry. Lyrics
+ * live outside the view, so callers that have them (the album page) pass them
+ * in; they default to null so the player's Lyrics action simply stays hidden.
+ */
+export function toPlayerTrack(
+  track: Track,
+  lyrics: string | null = null
+): PlayerTrack {
   return {
     id: track.track_id,
     name: track.track_name,
@@ -57,6 +72,8 @@ export function toPlayerTrack(track: Track): PlayerTrack {
     albumName: track.album_name,
     coverUrl: track.album_cover_url,
     theme: track.album_theme ?? null,
+    description: track.track_description,
+    lyrics,
   };
 }
 

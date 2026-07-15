@@ -23,6 +23,12 @@ export const fr: Messages = {
     signOut: "Se déconnecter",
   },
   profile: { nameFallback: "Vous" },
+  player: {
+    expand: "Afficher les détails du titre",
+    collapse: "Masquer les détails du titre",
+    album: "Album",
+    lyrics: "Paroles",
+  },
   likes: {
     title: "Mes favoris",
     empty:

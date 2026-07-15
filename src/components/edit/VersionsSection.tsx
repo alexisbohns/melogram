@@ -246,6 +246,8 @@ export default function VersionsSection({
         albumName: album.name,
         coverUrl: album.cover_url,
         theme: album.theme,
+        description: track.description,
+        lyrics: track.lyrics,
       })),
       playable.findIndex((v) => v.id === version.id)
     );

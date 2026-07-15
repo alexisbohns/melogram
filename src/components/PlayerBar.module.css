@@ -86,11 +86,19 @@
   align-items: center;
 }
 
+/* The meta block doubles as the drawer toggle — tapping the vinyl or the
+   track name expands the player. Inherits the global button reset. */
 .meta {
   display: flex;
   align-items: center;
   gap: 16px;
   min-width: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.meta:disabled {
+  cursor: default;
 }
 
 /* The album's vinyl disc replaces the flat cover — it turns gently while the
@@ -117,6 +125,23 @@
   flex-direction: column;
   gap: 4px;
   min-width: 0;
+  flex: 1;
+}
+
+/* Disclosure affordance for the expandable details drawer; rotates when open. */
+.chevron {
+  flex-shrink: 0;
+  color: var(--album-accent);
+  opacity: 0.5;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+}
+
+.meta:hover .chevron {
+  opacity: 0.85;
+}
+
+.bar[data-expanded="true"] .chevron {
+  transform: rotate(180deg);
 }
 
 .trackName {
@@ -222,11 +247,85 @@
   }
 }
 
+/* Expandable details drawer. The 0fr → 1fr grid row animates the height
+   fluidly with no magic max-height; the inner content fades and settles in
+   just behind it. The card is bottom-anchored, so it grows gently upward. */
+.expansion {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bar[data-expanded="true"] .expansion {
+  grid-template-rows: 1fr;
+}
+
+.expansionClip {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.expansionInner {
+  margin: 0 24px;
+  padding: 14px 0 16px;
+  border-top: 1px solid color-mix(in srgb, var(--album-light) 10%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.bar[data-expanded="true"] .expansionInner {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.06s;
+}
+
+.description {
+  color: var(--album-light);
+  opacity: 0.62;
+  font-size: 14px;
+  line-height: 20px;
+  max-width: 680px;
+}
+
+.expandActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.expandButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: var(--radius-button);
+  background: color-mix(in srgb, var(--album-accent) 14%, transparent);
+  color: var(--album-light);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.expandButton:hover {
+  background: color-mix(in srgb, var(--album-accent) 24%, transparent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .disc[data-playing="true"],
   .bar[data-playing="true"]::before,
   .bar[data-playing="true"] .playButton {
     animation: none;
+  }
+
+  .expansion,
+  .expansionInner,
+  .chevron {
+    transition: none;
   }
 }
 
@@ -251,5 +350,19 @@
   .timeline {
     grid-area: timeline;
     gap: 12px;
+  }
+
+  /* Reclaim room for the track name: drop the skip buttons and keep just
+     repeat + play/pause, with repeat on the left and the pause on the right. */
+  .stepButton {
+    display: none;
+  }
+
+  .repeatButton {
+    order: -1;
+  }
+
+  .expansionInner {
+    margin: 0 16px;
   }
 }

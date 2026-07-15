@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import {
+  ChevronDown,
+  Disc3,
+  Mic,
   Pause,
   Play,
   Repeat,
@@ -13,6 +17,8 @@ import type WaveSurfer from "wavesurfer.js";
 import { getPalette, paletteVars } from "@/lib/palettes";
 import { formatTime } from "@/player/durations";
 import { usePlayer } from "@/player/PlayerProvider";
+import { useMessages } from "@/lib/i18n/LocaleProvider";
+import LyricsSheet from "./LyricsSheet";
 import VinylDisc from "./VinylDisc";
 import styles from "./PlayerBar.module.css";
 
@@ -59,11 +65,29 @@ function alpha(hex: string, fraction: number): string {
 export default function PlayerBar() {
   const player = usePlayer();
   const { current, isPlaying, repeat, time, duration } = player;
+  const m = useMessages();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const wsRef = useRef<WaveSurfer | null>(null);
   const loadedUrl = useRef<string | null>(null);
   const [wsReady, setWsReady] = useState(false);
+
+  // Expanded details drawer (description + Album/Lyrics actions), toggled by
+  // tapping the vinyl or the track name.
+  const [expanded, setExpanded] = useState(false);
+  const [lyricsOpen, setLyricsOpen] = useState(false);
+
+  // A freshly-started track always appears collapsed: reset the drawer whenever
+  // the current track changes (or the bar hides). Adjusting state during render
+  // — rather than in an effect — is React's recommended way to reset on a
+  // changing value, and avoids a cascading re-render.
+  const trackId = current?.id ?? null;
+  const [shownTrackId, setShownTrackId] = useState(trackId);
+  if (trackId !== shownTrackId) {
+    setShownTrackId(trackId);
+    setExpanded(false);
+    setLyricsOpen(false);
+  }
 
   // the seek callback changes identity across renders; the wavesurfer
   // 'interaction' handler is registered once, so it reads through a ref
@@ -138,83 +162,145 @@ export default function PlayerBar() {
     wsRef.current?.setTime(time);
   }, [time]);
 
+  const hasLyrics = Boolean(current?.lyrics);
+  const canExpand = Boolean(current);
+
   return (
-    <div
-      className={styles.bar}
-      data-player-visible={current ? "true" : "false"}
-      data-playing={isPlaying ? "true" : "false"}
-      aria-hidden={current ? undefined : true}
-      style={palette ? paletteVars(palette) : undefined}
-    >
-      <div className={styles.inner}>
-        <div className={styles.meta}>
-          <div className={styles.disc} data-playing={isPlaying ? "true" : "false"}>
-            <VinylDisc coverUrl={current?.coverUrl ?? null} size={48} />
-          </div>
-          <div className={styles.titles}>
-            <span
-              className={`${styles.trackName} ${isPlaying ? "shimmer" : ""}`}
-            >
-              {current?.name}
+    <>
+      <div
+        className={styles.bar}
+        data-player-visible={current ? "true" : "false"}
+        data-playing={isPlaying ? "true" : "false"}
+        data-expanded={expanded ? "true" : "false"}
+        aria-hidden={current ? undefined : true}
+        style={palette ? paletteVars(palette) : undefined}
+      >
+        <div className={styles.inner}>
+          <button
+            type="button"
+            className={styles.meta}
+            aria-expanded={expanded}
+            title={expanded ? m.player.collapse : m.player.expand}
+            disabled={!canExpand}
+            onClick={() => setExpanded((v) => !v)}
+          >
+            <div className={styles.disc} data-playing={isPlaying ? "true" : "false"}>
+              <VinylDisc coverUrl={current?.coverUrl ?? null} size={48} />
+            </div>
+            <div className={styles.titles}>
+              <span
+                className={`${styles.trackName} ${isPlaying ? "shimmer" : ""}`}
+              >
+                {current?.name}
+              </span>
+              <span className={styles.albumName}>{current?.albumName}</span>
+            </div>
+            <ChevronDown
+              className={styles.chevron}
+              size={18}
+              strokeWidth={2}
+              aria-hidden
+            />
+          </button>
+
+          <div className={styles.timeline}>
+            <span className={styles.time}>{formatTime(time)}</span>
+            <div ref={containerRef} className={styles.waveform} />
+            <span className={styles.time}>
+              {duration > 0 ? formatTime(duration) : "–:–"}
             </span>
-            <span className={styles.albumName}>{current?.albumName}</span>
+          </div>
+
+          <div className={styles.controls}>
+            <button
+              type="button"
+              className={`${styles.controlButton} ${styles.stepButton}`}
+              aria-label="Previous track"
+              onClick={player.previous}
+            >
+              <SkipBack size={20} strokeWidth={2} />
+            </button>
+            <button
+              type="button"
+              className={styles.playButton}
+              aria-label={isPlaying ? "Pause" : "Play"}
+              onClick={player.toggle}
+            >
+              {isPlaying ? (
+                <Pause size={20} strokeWidth={2} />
+              ) : (
+                <Play size={20} strokeWidth={2} />
+              )}
+            </button>
+            <button
+              type="button"
+              className={`${styles.controlButton} ${styles.stepButton}`}
+              aria-label="Next track"
+              onClick={player.next}
+            >
+              <SkipForward size={20} strokeWidth={2} />
+            </button>
+            <button
+              type="button"
+              className={`${styles.controlButton} ${styles.repeatButton} ${
+                repeat === "none" ? styles.repeatOff : ""
+              }`}
+              aria-label={`Repeat mode: ${repeat}`}
+              title={`Repeat: ${repeat}`}
+              onClick={player.cycleRepeat}
+            >
+              {repeat === "one" ? (
+                <Repeat1 size={20} strokeWidth={2} />
+              ) : (
+                <Repeat size={20} strokeWidth={2} />
+              )}
+            </button>
           </div>
         </div>
 
-        <div className={styles.timeline}>
-          <span className={styles.time}>{formatTime(time)}</span>
-          <div ref={containerRef} className={styles.waveform} />
-          <span className={styles.time}>
-            {duration > 0 ? formatTime(duration) : "–:–"}
-          </span>
-        </div>
-
-        <div className={styles.controls}>
-          <button
-            type="button"
-            className={styles.controlButton}
-            aria-label="Previous track"
-            onClick={player.previous}
-          >
-            <SkipBack size={20} strokeWidth={2} />
-          </button>
-          <button
-            type="button"
-            className={styles.playButton}
-            aria-label={isPlaying ? "Pause" : "Play"}
-            onClick={player.toggle}
-          >
-            {isPlaying ? (
-              <Pause size={20} strokeWidth={2} />
-            ) : (
-              <Play size={20} strokeWidth={2} />
-            )}
-          </button>
-          <button
-            type="button"
-            className={styles.controlButton}
-            aria-label="Next track"
-            onClick={player.next}
-          >
-            <SkipForward size={20} strokeWidth={2} />
-          </button>
-          <button
-            type="button"
-            className={`${styles.controlButton} ${
-              repeat === "none" ? styles.repeatOff : ""
-            }`}
-            aria-label={`Repeat mode: ${repeat}`}
-            title={`Repeat: ${repeat}`}
-            onClick={player.cycleRepeat}
-          >
-            {repeat === "one" ? (
-              <Repeat1 size={20} strokeWidth={2} />
-            ) : (
-              <Repeat size={20} strokeWidth={2} />
-            )}
-          </button>
+        <div className={styles.expansion}>
+          <div className={styles.expansionClip}>
+            <div className={styles.expansionInner}>
+              {current?.description && (
+                <p className={styles.description}>{current.description}</p>
+              )}
+              <div className={styles.expandActions}>
+                {current?.albumId && (
+                  <Link
+                    href={`/albums/${current.albumId}`}
+                    className={styles.expandButton}
+                    onClick={() => setExpanded(false)}
+                  >
+                    <Disc3 size={16} strokeWidth={2} aria-hidden />
+                    {m.player.album}
+                  </Link>
+                )}
+                {hasLyrics && (
+                  <button
+                    type="button"
+                    className={styles.expandButton}
+                    onClick={() => setLyricsOpen(true)}
+                  >
+                    <Mic size={16} strokeWidth={2} aria-hidden />
+                    {m.player.lyrics}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+
+      {hasLyrics && current && (
+        <div style={palette ? paletteVars(palette) : undefined}>
+          <LyricsSheet
+            open={lyricsOpen}
+            onClose={() => setLyricsOpen(false)}
+            trackName={current.name}
+            lyrics={current.lyrics ?? ""}
+          />
+        </div>
+      )}
+    </>
   );
 }

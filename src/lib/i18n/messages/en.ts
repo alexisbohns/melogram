@@ -26,6 +26,12 @@ export const en = {
     signOut: "Sign out",
   },
   profile: { nameFallback: "You" },
+  player: {
+    expand: "Show track details",
+    collapse: "Hide track details",
+    album: "Album",
+    lyrics: "Lyrics",
+  },
   likes: {
     title: "My likes",
     empty:
