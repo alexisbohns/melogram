@@ -104,12 +104,25 @@ export default function PlayerBar() {
       })
     : null;
 
-  // Create the render-only wavesurfer on first playback. Playback stays on
-  // the provider's Audio element; wavesurfer only decodes + draws the file
-  // and reports scrub interactions.
+  // Create the render-only wavesurfer on first playback. It *shares* the
+  // provider's single <audio> element (the `media` option) rather than
+  // creating its own — two elements playing the same track confuse iOS, which
+  // binds the lock-screen play/pause state to the wrong (never-played) element
+  // and shows a stale ▶︎. Sharing keeps exactly one media element, so the
+  // lock-screen controls track real playback. Wavesurfer still only decodes +
+  // draws the file and reports scrub interactions; it never drives playback.
+  const audioElement = player.audioElement;
   useEffect(() => {
-    if (!current || wsRef.current || !containerRef.current) return;
+    if (!current || wsRef.current || !containerRef.current || !audioElement)
+      return;
     let cancelled = false;
+    const media = audioElement;
+    const url = current.url;
+    const trackPalette = getPalette({
+      id: current.albumId ?? "",
+      name: current.albumName ?? "",
+      theme: current.theme,
+    });
     import("wavesurfer.js").then(({ default: WS }) => {
       if (cancelled || wsRef.current || !containerRef.current) return;
       const ws = WS.create({
@@ -119,16 +132,22 @@ export default function PlayerBar() {
         dragToSeek: true,
         cursorWidth: 0,
         renderFunction: renderWaveform,
+        // Share the provider's audio element instead of muting a second one.
+        media,
+        waveColor: alpha(trackPalette.accent, 0.4),
+        progressColor: trackPalette.light,
       });
-      ws.setVolume(0);
       ws.on("interaction", (newTime: number) => seekRef.current(newTime));
       wsRef.current = ws;
+      // wavesurfer auto-loads from the shared element's existing src, so mark
+      // this URL loaded to keep the effect below from re-fetching it.
+      loadedUrl.current = url;
       setWsReady(true);
     });
     return () => {
       cancelled = true;
     };
-  }, [current]);
+  }, [current, audioElement]);
 
   useEffect(
     () => () => {
@@ -157,10 +176,9 @@ export default function PlayerBar() {
     }
   }, [wsReady, current]);
 
-  // Follow playback progress with the waveform cursor.
-  useEffect(() => {
-    wsRef.current?.setTime(time);
-  }, [time]);
+  // The waveform cursor follows the shared media element's own timeupdate
+  // events, so no manual time-syncing is needed here. (Calling setTime on the
+  // shared element would re-seek real playback and stutter it.)
 
   const hasLyrics = Boolean(current?.lyrics);
   const canExpand = Boolean(current);

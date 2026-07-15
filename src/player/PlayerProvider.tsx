@@ -41,6 +41,13 @@ type PlayerContextValue = {
   repeat: RepeatMode;
   time: number;
   duration: number;
+  /**
+   * The single <audio> element that actually plays. Shared with the waveform
+   * visualizer so the whole app owns exactly one media element — see the
+   * comment in `getAudio` for why a second element breaks iOS lock-screen
+   * controls. Null until the first track loads.
+   */
+  audioElement: HTMLAudioElement | null;
   /** Replace the queue (an album's playable tracks) and start at index. */
   playFrom: (tracks: PlayerTrack[], index: number) => void;
   /** Play/pause the current track. */
@@ -79,6 +86,7 @@ export function toPlayerTrack(
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audioEl, setAudioEl] = useState<HTMLAudioElement | null>(null);
   const [queue, setQueue] = useState<PlayerTrack[]>([]);
   const [index, setIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -137,6 +145,15 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const audio = new Audio();
     audioRef.current = audio;
 
+    // Attach the element to the document. iOS ties the lock-screen "Now
+    // Playing" controls (play/pause icon, and tapping to re-open the tab) to a
+    // media element that lives in the DOM; a detached `new Audio()` shows a
+    // stale play/pause state. It renders nothing without `controls`.
+    if (typeof document !== "undefined") {
+      audio.setAttribute("aria-hidden", "true");
+      document.body.appendChild(audio);
+    }
+
     const setPlaybackState = (state: MediaSessionPlaybackState) => {
       try {
         if (navigator.mediaSession) navigator.mediaSession.playbackState = state;
@@ -188,6 +205,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       });
     }
 
+    // Publish the element so the waveform visualizer can share it rather than
+    // spin up a second, competing <audio> element.
+    setAudioEl(audio);
     return audio;
   }, [syncPositionState]);
 
@@ -304,6 +324,19 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Detach the audio element from the DOM when the provider unmounts (the app
+  // teardown); guards against leaking the element across hot reloads.
+  useEffect(
+    () => () => {
+      const audio = audioRef.current;
+      if (audio) {
+        audio.pause();
+        audio.remove();
+      }
+    },
+    []
+  );
+
   useEffect(() => {
     stateRef.current = { queue, index, repeat };
   }, [queue, index, repeat]);
@@ -322,6 +355,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       repeat,
       time,
       duration,
+      audioElement: audioEl,
       playFrom,
       toggle,
       next,
@@ -337,6 +371,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       repeat,
       time,
       duration,
+      audioEl,
       playFrom,
       toggle,
       next,

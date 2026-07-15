@@ -39,8 +39,9 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except static assets:
-     *   _next/static, _next/image, favicon.ico, and common image files.
+     *   _next/static, _next/image, favicon.ico, the web manifest, and common
+     *   image files.
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };
