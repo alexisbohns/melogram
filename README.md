@@ -25,8 +25,11 @@ Home and Album pages.
 
 ## Pages
 
-- `/` — artist header (brand, bio, social links) + every album as a card with
-  cover, meta tiles, description and playlist
+- `/` — artist header (brand, bio, social links) then two tabbed sections: a
+  **Tracks** section of standalone tracks (the cover doubles as the play/pause
+  control) under _Popular_ / _Latests_ tabs, and an **Albums** section of album
+  cards filtered by genre. Popularity ranks a track by `likes × 10 + plays ÷ 10`
+  (play totals come from the `track_play_counts` view)
 - `/albums/[id]` — compact header, album switcher (rail on desktop,
   horizontal strip on mobile) and album detail with track descriptions and a
   lyrics sheet

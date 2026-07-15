@@ -1,0 +1,32 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid color-mix(in srgb, var(--header-fg) 8%, transparent);
+}
+
+.tracks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 1023px) {
+  .tracks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .section {
+    gap: 16px;
+    padding: 0 24px 24px;
+  }
+
+  .tracks {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+}

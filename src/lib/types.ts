@@ -55,6 +55,12 @@ export type Track = {
    * (on upload, or by the backfill script for pre-existing rows).
    */
   duration: number | null;
+  /**
+   * Total recorded plays, attached by the data layer from the
+   * `track_play_counts` view. Only populated where a popularity ranking needs
+   * it (the home "Popular" tab); undefined elsewhere, treated as 0.
+   */
+  play_count?: number | null;
 };
 
 export type AlbumWithTracks = Album & {
@@ -70,6 +76,15 @@ export type AlbumWithTracks = Album & {
  */
 export function hasVersion(track: Track): boolean {
   return track.latest_version_id !== null;
+}
+
+/**
+ * Popularity score for the home "Popular" ranking: a like is worth 10 points,
+ * ten plays are worth 1 (i.e. one play = 0.1). So 3 likes + 20 plays = 32, and
+ * 1 like + 500 plays = 60.
+ */
+export function trackPopularity(track: Track): number {
+  return (track.like_count ?? 0) * 10 + (track.play_count ?? 0) * 0.1;
 }
 
 export type TrackLyrics = Record<string, string | null>;
