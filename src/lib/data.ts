@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "./supabase/anon";
 import {
   hasVersion,
+  trackPopularity,
   type Album,
   type AlbumWithTracks,
   type Genre,
@@ -104,10 +105,25 @@ async function attachAlbumThemes(
   }
 }
 
+/** Build an album_id → genres map from an `album_genres(genres(...))` join. */
+function groupGenres(
+  rows: { album_id: string; genres: Genre | null }[]
+): Map<string, Genre[]> {
+  const byAlbum = new Map<string, Genre[]>();
+  for (const row of rows) {
+    if (!row.genres) continue;
+    const list = byAlbum.get(row.album_id) ?? [];
+    list.push(row.genres);
+    byAlbum.set(row.album_id, list);
+  }
+  return byAlbum;
+}
+
 function groupTracks(
   albums: Album[],
   tracks: Track[],
-  position: Map<string, number>
+  position: Map<string, number>,
+  genresByAlbum: Map<string, Genre[]>
 ): AlbumWithTracks[] {
   const byAlbum = new Map<string, Track[]>();
   for (const track of tracks) {
@@ -128,12 +144,12 @@ function groupTracks(
   return albums.map((album) => ({
     ...album,
     tracks: byAlbum.get(album.id) ?? [],
-    genres: [],
+    genres: genresByAlbum.get(album.id) ?? [],
   }));
 }
 
 export async function getAlbumsWithTracks(): Promise<AlbumWithTracks[]> {
-  const [albumsRes, tracksRes, orderRes] = await Promise.all([
+  const [albumsRes, tracksRes, orderRes, genresRes] = await Promise.all([
     supabase
       .from("albums")
       .select(ALBUM_COLS)
@@ -144,17 +160,29 @@ export async function getAlbumsWithTracks(): Promise<AlbumWithTracks[]> {
       .not("album_id", "is", null)
       .order("latest_release_date", { ascending: false }),
     supabase.from("album_tracks").select("track_id,position"),
+    supabase.from("album_genres").select("album_id,genres(id,name,slug)"),
   ]);
 
   if (albumsRes.error) fail("Failed to load albums", albumsRes.error);
   if (tracksRes.error) fail("Failed to load tracks", tracksRes.error);
   if (orderRes.error) fail("Failed to load track order", orderRes.error);
+  // Genres are non-critical decoration (the home filter tabs fall back to the
+  // display genre); degrade to none rather than break the catalog.
+  if (genresRes.error) {
+    console.error("Failed to load album genres", genresRes.error.message);
+  }
 
   const position = new Map(
     (orderRes.data ?? []).map((r) => [
       r.track_id as string,
       r.position as number,
     ])
+  );
+  const genresByAlbum = groupGenres(
+    (genresRes.data ?? []) as unknown as {
+      album_id: string;
+      genres: Genre | null;
+    }[]
   );
 
   // Listener view: drop versionless tracks, then albums left with none. Owners
@@ -163,9 +191,61 @@ export async function getAlbumsWithTracks(): Promise<AlbumWithTracks[]> {
   const tracks = ((tracksRes.data ?? []) as Track[]).filter(hasVersion);
   attachThemesFromAlbums(albums, tracks);
   await attachDurations(supabase, tracks);
-  return groupTracks(albums, tracks, position).filter(
+  return groupTracks(albums, tracks, position, genresByAlbum).filter(
     (album) => album.tracks.length > 0
   );
+}
+
+/**
+ * Attach each track's total play count from the `track_play_counts` view.
+ * Non-critical (only feeds the "Popular" ranking); a missing view or error
+ * degrades every count to 0 rather than breaking the home page.
+ */
+async function attachPlayCounts(
+  client: SupabaseClient,
+  tracks: Track[]
+): Promise<void> {
+  const ids = [...new Set(tracks.map((t) => t.track_id))];
+  if (ids.length === 0) return;
+  const { data, error } = await client
+    .from("track_play_counts")
+    .select("track_id,play_count")
+    .in("track_id", ids);
+  if (error) {
+    console.error("Failed to load play counts", error.message);
+    for (const track of tracks) track.play_count = track.play_count ?? 0;
+    return;
+  }
+  const byId = new Map(
+    (data ?? []).map((row) => [
+      row.track_id as string,
+      Number(row.play_count) || 0,
+    ])
+  );
+  for (const track of tracks) track.play_count = byId.get(track.track_id) ?? 0;
+}
+
+/**
+ * Split a flat track list into the two home "Tracks" tabs:
+ *  - `popular`: the top 3 by {@link trackPopularity} (likes weighted over plays)
+ *  - `latest`:  the 3 most recently released (by the latest version's date)
+ * Play counts are attached here so the ranking has them.
+ */
+export async function getFeaturedTracks(
+  tracks: Track[],
+  limit = 3
+): Promise<{ popular: Track[]; latest: Track[] }> {
+  await attachPlayCounts(supabase, tracks);
+  const popular = [...tracks]
+    .sort((a, b) => trackPopularity(b) - trackPopularity(a))
+    .slice(0, limit);
+  const latest = [...tracks]
+    .filter((t) => t.latest_release_date)
+    .sort((a, b) =>
+      (b.latest_release_date ?? "").localeCompare(a.latest_release_date ?? "")
+    )
+    .slice(0, limit);
+  return { popular, latest };
 }
 
 export async function getAlbumWithTracks(

@@ -1,0 +1,36 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid color-mix(in srgb, var(--header-fg) 8%, transparent);
+}
+
+.tracks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 1023px) {
+  .tracks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .section {
+    /* horizontal inset for the header + track rows; the section stays
+       full-width so the header's tabs can scroll edge to edge */
+    --section-pad: 24px;
+    gap: 16px;
+    padding-bottom: 24px;
+  }
+
+  .tracks {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding-inline: var(--section-pad);
+  }
+}

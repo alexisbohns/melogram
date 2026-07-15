@@ -109,7 +109,7 @@ const LEGACY_GENRE: Record<string, string> = {
   Celesta: "Cinematic",
 };
 
-type AlbumLike = { id?: string; name?: string; theme?: string | null };
+type AlbumLike = { id?: string; name?: string | null; theme?: string | null };
 
 /** Resolve an album's palette: its stored theme, else the legacy match, else
     the default. `theme` may be absent when the caller only has id/name. */

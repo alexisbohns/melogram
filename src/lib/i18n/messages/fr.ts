@@ -6,6 +6,13 @@ import type { Messages } from "./en";
  */
 export const fr: Messages = {
   nav: { home: "Accueil", top: "Top", bio: "Bio" },
+  sections: {
+    tracks: "Morceaux",
+    albums: "Albums",
+    popular: "Populaires",
+    latests: "Récents",
+    all: "Tous",
+  },
   account: {
     triggerLabel: "Menu du compte",
     sectionAccount: "Compte",

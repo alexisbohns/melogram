@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { hasVersion, type AlbumWithTracks, type TrackLyrics } from "@/lib/types";
 import { getPalette, paletteVars } from "@/lib/palettes";
+import { displayGenre } from "@/lib/genres";
 import AlbumCoverLive from "./AlbumCoverLive";
 import AlbumHeader from "./AlbumHeader";
 import AlbumInfos from "./AlbumInfos";
@@ -117,7 +118,7 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
             </>
           ) : (
             <AlbumMetaTiles
-              genre={palette.genre ?? capitalize(album.type)}
+              genre={displayGenre(album)}
               year={new Date(album.created_at).getFullYear().toString()}
               direction="horizontal"
             />
@@ -141,9 +142,4 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
       )}
     </article>
   );
-}
-
-function capitalize(value: string | null): string {
-  if (!value) return "Album";
-  return value.charAt(0).toUpperCase() + value.slice(1);
 }

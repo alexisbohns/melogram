@@ -9,6 +9,13 @@
  */
 export const en = {
   nav: { home: "Home", top: "Top", bio: "Bio" },
+  sections: {
+    tracks: "Tracks",
+    albums: "Albums",
+    popular: "Popular",
+    latests: "Latests",
+    all: "All",
+  },
   account: {
     triggerLabel: "Account menu",
     sectionAccount: "Account",
