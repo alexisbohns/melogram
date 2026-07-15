@@ -40,14 +40,12 @@ export default function AlbumsSection({ albums }: { albums: AlbumWithTracks[] })
 
   return (
     <section className={styles.section}>
-      <div className={styles.head}>
-        <SectionHeader
-          title={m.sections.albums}
-          tabs={tabs}
-          activeKey={active}
-          onSelect={setActive}
-        />
-      </div>
+      <SectionHeader
+        title={m.sections.albums}
+        tabs={tabs}
+        activeKey={active}
+        onSelect={setActive}
+      />
       <div className={styles.grid}>
         {visible.map((album) => (
           <AlbumCard key={album.id} album={album} />

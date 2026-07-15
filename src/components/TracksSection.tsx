@@ -27,14 +27,12 @@ export default function TracksSection({ popular, latest }: Props) {
 
   return (
     <section className={styles.section}>
-      <div className={styles.head}>
-        <SectionHeader
-          title={m.sections.tracks}
-          tabs={tabs}
-          activeKey={tab}
-          onSelect={(key) => setTab(key as "popular" | "latest")}
-        />
-      </div>
+      <SectionHeader
+        title={m.sections.tracks}
+        tabs={tabs}
+        activeKey={tab}
+        onSelect={(key) => setTab(key as "popular" | "latest")}
+      />
       <ul className={styles.tracks}>
         {tracks.map((track) => (
           <StandaloneTrack

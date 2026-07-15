@@ -19,12 +19,10 @@
 
 @media (max-width: 767px) {
   .section {
+    /* insets the header (its tabs still scroll edge to edge); the cards stay
+       full-bleed with their own internal padding */
+    --section-pad: 24px;
     gap: 24px;
-  }
-
-  /* the header aligns with the page edge inset; the cards stay full-bleed */
-  .head {
-    padding: 0 24px;
   }
 
   .grid {
