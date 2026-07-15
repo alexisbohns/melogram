@@ -24,6 +24,7 @@ export default function AlbumPlaylist({
           queue={tracks}
           variant={variant}
           lyrics={lyrics[track.track_id] ?? null}
+          queueLyrics={lyrics}
         />
       ))}
     </ul>

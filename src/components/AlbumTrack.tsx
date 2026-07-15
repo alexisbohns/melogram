@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Mic, Pause, Play } from "lucide-react";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime } from "@/player/durations";
-import type { Track } from "@/lib/types";
+import type { Track, TrackLyrics } from "@/lib/types";
 import LikeButton from "./LikeButton";
 import LyricsSheet from "./LyricsSheet";
 import styles from "./AlbumTrack.module.css";
@@ -15,6 +15,11 @@ type Props = {
   queue: Track[];
   variant?: "simple" | "detailed";
   lyrics?: string | null;
+  /**
+   * Lyrics keyed by track id for the whole `queue`, so each queued entry
+   * carries its lyrics into the global player's expanded view.
+   */
+  queueLyrics?: TrackLyrics;
 };
 
 export default function AlbumTrack({
@@ -22,6 +27,7 @@ export default function AlbumTrack({
   queue,
   variant = "simple",
   lyrics = null,
+  queueLyrics,
 }: Props) {
   const { current, isPlaying, toggle, playFrom } = usePlayer();
   const duration = track.duration;
@@ -39,7 +45,7 @@ export default function AlbumTrack({
     }
     const playableTracks = queue.filter((t) => t.latest_resource_url);
     playFrom(
-      playableTracks.map(toPlayerTrack),
+      playableTracks.map((t) => toPlayerTrack(t, queueLyrics?.[t.track_id] ?? null)),
       playableTracks.findIndex((t) => t.track_id === track.track_id)
     );
   };
