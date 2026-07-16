@@ -19,7 +19,8 @@ import { getPalette } from "@/lib/palettes";
 
 /** Standard landscape OG size; consumed as the route's `size` export too. */
 export const OG_SIZE = { width: 1200, height: 630 };
-export const OG_CONTENT_TYPE = "image/png";
+/** JPEG, not PNG — see the re-encode note at the end of renderAlbumImage. */
+export const OG_CONTENT_TYPE = "image/jpeg";
 
 const BG = "#11090c"; // --bg
 const COVER = 356; // rendered cover square (px)
@@ -109,7 +110,7 @@ async function vinylDataUri(accent: string, size: number): Promise<string> {
   return `data:image/png;base64,${buf.toString("base64")}`;
 }
 
-export async function renderAlbumImage(album: OgAlbum): Promise<ImageResponse> {
+export async function renderAlbumImage(album: OgAlbum): Promise<Response> {
   const name = album?.name?.trim() || "Melogram";
   const palette = getPalette(album ?? {});
 
@@ -151,7 +152,7 @@ export async function renderAlbumImage(album: OgAlbum): Promise<ImageResponse> {
     </div>
   );
 
-  return new ImageResponse(
+  const png = new ImageResponse(
     (
       <div
         style={{
@@ -243,4 +244,18 @@ export async function renderAlbumImage(album: OgAlbum): Promise<ImageResponse> {
       ],
     }
   );
+
+  // next/og only emits PNG, and a 1200x630 photographic cover lands ~400KB —
+  // over WhatsApp's ~300KB link-preview ceiling, so it silently drops the
+  // image. The card is fully opaque, so re-encoding to JPEG loses no alpha and
+  // brings it to ~30-40KB, which every scraper (WhatsApp included) shows.
+  const jpeg = await sharp(Buffer.from(await png.arrayBuffer()))
+    .jpeg({ quality: 82, mozjpeg: true })
+    .toBuffer();
+  return new Response(new Uint8Array(jpeg), {
+    headers: {
+      "content-type": OG_CONTENT_TYPE,
+      "cache-control": "public, max-age=3600, s-maxage=3600",
+    },
+  });
 }
