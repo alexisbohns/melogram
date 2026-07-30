@@ -1,0 +1,258 @@
+/**
+ * vinyl-kit — one stylesheet, no build step.
+ *
+ * Everything tunable is a custom property, and every state is a data attribute,
+ * so you can restyle or drive the whole thing from your own CSS without
+ * touching the components. See the README for the full table.
+ *
+ * Note on defaults: every property is read as `var(--x, default)` at the point
+ * of use, and none is *declared* on a vinyl-kit class. That's deliberate — a
+ * declared value would beat an inherited one, so setting `--vinyl-tint` on a
+ * sleeve (or a card, or :root) would never reach the record nested inside it.
+ * Fallbacks keep the whole set genuinely themeable from any ancestor.
+ */
+
+/* ==========================================================================
+   The record
+   ========================================================================== */
+
+.vk-disc {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  /* Contain the luminosity blend to the layers within the disc, so the mask
+     composites against the tint + label — never the page behind it. */
+  isolation: isolate;
+  box-shadow: var(--vinyl-disc-shadow, 0 6px 16px rgba(0, 0, 0, 0.4));
+  /* Pin the disc to its own permanent compositing layer so the luminosity blend
+     always rasterizes against its own tint + label backdrop. Without it, an
+     ancestor's one-shot transform *transition* (the sleeve's slide-out) briefly
+     promotes then demotes the disc, and Android Chrome mis-composites the nested
+     mix-blend-mode during that churn — the grooves lose their colour for a frame
+     or two, intermittently. A spinning disc never shows this because its
+     infinite animation keeps the layer permanently promoted; this makes every
+     disc behave the same, stable way. (The spin keyframes below re-declare the
+     translateZ for exactly this reason.) */
+  transform: translateZ(0);
+}
+
+/* Fill a positioned parent rather than sizing the disc from its own width. */
+.vk-disc--fill {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  aspect-ratio: auto;
+}
+
+/* 1. Solid fill in the record's colour. */
+.vk-disc-color {
+  position: absolute;
+  inset: 0;
+  background: var(--vinyl-tint, #808080);
+}
+
+/* 2. The centre label: cover art in a circle. Sized just over the mask's
+   transparent hole so its edge tucks under the innermost grooves rather than
+   leaving a ring of bare tint. */
+.vk-disc-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--vinyl-label, 38%);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+/* 3. The groove mask — luminance only, so the grooves take their hue from the
+   tint below while the transparent centre reveals the label. */
+.vk-disc-mask {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: luminosity;
+}
+
+/* Every image in a vinyl layer fills it. Stated here rather than inline so the
+   default plain <img> and framework components (next/image with `fill`, which
+   sets the same properties inline) both land in the same place. */
+.vk-disc-label img,
+.vk-disc-mask img,
+.vk-sleeve-cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==========================================================================
+   The sleeve
+
+   Geometry is expressed as fractions of --vinyl-size (the square cover):
+     --vinyl-diameter  0.94   record diameter
+     --vinyl-peek      0.16   resting overhang past the cover's right edge
+     --vinyl-slide     0.46   active: extra rightward slide (~66% exposed)
+     --vinyl-roll      2.5deg active: record roll, as if rolling out of the sleeve
+     --vinyl-tilt     -2deg   active: cover rotation
+   ========================================================================== */
+
+.vk-sleeve {
+  position: relative;
+  width: calc(var(--vinyl-size) * (1 + var(--vinyl-peek, 0.16)));
+  height: var(--vinyl-size);
+  flex-shrink: 0;
+}
+
+/* Reserve room for the fully extracted record (contexts with content to the
+   right of the sleeve). Without it the record simply overflows when active. */
+.vk-sleeve--reserve {
+  width: calc(
+    var(--vinyl-size) * (1 + var(--vinyl-peek, 0.16) + var(--vinyl-slide, 0.46))
+  );
+}
+
+/* --vinyl-extract (0 resting → 1 extracted) drives the cover tilt and the
+   record's slide. The active state sets it here, but because custom properties
+   inherit, any ancestor can drive it from CSS alone — no JS hover handlers:
+     .album-card:hover { --vinyl-extract: 1; } */
+.vk-sleeve[data-active="true"] {
+  --vinyl-extract: 1;
+}
+
+.vk-sleeve-cover {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--vinyl-size);
+  height: var(--vinyl-size);
+  /* Asymmetric corners: tight at the spine, softer at the opening. */
+  border-radius: calc(var(--vinyl-size) * 0.05) calc(var(--vinyl-size) * 0.1)
+    calc(var(--vinyl-size) * 0.1) calc(var(--vinyl-size) * 0.05);
+  overflow: hidden;
+  box-shadow: var(--vinyl-sleeve-shadow, 0 0 10px rgba(0, 0, 0, 0.5));
+  transform-origin: center;
+  transform: rotate(calc(var(--vinyl-extract, 0) * var(--vinyl-tilt, -2deg)));
+  transition: transform var(--vinyl-duration, 0.55s)
+    var(--vinyl-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  z-index: 1;
+  /* Shown behind the cover art while it loads, so the record never shows
+     through a transparent gap. Override with your own palette. */
+  background: var(
+    --vinyl-backdrop,
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--vinyl-tint, #808080) 45%, #101010),
+      color-mix(in srgb, var(--vinyl-tint, #808080) 20%, #101010)
+    )
+  );
+}
+
+.vk-sleeve-texture {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  mix-blend-mode: multiply;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.vk-sleeve-vinyl {
+  position: absolute;
+  top: 50%;
+  left: calc(
+    var(--vinyl-size) *
+      (1 + var(--vinyl-peek, 0.16) - var(--vinyl-diameter, 0.94))
+  );
+  width: calc(var(--vinyl-size) * var(--vinyl-diameter, 0.94));
+  aspect-ratio: 1;
+  transform: translateY(-50%)
+    translateX(
+      calc(var(--vinyl-extract, 0) * var(--vinyl-size) * var(--vinyl-slide, 0.46))
+    )
+    rotate(calc(var(--vinyl-extract, 0) * var(--vinyl-roll, 2.5deg)));
+  transition: transform var(--vinyl-duration, 0.55s)
+    var(--vinyl-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  z-index: 0;
+}
+
+/* ==========================================================================
+   The stack
+   ========================================================================== */
+
+.vk-stack {
+  position: relative;
+  display: grid;
+  width: calc(
+    var(--vinyl-size) *
+      (1 + (var(--vk-count, 1) - 1) * var(--vinyl-stack-shift, 0.35))
+  );
+  height: var(--vinyl-size);
+}
+
+.vk-stack-item {
+  grid-area: 1 / 1;
+  position: relative;
+  width: var(--vinyl-size);
+  height: var(--vinyl-size);
+  transform: translateX(
+      calc(var(--vk-i, 0) * var(--vinyl-stack-shift, 0.35) * var(--vinyl-size))
+    )
+    rotate(calc(var(--vk-i, 0) * var(--vinyl-stack-roll, -2deg)));
+  transition: transform var(--vinyl-duration, 0.55s)
+    var(--vinyl-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+/* Fan wider on hover — transform only, so the layout around it never moves. */
+.vk-stack:hover .vk-stack-item,
+.vk-stack:focus-within .vk-stack-item {
+  transform: translateX(
+      calc(
+        var(--vk-i, 0) * var(--vinyl-stack-shift-hover, 0.5) * var(--vinyl-size)
+      )
+    )
+    rotate(calc(var(--vk-i, 0) * var(--vinyl-stack-roll, -2deg)));
+}
+
+/* ==========================================================================
+   Spin
+   ========================================================================== */
+
+.vk-disc[data-spinning] {
+  animation: vk-spin var(--vinyl-spin-duration, 5s) linear infinite;
+}
+
+/* Pausing freezes the record where it stopped rather than snapping it back. */
+.vk-disc[data-spinning="false"] {
+  animation-play-state: paused;
+}
+
+/* translateZ(0) is repeated here because an animated transform replaces the
+   base one outright — dropping it would undo the disc's compositing fix for
+   every spinning (or paused) record. */
+@keyframes vk-spin {
+  from {
+    transform: translateZ(0) rotate(0deg);
+  }
+  to {
+    transform: translateZ(0) rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .vk-sleeve-cover,
+  .vk-sleeve-vinyl,
+  .vk-stack-item {
+    transition: none;
+  }
+
+  .vk-disc[data-spinning] {
+    animation: none;
+  }
+}

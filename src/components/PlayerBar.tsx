@@ -14,12 +14,14 @@ import {
   SkipForward,
 } from "lucide-react";
 import type WaveSurfer from "wavesurfer.js";
-import { getPalette, paletteVars } from "@/lib/palettes";
+import { paletteVars } from "@/lib/palettes";
+import { useAlbumPalette } from "@/lib/albumPalette";
 import { formatTime } from "@/player/durations";
 import { usePlayer } from "@/player/PlayerProvider";
 import { useMessages } from "@/lib/i18n/LocaleProvider";
+import { Vinyl } from "vinyl-kit";
+import { VINYL_MASK_URL, albumVinylVars, nextVinylImage } from "@/lib/vinyl";
 import LyricsSheet from "./LyricsSheet";
-import VinylDisc from "./VinylDisc";
 import styles from "./PlayerBar.module.css";
 
 /** Rounded-pill waveform bars — carried over from the previous app's player. */
@@ -96,13 +98,17 @@ export default function PlayerBar() {
     seekRef.current = player.seek;
   }, [player.seek]);
 
-  const palette = current
-    ? getPalette({
-        id: current.albumId ?? "",
-        name: current.albumName ?? "",
-        theme: current.theme,
-      })
-    : null;
+  // One palette for the whole bar — the album's own, or one derived from its
+  // cover. The waveform colours below are derived from it, so a cover-sampled
+  // accent arriving late re-tints the waveform along with everything else.
+  const palette = useAlbumPalette({
+    id: current?.albumId ?? "",
+    name: current?.albumName ?? "",
+    theme: current?.theme,
+    coverUrl: current?.coverUrl,
+  });
+  const waveColor = alpha(palette.accent, 0.4);
+  const progressColor = palette.light;
 
   // Create the render-only wavesurfer on first playback. It *shares* the
   // provider's single <audio> element (the `media` option) rather than
@@ -118,11 +124,6 @@ export default function PlayerBar() {
     let cancelled = false;
     const media = audioElement;
     const url = current.url;
-    const trackPalette = getPalette({
-      id: current.albumId ?? "",
-      name: current.albumName ?? "",
-      theme: current.theme,
-    });
     import("wavesurfer.js").then(({ default: WS }) => {
       if (cancelled || wsRef.current || !containerRef.current) return;
       const ws = WS.create({
@@ -134,8 +135,8 @@ export default function PlayerBar() {
         renderFunction: renderWaveform,
         // Share the provider's audio element instead of muting a second one.
         media,
-        waveColor: alpha(trackPalette.accent, 0.4),
-        progressColor: trackPalette.light,
+        waveColor,
+        progressColor,
       });
       ws.on("interaction", (newTime: number) => seekRef.current(newTime));
       wsRef.current = ws;
@@ -147,7 +148,7 @@ export default function PlayerBar() {
     return () => {
       cancelled = true;
     };
-  }, [current, audioElement]);
+  }, [current, audioElement, waveColor, progressColor]);
 
   useEffect(
     () => () => {
@@ -161,20 +162,12 @@ export default function PlayerBar() {
   useEffect(() => {
     const ws = wsRef.current;
     if (!ws || !current) return;
-    const trackPalette = getPalette({
-      id: current.albumId ?? "",
-      name: current.albumName ?? "",
-      theme: current.theme,
-    });
-    ws.setOptions({
-      waveColor: alpha(trackPalette.accent, 0.4),
-      progressColor: trackPalette.light,
-    });
+    ws.setOptions({ waveColor, progressColor });
     if (loadedUrl.current !== current.url) {
       loadedUrl.current = current.url;
       ws.load(current.url).catch(() => {});
     }
-  }, [wsReady, current]);
+  }, [wsReady, current, waveColor, progressColor]);
 
   // The waveform cursor follows the shared media element's own timeupdate
   // events, so no manual time-syncing is needed here. (Calling setTime on the
@@ -191,7 +184,7 @@ export default function PlayerBar() {
         data-playing={isPlaying ? "true" : "false"}
         data-expanded={expanded ? "true" : "false"}
         aria-hidden={current ? undefined : true}
-        style={palette ? paletteVars(palette) : undefined}
+        style={current ? paletteVars(palette) : undefined}
       >
         <div className={styles.inner}>
           <button
@@ -202,8 +195,15 @@ export default function PlayerBar() {
             disabled={!canExpand}
             onClick={() => setExpanded((v) => !v)}
           >
-            <div className={styles.disc} data-playing={isPlaying ? "true" : "false"}>
-              <VinylDisc coverUrl={current?.coverUrl ?? null} size={48} />
+            <div className={styles.disc}>
+              <Vinyl
+                fill
+                cover={current?.coverUrl ?? null}
+                spinning={isPlaying}
+                maskUrl={VINYL_MASK_URL}
+                renderImage={nextVinylImage()}
+                style={albumVinylVars}
+              />
             </div>
             <div className={styles.titles}>
               <span
@@ -310,7 +310,7 @@ export default function PlayerBar() {
       </div>
 
       {hasLyrics && current && (
-        <div style={palette ? paletteVars(palette) : undefined}>
+        <div style={current ? paletteVars(palette) : undefined}>
           <LyricsSheet
             open={lyricsOpen}
             onClose={() => setLyricsOpen(false)}

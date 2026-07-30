@@ -1,0 +1,46 @@
+{
+  "name": "vinyl-kit",
+  "version": "0.1.0",
+  "description": "A tintable vinyl record built from one grayscale mask and a CSS blend mode — disc, sleeve with slide-out choreography, stacks, and cover-accent extraction. React, zero dependencies.",
+  "license": "MIT",
+  "author": "Alexis Bohns (https://bohns.design)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexisbohns/melogram",
+    "directory": "packages/vinyl-kit"
+  },
+  "keywords": [
+    "react",
+    "vinyl",
+    "record",
+    "music",
+    "album",
+    "css",
+    "blend-mode",
+    "component"
+  ],
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./vinyl.css": "./src/vinyl.css",
+    "./assets": "./src/assets.ts",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "files": [
+    "src",
+    "assets",
+    "LICENSE",
+    "README.md"
+  ],
+  "devDependencies": {
+    "esbuild": "^0.28.1"
+  }
+}

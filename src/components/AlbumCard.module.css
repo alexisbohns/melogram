@@ -7,10 +7,11 @@
   gap: 24px;
 }
 
-/* Slide the vinyl out while the cover is hovered or keyboard-focused. */
+/* Slide the vinyl out while the cover is hovered or keyboard-focused. The
+   property inherits down into vinyl-kit's sleeve — no JS hover handling. */
 .coverLink:hover,
 .coverLink:focus-visible {
-  --extract: 1;
+  --vinyl-extract: 1;
 }
 
 .description {

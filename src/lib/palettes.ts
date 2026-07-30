@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { nearestColor } from "vinyl-kit";
 
 /**
  * Resolved album colors — the CSS custom properties every album-scoped
@@ -31,8 +32,9 @@ export type AlbumTheme = {
 
 /**
  * Sentinel stored in `albums.theme` when the palette should be derived from
- * the cover art. The nearest-theme match is computed client-side (added in a
- * later step); until then such albums fall back to the legacy map / default.
+ * the cover art: the cover's accent colour is matched to the nearest theme
+ * below. See `needsCoverAccent` / `nearestThemeKey`, plus `useAlbumPalette`
+ * (client) and the share-image renderer (server) which do the deriving.
  */
 export const AUTO_THEME = "auto";
 
@@ -109,7 +111,11 @@ const LEGACY_GENRE: Record<string, string> = {
   Celesta: "Cinematic",
 };
 
-type AlbumLike = { id?: string; name?: string | null; theme?: string | null };
+export type AlbumLike = {
+  id?: string;
+  name?: string | null;
+  theme?: string | null;
+};
 
 /** Resolve an album's palette: its stored theme, else the legacy match, else
     the default. `theme` may be absent when the caller only has id/name. */
@@ -121,6 +127,36 @@ export function getPalette(album: AlbumLike): AlbumPalette {
   const base = (key ? THEME_BY_KEY[key]?.palette : undefined) ?? FALLBACK;
   const genre = LEGACY_GENRE[album.name ?? ""];
   return genre ? { ...base, genre } : { ...base };
+}
+
+/** A theme's colors by key, or undefined for an unknown key. */
+export function themePalette(key: string): AlbumTheme["palette"] | undefined {
+  return THEME_BY_KEY[key]?.palette;
+}
+
+/**
+ * True when an album has no colors of its own — no stored theme, no legacy name
+ * match — so they're worth deriving from its cover art. Resolution order stays
+ * stored theme → legacy name → cover art → fallback, meaning detection only
+ * ever fills a genuine gap.
+ */
+export function needsCoverAccent(album: AlbumLike): boolean {
+  const stored =
+    album.theme && album.theme !== AUTO_THEME
+      ? THEME_BY_KEY[album.theme]
+      : undefined;
+  if (stored) return false;
+  return !LEGACY_THEME[album.name ?? ""];
+}
+
+/**
+ * The theme whose accent looks closest to `hex` — how a cover's extracted
+ * color becomes one of the catalog's hand-picked palettes rather than a raw
+ * sampled color (which rarely reads as designed).
+ */
+export function nearestThemeKey(hex: string): string {
+  const accents = THEMES.map((theme) => theme.palette.accent);
+  return THEMES[nearestColor(accents, hex)].key;
 }
 
 /** Inline CSS custom properties consumed by every album-scoped component. */

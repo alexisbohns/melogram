@@ -4,7 +4,8 @@ import Image from "next/image";
 import { Pause, Play } from "lucide-react";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime } from "@/player/durations";
-import { getPalette, paletteVars } from "@/lib/palettes";
+import { paletteVars } from "@/lib/palettes";
+import { useAlbumPalette } from "@/lib/albumPalette";
 import type { Track } from "@/lib/types";
 import LikeButton from "./LikeButton";
 import styles from "./StandaloneTrack.module.css";
@@ -23,10 +24,11 @@ type Props = {
  */
 export default function StandaloneTrack({ track, queue }: Props) {
   const { current, isPlaying, toggle, playFrom } = usePlayer();
-  const palette = getPalette({
+  const palette = useAlbumPalette({
     id: track.album_id ?? undefined,
     name: track.album_name ?? undefined,
     theme: track.album_theme ?? undefined,
+    coverUrl: track.album_cover_url,
   });
 
   const playable = Boolean(track.latest_resource_url);

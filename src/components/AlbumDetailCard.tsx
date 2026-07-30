@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { hasVersion, type AlbumWithTracks, type TrackLyrics } from "@/lib/types";
-import { getPalette, paletteVars } from "@/lib/palettes";
+import { paletteVars } from "@/lib/palettes";
+import { useAlbumPalette } from "@/lib/albumPalette";
 import { displayGenre } from "@/lib/genres";
 import AlbumCoverLive from "./AlbumCoverLive";
 import AlbumHeader from "./AlbumHeader";
@@ -27,7 +28,7 @@ type Props = {
 /** Album page main card (Figma "AlbumCard" on Album frames). */
 export default function AlbumDetailCard({ album, lyrics }: Props) {
   const { editing, canEdit, draft, setField } = useAlbumEdit();
-  const palette = getPalette(album);
+  const palette = useAlbumPalette({ ...album, coverUrl: album.cover_url });
   // Track drawer target: null = closed, { trackId: null } = create mode.
   // Mounted at card level (not inside the setlist) so a setlist resync or a
   // staged row removal can't unmount it mid-upload.
