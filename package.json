@@ -2,9 +2,6 @@
   "name": "melogram",
   "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -19,7 +16,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "sharp": "^0.34.5",
-    "vinyl-kit": "file:packages/vinyl-kit",
+    "vinyl-kit": "^0.1.0",
     "wavesurfer.js": "^7.12.10"
   },
   "devDependencies": {
