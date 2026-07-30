@@ -286,7 +286,15 @@ body {
   padding: 0 24px 96px;
 }
 .wrap { max-width: 1040px; margin: 0 auto; }
-header { padding: 88px 0 24px; }
+header { padding: 76px 0 24px; }
+.hero {
+  display: flex; align-items: center; gap: clamp(28px, 6vw, 76px);
+  flex-wrap: wrap-reverse; justify-content: space-between;
+}
+.hero-text { flex: 1 1 380px; }
+.hero-record { flex: 0 0 auto; }
+/* The hero record turns slowly — it is the thesis of the page, not decoration. */
+#hero-disc { --vinyl-spin-duration: 14s; }
 h1 {
   font-family: ui-serif, Georgia, "Times New Roman", serif;
   font-weight: 400;
@@ -358,17 +366,28 @@ a { color: #e9b3c9; }
 
 <div class="wrap">
   <header>
-    <h1>vinyl-kit</h1>
-    <p class="tagline">
-      A vinyl record for the web, built from <strong>one grayscale mask and a CSS
-      blend mode</strong> — so a single 31&nbsp;KB asset paints a record in any
-      colour you like. Records, sleeves that slide open, fanned stacks, and
-      colour read straight from cover art.
-    </p>
-    <span class="install">npm install vinyl-kit</span>
+    <div class="hero">
+      <div class="hero-text">
+        <h1>vinyl-kit</h1>
+        <p class="tagline">
+          A vinyl record for the web, built from <strong>one grayscale mask and a
+          CSS blend mode</strong> — so a single 31&nbsp;KB asset paints a record
+          in any colour you like. Records, sleeves that slide open, fanned
+          stacks, and colour read straight from cover art.
+        </p>
+        <span class="install">npm install vinyl-kit</span>
+      </div>
+      <div class="hero-record">
+        <div class="vk-disc" data-spinning="true" style="--vinyl-tint:#7B5E99;--vinyl-size:300px;width:300px;height:300px" id="hero-disc">
+      <div class="vk-disc-color"></div>
+      <div class="vk-disc-label"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNDAwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOEU2QkIwIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMjQxNzMzIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGZpbHRlciBpZD0ibiI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuOSIgbnVtT2N0YXZlcz0iMyIvPgogICAgICA8ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwIi8+PC9maWx0ZXI+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSJ1cmwoI2cpIi8+CiAgPHBhdGggZD0iTTIwMCA5Nmw5MiAxNjhIMTA4eiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRjJFRkY1IiBzdHJva2Utd2lkdGg9IjEwIiBvcGFjaXR5PSIwLjkiLz4KICAgICAgIDxjaXJjbGUgY3g9IjIwMCIgY3k9IjIxMiIgcj0iMjQiIGZpbGw9IiNGMkVGRjUiIG9wYWNpdHk9IjAuNTUiLz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsdGVyPSJ1cmwoI24pIiBvcGFjaXR5PSIwLjE0Ii8+Cjwvc3ZnPg==" alt=""></div>
+      <div class="vk-disc-mask demo-mask" aria-hidden="true"></div>
+    </div>
+      </div>
+    </div>
     <p class="note">
-      Every record below is the same mask over a different colour fill. This page
-      is hand-written markup that mirrors exactly what the React components
+      Every record on this page is that same mask over a different colour fill.
+      The markup is hand-written to mirror exactly what the React components
       render — same class names, same data attributes — so what you see is the
       CSS contract, with no framework in the way.
     </p>

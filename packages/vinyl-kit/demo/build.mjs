@@ -166,7 +166,15 @@ body {
   padding: 0 24px 96px;
 }
 .wrap { max-width: 1040px; margin: 0 auto; }
-header { padding: 88px 0 24px; }
+header { padding: 76px 0 24px; }
+.hero {
+  display: flex; align-items: center; gap: clamp(28px, 6vw, 76px);
+  flex-wrap: wrap-reverse; justify-content: space-between;
+}
+.hero-text { flex: 1 1 380px; }
+.hero-record { flex: 0 0 auto; }
+/* The hero record turns slowly — it is the thesis of the page, not decoration. */
+#hero-disc { --vinyl-spin-duration: 14s; }
 h1 {
   font-family: ui-serif, Georgia, "Times New Roman", serif;
   font-weight: 400;
@@ -237,17 +245,24 @@ a { color: #e9b3c9; }
 const body = `
 <div class="wrap">
   <header>
-    <h1>vinyl-kit</h1>
-    <p class="tagline">
-      A vinyl record for the web, built from <strong>one grayscale mask and a CSS
-      blend mode</strong> — so a single 31&nbsp;KB asset paints a record in any
-      colour you like. Records, sleeves that slide open, fanned stacks, and
-      colour read straight from cover art.
-    </p>
-    <span class="install">npm install vinyl-kit</span>
+    <div class="hero">
+      <div class="hero-text">
+        <h1>vinyl-kit</h1>
+        <p class="tagline">
+          A vinyl record for the web, built from <strong>one grayscale mask and a
+          CSS blend mode</strong> — so a single 31&nbsp;KB asset paints a record
+          in any colour you like. Records, sleeves that slide open, fanned
+          stacks, and colour read straight from cover art.
+        </p>
+        <span class="install">npm install vinyl-kit</span>
+      </div>
+      <div class="hero-record">
+        ${disc({ cover: covers[1], tint: TINTS[1], sizePx: 300, spinning: true, label: "hero-disc" })}
+      </div>
+    </div>
     <p class="note">
-      Every record below is the same mask over a different colour fill. This page
-      is hand-written markup that mirrors exactly what the React components
+      Every record on this page is that same mask over a different colour fill.
+      The markup is hand-written to mirror exactly what the React components
       render — same class names, same data attributes — so what you see is the
       CSS contract, with no framework in the way.
     </p>
