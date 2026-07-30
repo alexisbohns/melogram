@@ -23,7 +23,7 @@
 .item:focus-visible {
   opacity: 1;
   /* Slide the vinyl out of the hovered nav item's cover. */
-  --extract: 1;
+  --vinyl-extract: 1;
 }
 
 .text {
@@ -32,9 +32,9 @@
   gap: 4px;
   min-width: 0;
   /* Rather than the vinyl pushing into the name, the name/meta slide out of its
-     way in step with the disc. Distance mirrors the cover geometry: --size (67)
-     * --slide (0.46) ≈ 31px. */
-  transform: translateX(calc(var(--extract, 0) * 31px));
+     way in step with the disc. Distance mirrors the cover geometry: the cover
+     size (67) * --vinyl-slide (0.46) ≈ 31px. */
+  transform: translateX(calc(var(--vinyl-extract, 0) * 31px));
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 

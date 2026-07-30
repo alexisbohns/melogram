@@ -7,6 +7,7 @@ import { LikesProvider } from "@/components/LikesProvider";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 import { getLocale, getMessages } from "@/lib/i18n";
 import { siteUrl } from "@/lib/site";
+import "vinyl-kit/vinyl.css";
 import "./globals.css";
 
 const gloock = Gloock({

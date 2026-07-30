@@ -1,7 +1,10 @@
-import Image from "next/image";
-import type { CSSProperties } from "react";
-import VinylDisc from "./VinylDisc";
-import styles from "./AlbumCover.module.css";
+import { VinylSleeve } from "vinyl-kit";
+import {
+  VINYL_MASK_URL,
+  VINYL_TEXTURE_URL,
+  albumVinylVars,
+  nextVinylImage,
+} from "@/lib/vinyl";
 
 type Props = {
   coverUrl: string | null;
@@ -19,8 +22,15 @@ type Props = {
    * to the right of the cover (album header, switcher) so it isn't overlapped.
    */
   reserve?: boolean;
+  /** Turn the extracted record — used while its album is playing. */
+  spinning?: boolean;
 };
 
+/**
+ * The album showcase: cover sleeve with its record tucked behind it, in the
+ * album's palette. A thin binding of vinyl-kit's `VinylSleeve` to Melogram's
+ * `next/image` renderer and album colours.
+ */
 export default function AlbumCover({
   coverUrl,
   alt,
@@ -28,33 +38,20 @@ export default function AlbumCover({
   priority,
   active = false,
   reserve = false,
+  spinning,
 }: Props) {
   return (
-    <div
-      className={[
-        styles.cover,
-        active ? styles.active : "",
-        reserve ? styles.reserve : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      style={{ "--size": `${size}px` } as CSSProperties}
-    >
-      <div className={styles.vinyl}>
-        <VinylDisc coverUrl={coverUrl} size={size} />
-      </div>
-      <div className={styles.wrap}>
-        {coverUrl && (
-          <Image
-            src={coverUrl}
-            alt={alt}
-            fill
-            sizes={`${size}px`}
-            priority={priority}
-          />
-        )}
-        <div className={styles.texture} />
-      </div>
-    </div>
+    <VinylSleeve
+      cover={coverUrl}
+      alt={alt}
+      size={size}
+      active={active}
+      reserve={reserve}
+      spinning={spinning}
+      maskUrl={VINYL_MASK_URL}
+      textureUrl={VINYL_TEXTURE_URL}
+      renderImage={nextVinylImage(priority)}
+      style={albumVinylVars}
+    />
   );
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { AlbumWithTracks } from "@/lib/types";
-import { getPalette, paletteVars } from "@/lib/palettes";
+import PaletteScope from "./PaletteScope";
 import AlbumCoverLive from "./AlbumCoverLive";
 import AlbumInfos from "./AlbumInfos";
 import styles from "./AlbumSwitcher.module.css";
@@ -19,23 +19,23 @@ export default function AlbumSwitcher({ albums, activeId }: Props) {
   return (
     <nav className={styles.switcher} aria-label="Albums">
       {others.map((album) => (
-        <Link
+        <PaletteScope
           key={album.id}
-          href={`/albums/${album.id}`}
-          className={styles.item}
-          style={paletteVars(getPalette(album))}
+          album={{ ...album, coverUrl: album.cover_url }}
         >
-          <AlbumCoverLive
-            albumId={album.id}
-            coverUrl={album.cover_url}
-            alt=""
-            size={67}
-          />
-          <span className={styles.text}>
-            <span className={styles.name}>{album.name}</span>
-            <AlbumInfos tracks={album.tracks} />
-          </span>
-        </Link>
+          <Link href={`/albums/${album.id}`} className={styles.item}>
+            <AlbumCoverLive
+              albumId={album.id}
+              coverUrl={album.cover_url}
+              alt=""
+              size={67}
+            />
+            <span className={styles.text}>
+              <span className={styles.name}>{album.name}</span>
+              <AlbumInfos tracks={album.tracks} />
+            </span>
+          </Link>
+        </PaletteScope>
       ))}
     </nav>
   );

@@ -102,22 +102,13 @@
 }
 
 /* The album's vinyl disc replaces the flat cover — it turns gently while the
-   track plays and rests when paused. VinylDisc fills this positioned box. */
+   track plays and freezes where it stopped when paused (vinyl-kit's `spinning`
+   prop drives that). The disc fills this positioned box. */
 .disc {
   position: relative;
   width: 48px;
   height: 48px;
   flex-shrink: 0;
-}
-
-.disc[data-playing="true"] {
-  animation: spin 5s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .titles {

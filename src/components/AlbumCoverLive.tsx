@@ -36,6 +36,10 @@ export default function AlbumCoverLive({ albumId, ...cover }: Props) {
   const playingThisAlbum = current?.albumId === albumId && isPlaying;
 
   return (
-    <AlbumCover active={entered && (onAlbumPage || playingThisAlbum)} {...cover} />
+    <AlbumCover
+      active={entered && (onAlbumPage || playingThisAlbum)}
+      spinning={playingThisAlbum}
+      {...cover}
+    />
   );
 }

@@ -2,7 +2,13 @@ import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import sharp from "sharp";
-import { getPalette } from "@/lib/palettes";
+import {
+  getPalette,
+  nearestThemeKey,
+  needsCoverAccent,
+  themePalette,
+  type AlbumPalette,
+} from "@/lib/palettes";
 
 /**
  * Shared renderer for an album's social-share image (Open Graph / Twitter).
@@ -72,17 +78,21 @@ const asset = (file: string) => join(process.cwd(), "public", file);
 
 /**
  * Fetch the cover, square-crop it, and apply the app's cover texture (a 0.6
- * multiply overlay). Returns a data URI, or null when there is no cover or the
- * fetch/decode fails — the caller then renders the palette gradient fallback.
+ * multiply overlay). Also reports the cover's dominant color, so an album with
+ * no theme of its own can be dressed from its artwork — the server-side
+ * counterpart of `useCoverAccent` in the app.
+ *
+ * `image` is null when there is no cover or the fetch/decode fails, and the
+ * caller then renders the palette gradient fallback.
  */
-async function coverDataUri(
+async function renderCover(
   coverUrl: string | null | undefined,
   size: number
-): Promise<string | null> {
-  if (!coverUrl) return null;
+): Promise<{ image: string | null; accent: string | null }> {
+  if (!coverUrl) return { image: null, accent: null };
   try {
     const res = await fetch(coverUrl);
-    if (!res.ok) return null;
+    if (!res.ok) return { image: null, accent: null };
     const input = Buffer.from(await res.arrayBuffer());
     const texture = await sharp(asset("cover-texture.png"))
       .resize(size, size)
@@ -93,10 +103,33 @@ async function coverDataUri(
       .composite([{ input: texture, blend: "multiply" }])
       .png()
       .toBuffer();
-    return `data:image/png;base64,${buf.toString("base64")}`;
+
+    let accent: string | null = null;
+    try {
+      const { dominant } = await sharp(input).stats();
+      accent = `rgb(${dominant.r},${dominant.g},${dominant.b})`;
+    } catch {
+      // Stats are a bonus — a cover that renders but won't analyse is fine.
+    }
+
+    return {
+      image: `data:image/png;base64,${buf.toString("base64")}`,
+      accent,
+    };
   } catch {
-    return null;
+    return { image: null, accent: null };
   }
+}
+
+/** `rgb(r,g,b)` → `#rrggbb`, for handing sharp's stats to the palette matcher. */
+function rgbStringToHex(rgb: string): string | null {
+  const match = rgb.match(/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+  if (!match) return null;
+  const hex = match
+    .slice(1, 4)
+    .map((n) => Number(n).toString(16).padStart(2, "0"))
+    .join("");
+  return `#${hex}`;
 }
 
 /** The vinyl mask tinted with the album's accent color, as a data URI. */
@@ -109,19 +142,39 @@ async function vinylDataUri(accent: string, size: number): Promise<string> {
   return `data:image/png;base64,${buf.toString("base64")}`;
 }
 
+/**
+ * An album's colors, dressed from its cover's dominant color when it has none
+ * of its own — mirroring the app's resolution order (stored theme → legacy name
+ * → cover art → fallback) so a share image matches the page it links to.
+ */
+function resolvePalette(
+  base: AlbumPalette,
+  album: OgAlbum,
+  accent: string | null
+): AlbumPalette {
+  if (!accent || !album) return base;
+  if (!needsCoverAccent({ name: album.name, theme: album.theme })) return base;
+  const hex = rgbStringToHex(accent);
+  const derived = hex ? themePalette(nearestThemeKey(hex)) : undefined;
+  if (!derived) return base;
+  return base.genre ? { ...derived, genre: base.genre } : { ...derived };
+}
+
 export async function renderAlbumImage(album: OgAlbum): Promise<ImageResponse> {
   const name = album?.name?.trim() || "Melogram";
-  const palette = getPalette(album ?? {});
 
-  const [[gloock, grotesk], cover, vinyl] = await Promise.all([
+  // The cover has to land before the vinyl can be tinted: an album with no
+  // theme takes its colors from the artwork.
+  const [[gloock, grotesk], cover] = await Promise.all([
     loadFonts(),
-    coverDataUri(album?.cover_url, RASTER),
-    vinylDataUri(palette.accent, RASTER),
+    renderCover(album?.cover_url, RASTER),
   ]);
+  const palette = resolvePalette(getPalette(album ?? {}), album, cover.accent);
+  const vinyl = await vinylDataUri(palette.accent, RASTER);
 
-  const sleeve = cover ? (
+  const sleeve = cover.image ? (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={cover} width={COVER} height={COVER} alt="" />
+    <img src={cover.image} width={COVER} height={COVER} alt="" />
   ) : (
     // Palette gradient + monogram — mirrors AlbumCover's loading backdrop so a
     // cover-less album still previews as a designed tile, not an empty square.
