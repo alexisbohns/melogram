@@ -21,6 +21,8 @@ export const en = {
     sectionAccount: "Account",
     profile: "Profile",
     myLikes: "My Likes",
+    sectionArtist: "Artist",
+    orderAlbums: "Order albums",
     language: "Language",
     signIn: "Sign in",
     signOut: "Sign out",
@@ -37,12 +39,28 @@ export const en = {
     empty:
       "You haven't liked any tracks yet. Tap the heart on a track to save it here.",
   },
+  albumOrder: {
+    title: "Order albums",
+    intro:
+      "Move an album up or down to change where it sits in the Albums section of the home page.",
+    moveUp: "Move {name} up",
+    moveDown: "Move {name} down",
+    hidden: "Not on home yet",
+    hiddenHint: "Albums without a playable track stay hidden from listeners, but keep their place in the order.",
+    empty: "You don't have any albums yet.",
+    save: "Save order",
+    saving: "Saving…",
+    saved: "Order saved",
+    reset: "Reset",
+    error: "Save failed",
+  },
   meta: {
     homeTitle: "Bohns — Melogram",
     homeDescription:
       "Music is my most intuitive way of expressing what words can't hold.",
     profileTitle: "Profile — Bohns",
     likesTitle: "My likes — Bohns",
+    albumOrderTitle: "Order albums — Bohns",
   },
 };
 

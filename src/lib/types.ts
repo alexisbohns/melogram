@@ -7,6 +7,12 @@ export type Album = {
   cover_url: string | null;
   /** Color theme key (see src/lib/palettes.ts); 'auto' derives it from the cover. */
   theme: string;
+  /**
+   * Artist-set rank within their catalog (1-based, see the album order page).
+   * Null on albums created before an ordering was recorded — those sort after
+   * the ranked ones, newest first.
+   */
+  position: number | null;
   created_at: string;
 };
 

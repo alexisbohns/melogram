@@ -3,9 +3,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Check, Heart, LogIn, LogOut, UserCircle } from "lucide-react";
+import { Check, Heart, ListOrdered, LogIn, LogOut, UserCircle } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import { getMyArtistIds } from "@/lib/edit";
 import {
   LOCALES,
   LOCALE_COOKIE,
@@ -40,6 +41,10 @@ export default function AccountMenu() {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const [open, setOpen] = useState(false);
+  // Id of the user whose artist membership was confirmed. Storing the id
+  // rather than a boolean means a stale "yes" can never leak across a sign-out
+  // or an account switch — it only matches the user it was resolved for.
+  const [artistUserId, setArtistUserId] = useState<string | null>(null);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -62,6 +67,25 @@ export default function AccountMenu() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Resolve artist membership from the session (RLS scopes artist_members to
+  // the caller, so an empty result simply means "listener"). Failures degrade
+  // to hiding the artist section — the page and the RPC re-check anyway.
+  useEffect(() => {
+    if (!user) return;
+    const userId = user.id;
+    let active = true;
+    getMyArtistIds()
+      .then((ids) => {
+        if (active) setArtistUserId(ids.size > 0 ? userId : null);
+      })
+      .catch(() => {
+        if (active) setArtistUserId(null);
+      });
+    return () => {
+      active = false;
+    };
+  }, [user]);
 
   // Dismiss on outside click / Escape, and move focus into the menu on open.
   useEffect(() => {
@@ -106,6 +130,7 @@ export default function AccountMenu() {
   }
 
   const signedIn = ready && Boolean(user);
+  const isArtist = signedIn && artistUserId === user?.id;
 
   return (
     <div className={styles.wrapper} ref={wrapperRef}>
@@ -154,6 +179,21 @@ export default function AccountMenu() {
               >
                 <Heart size={18} strokeWidth={2} />
                 <span>{m.account.myLikes}</span>
+              </Link>
+            </div>
+          )}
+
+          {signedIn && isArtist && (
+            <div className={styles.section}>
+              <p className={styles.sectionLabel}>{m.account.sectionArtist}</p>
+              <Link
+                href="/artist/albums"
+                role="menuitem"
+                className={styles.item}
+                onClick={() => setOpen(false)}
+              >
+                <ListOrdered size={18} strokeWidth={2} />
+                <span>{m.account.orderAlbums}</span>
               </Link>
             </div>
           )}
