@@ -155,6 +155,20 @@ export async function reorderSetlist(
   if (error) throw new Error(error.message);
 }
 
+/** Persist the artist-set order of a whole catalog: `orderedAlbumIds` is the
+    artist's album list, first to last, as shown on the home page. */
+export async function reorderAlbums(
+  artistId: string,
+  orderedAlbumIds: string[]
+): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc("reorder_albums", {
+    _artist_id: artistId,
+    _ordered_album_ids: orderedAlbumIds,
+  });
+  if (error) throw new Error(error.message);
+}
+
 /** Upload a cover to the `covers` bucket and record its public URL.
     The stored URL is cache-busted: the object path is fixed, and an upsert
     does not purge the storage CDN, so a bare URL would serve the old image. */

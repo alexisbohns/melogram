@@ -11,7 +11,7 @@ import {
 } from "./types";
 
 const ALBUM_COLS =
-  "id,artist_id,name,description,type,cover_url,theme,created_at";
+  "id,artist_id,name,description,type,cover_url,theme,position,created_at";
 
 /** Supabase errors are plain objects; wrap them so logs show a real message. */
 function fail(context: string, error: { message?: string }): never {
@@ -153,6 +153,7 @@ export async function getAlbumsWithTracks(): Promise<AlbumWithTracks[]> {
     supabase
       .from("albums")
       .select(ALBUM_COLS)
+      .order("position", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: false }),
     supabase
       .from("track_overview")
@@ -361,4 +362,45 @@ export async function getLikedTracks(
     attachAlbumThemes(client, ordered),
   ]);
   return ordered;
+}
+
+/**
+ * An artist's albums in their current home-page order, each flagged with
+ * whether listeners actually see it. Powers the album order page: it lists the
+ * whole catalog (not just the visible slice) so the saved ordering stays a
+ * complete, gap-free ranking even while an album is still being filled in.
+ */
+export type OrderableAlbum = Album & { onHome: boolean };
+
+export async function getArtistAlbumsInOrder(
+  artistId: string
+): Promise<OrderableAlbum[]> {
+  const [albumsRes, tracksRes] = await Promise.all([
+    supabase
+      .from("albums")
+      .select(ALBUM_COLS)
+      .eq("artist_id", artistId)
+      .order("position", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("track_overview")
+      .select("album_id,latest_version_id")
+      .not("album_id", "is", null),
+  ]);
+
+  if (albumsRes.error) fail("Failed to load albums", albumsRes.error);
+  if (tracksRes.error) fail("Failed to load tracks", tracksRes.error);
+
+  // An album reaches the home page once one of its tracks has a version —
+  // the same rule getAlbumsWithTracks applies to the public catalog.
+  const playable = new Set(
+    (tracksRes.data ?? [])
+      .filter((row) => row.latest_version_id !== null)
+      .map((row) => row.album_id as string)
+  );
+
+  return ((albumsRes.data ?? []) as Album[]).map((album) => ({
+    ...album,
+    onHome: playable.has(album.id),
+  }));
 }

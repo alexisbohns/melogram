@@ -18,6 +18,8 @@ export const fr: Messages = {
     sectionAccount: "Compte",
     profile: "Profil",
     myLikes: "Mes favoris",
+    sectionArtist: "Artiste",
+    orderAlbums: "Ordonner les albums",
     language: "Langue",
     signIn: "Se connecter",
     signOut: "Se déconnecter",
@@ -34,11 +36,27 @@ export const fr: Messages = {
     empty:
       "Vous n'avez encore aimé aucun titre. Touchez le cœur d'un titre pour l'enregistrer ici.",
   },
+  albumOrder: {
+    title: "Ordonner les albums",
+    intro:
+      "Fais monter ou descendre un album pour choisir sa place dans la section Albums de la page d'accueil.",
+    moveUp: "Monter {name}",
+    moveDown: "Descendre {name}",
+    hidden: "Pas encore en ligne",
+    hiddenHint: "Un album sans morceau écoutable reste invisible pour le public, mais garde sa place dans l'ordre.",
+    empty: "Tu n'as pas encore d'album.",
+    save: "Enregistrer l'ordre",
+    saving: "Enregistrement…",
+    saved: "Ordre enregistré",
+    reset: "Réinitialiser",
+    error: "Échec de l'enregistrement",
+  },
   meta: {
     homeTitle: "Bohns — Melogram",
     homeDescription:
       "La musique est ma façon la plus intuitive d'exprimer ce que les mots ne peuvent contenir.",
     profileTitle: "Profil — Bohns",
     likesTitle: "Mes favoris — Bohns",
+    albumOrderTitle: "Ordonner les albums — Bohns",
   },
 };

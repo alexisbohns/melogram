@@ -33,6 +33,13 @@ Home and Album pages.
 - `/albums/[id]` — compact header, album switcher (rail on desktop,
   horizontal strip on mobile) and album detail with track descriptions and a
   lyrics sheet
+- `/artist/albums` — artist-only: rank the albums shown in the home **Albums**
+  section. Reached from the account menu's _Artist_ group (only rendered for
+  artist members). Moves are staged locally and saved as one full ranking via
+  the `reorder_albums` RPC, which re-checks membership before writing; the
+  order lives in `albums.position` (see
+  `supabase/migrations/20260716000000_album_position.sql`) and albums without
+  one sort last, newest first
 
 Playing a track queues its whole album into a global player bar: waveform
 timeline (wavesurfer.js) recolored per album palette, play/pause,
@@ -53,6 +60,8 @@ survives page navigation (the player lives above the router).
   client-side, so pages don't become per-user dynamic.
 - `/profile` shows the signed-in user and a sign-out control; `/likes` lists the
   tracks the user has liked, most recent first.
+- **Artist members** (rows in `artist_members`) additionally get inline album
+  editing and the `/artist/albums` ordering page.
 
 Supabase clients live in `src/lib/supabase/`: `anon.ts` (public read-only
 content), `client.ts` (browser, auth + likes) and `server.ts` (cookie-bound, for
