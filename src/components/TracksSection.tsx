@@ -6,6 +6,7 @@ import { useMessages } from "@/lib/i18n/LocaleProvider";
 import SectionHeader from "./SectionHeader";
 import StandaloneTrack from "./StandaloneTrack";
 import styles from "./TracksSection.module.css";
+import rail from "./Rail.module.css";
 
 type Props = {
   popular: Track[];
@@ -33,7 +34,9 @@ export default function TracksSection({ popular, latest }: Props) {
         activeKey={tab}
         onSelect={(key) => setTab(key as "popular" | "latest")}
       />
-      <ul className={styles.tracks}>
+      {/* Keyed per tab: a fresh scroller, so switching tabs starts the new
+          list at the beginning instead of inheriting the old scroll offset. */}
+      <ul key={tab} className={rail.rail}>
         {tracks.map((track) => (
           <StandaloneTrack
             key={track.track_id}

@@ -1,7 +1,10 @@
 .page {
+  /* The gutter the sections sit in. Rails read it to bleed past the gutter so
+     they scroll all the way to the page edge. */
+  --page-pad: 72px;
   max-width: 1440px;
   margin-inline: auto;
-  padding: 72px;
+  padding: var(--page-pad);
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -9,6 +12,7 @@
 
 @media (max-width: 767px) {
   .page {
+    --page-pad: 0px;
     padding: 0 0 48px;
     gap: 24px;
   }

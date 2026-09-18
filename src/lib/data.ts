@@ -234,7 +234,7 @@ async function attachPlayCounts(
  */
 export async function getFeaturedTracks(
   tracks: Track[],
-  limit = 3
+  limit = 5
 ): Promise<{ popular: Track[]; latest: Track[] }> {
   await attachPlayCounts(supabase, tracks);
   const popular = [...tracks]

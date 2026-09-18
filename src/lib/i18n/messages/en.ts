@@ -12,6 +12,7 @@ export const en = {
   sections: {
     tracks: "Tracks",
     albums: "Albums",
+    singles: "Singles",
     popular: "Popular",
     latests: "Latests",
     all: "All",
