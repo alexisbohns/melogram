@@ -42,7 +42,8 @@ type Props = {
  * (it becomes a pause button while this track is playing), the heading pairs
  * the track name with its album, and the description sits underneath like the
  * detailed album-page row — clamped to {@link DESCRIPTION_LIMIT} characters
- * with a "More" toggle when it runs longer.
+ * with a +/− toggle when it runs longer (the More/Less wording stays as the
+ * button's accessible name).
  */
 export default function StandaloneTrack({ track, queue }: Props) {
   const m = useMessages();
@@ -136,9 +137,10 @@ export default function StandaloneTrack({ track, queue }: Props) {
               type="button"
               className={styles.more}
               aria-expanded={expanded}
+              aria-label={expanded ? m.track.less : m.track.more}
               onClick={() => setExpanded((v) => !v)}
             >
-              {expanded ? m.track.less : m.track.more}
+              <span aria-hidden>{expanded ? "−" : "+"}</span>
             </button>
           )}
         </p>
