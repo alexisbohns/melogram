@@ -17,7 +17,7 @@ import styles from "./StandaloneTrack.module.css";
  * in characters (not CSS lines) so every row collapses to the same height
  * whatever the viewport width.
  */
-const DESCRIPTION_LIMIT = 140;
+const DESCRIPTION_LIMIT = 100;
 
 /**
  * Cut `text` to at most `limit` characters, backing up to the last word break
