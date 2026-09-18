@@ -132,18 +132,24 @@
   line-height: 22px;
 }
 
-/* inline "More"/"Less" toggle, sitting right after the clamped text */
+/* Inline "More"/"Less" toggle, sitting right after the clamped text. Reads
+   pink like the section tabs and the site header: soft grey compositing over
+   the page background through color-dodge. Nothing between here and the body
+   sets transform/opacity/isolation, so the blend reaches the backdrop. */
 .more {
   margin-left: 6px;
-  color: var(--album-light);
+  mix-blend-mode: color-dodge;
+  color: var(--header-fg);
+  opacity: 0.8;
   font-size: 16px;
   font-weight: 500;
   line-height: 22px;
   text-decoration: underline;
   text-underline-offset: 2px;
+  transition: opacity 0.15s ease;
 }
 
 .more:hover,
 .more:focus-visible {
-  color: var(--album-accent);
+  opacity: 1;
 }
