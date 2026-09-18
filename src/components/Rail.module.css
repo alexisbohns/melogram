@@ -1,0 +1,66 @@
+/**
+ * Horizontal scroller shared by the home sections. Items are sized so
+ * `--rail-per-view` of them fill the inset content width — lining up with the
+ * section header — while the scroller itself bleeds out over the page gutter,
+ * so the next item peeks in and the rail scrolls to the true page edge.
+ */
+.rail {
+  --rail-gap: 32px;
+  --rail-per-view: 3;
+  /* padding keeps the first item aligned with the header; the matching
+     negative margin is what lets the rest run past the gutter */
+  --rail-inset: var(--page-pad, 0px);
+  --rail-bleed: var(--page-pad, 0px);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc(
+    (100% - (var(--rail-per-view) - 1) * var(--rail-gap)) / var(--rail-per-view)
+  );
+  gap: var(--rail-gap);
+  align-items: start;
+  margin-inline: calc(var(--rail-bleed) * -1);
+  padding-inline: var(--rail-inset);
+  scroll-padding-inline: var(--rail-inset);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  /* Swapping a tab's items out from under the scroller makes the browser
+     "helpfully" re-anchor the scroll offset to whatever it had latched onto.
+     The rail has nothing worth anchoring to, so opt out. */
+  overflow-anchor: none;
+  scrollbar-width: none;
+}
+
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+.rail > * {
+  scroll-snap-align: start;
+}
+
+@media (max-width: 1023px) {
+  .rail {
+    --rail-per-view: 2;
+  }
+}
+
+@media (max-width: 767px) {
+  .rail {
+    --rail-gap: 24px;
+    /* the page has no gutter to bleed over here — the section's own inset
+       lives inside the scroller instead, like the header's tabs */
+    --rail-inset: var(--section-pad, 0px);
+    --rail-bleed: 0px;
+    /* one item in view plus a peek of the next */
+    grid-auto-columns: calc(100% - 40px);
+  }
+}
+
+/** Items that carry their own padding (album cards) sit flush with the edge. */
+@media (max-width: 767px) {
+  .bleed {
+    --rail-gap: 16px;
+    --rail-inset: 0px;
+  }
+}

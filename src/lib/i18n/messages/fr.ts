@@ -9,6 +9,7 @@ export const fr: Messages = {
   sections: {
     tracks: "Morceaux",
     albums: "Albums",
+    singles: "Singles",
     popular: "Populaires",
     latests: "Récents",
     all: "Tous",
