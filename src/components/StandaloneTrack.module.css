@@ -123,10 +123,32 @@
 
 /* ---------- description ---------- */
 
+/* the fade lives in the colour, not in `opacity`, so the inline "More" toggle
+   below can sit at full strength against the dimmed blurb */
 .description {
   width: 100%;
-  color: var(--album-light);
-  opacity: 0.5;
+  color: color-mix(in srgb, var(--album-light) 50%, transparent);
   font-size: 16px;
   line-height: 22px;
+}
+
+/* Inline expand toggle, sitting right after the clamped text. A bare +/− so it
+   stays secondary to the blurb it reveals — no underline, and dimmer at rest.
+   Reads pink like the section tabs and the site header: soft grey compositing
+   over the page background through color-dodge. Nothing between here and the
+   body sets transform/opacity/isolation, so the blend reaches the backdrop. */
+.more {
+  margin-left: 4px;
+  mix-blend-mode: color-dodge;
+  color: var(--header-fg);
+  opacity: 0.55;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  transition: opacity 0.15s ease;
+}
+
+.more:hover,
+.more:focus-visible {
+  opacity: 1;
 }

@@ -28,6 +28,7 @@ export const en = {
     signOut: "Sign out",
   },
   profile: { nameFallback: "You" },
+  track: { more: "More", less: "Less" },
   player: {
     expand: "Show track details",
     collapse: "Hide track details",

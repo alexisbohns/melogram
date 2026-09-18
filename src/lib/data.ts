@@ -228,13 +228,15 @@ async function attachPlayCounts(
 
 /**
  * Split a flat track list into the two home "Tracks" tabs:
- *  - `popular`: the top 3 by {@link trackPopularity} (likes weighted over plays)
- *  - `latest`:  the 3 most recently released (by the latest version's date)
+ *  - `popular`: the top `limit` by {@link trackPopularity} (likes weighted
+ *               over plays)
+ *  - `latest`:  the `limit` most recently released (by the latest version's
+ *               date)
  * Play counts are attached here so the ranking has them.
  */
 export async function getFeaturedTracks(
   tracks: Track[],
-  limit = 3
+  limit = 5
 ): Promise<{ popular: Track[]; latest: Track[] }> {
   await attachPlayCounts(supabase, tracks);
   const popular = [...tracks]

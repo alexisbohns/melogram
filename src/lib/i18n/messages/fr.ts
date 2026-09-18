@@ -25,6 +25,7 @@ export const fr: Messages = {
     signOut: "Se déconnecter",
   },
   profile: { nameFallback: "Vous" },
+  track: { more: "Plus", less: "Moins" },
   player: {
     expand: "Afficher les détails du titre",
     collapse: "Masquer les détails du titre",

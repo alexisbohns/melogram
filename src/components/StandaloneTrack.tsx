@@ -1,14 +1,35 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { Pause, Play } from "lucide-react";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime } from "@/player/durations";
 import { paletteVars } from "@/lib/palettes";
 import { useAlbumPalette } from "@/lib/albumPalette";
+import { useMessages } from "@/lib/i18n/LocaleProvider";
 import type { Track } from "@/lib/types";
 import LikeButton from "./LikeButton";
 import styles from "./StandaloneTrack.module.css";
+
+/**
+ * Longest description shown before it is clamped behind a "More" button. Kept
+ * in characters (not CSS lines) so every row collapses to the same height
+ * whatever the viewport width.
+ */
+const DESCRIPTION_LIMIT = 100;
+
+/**
+ * Cut `text` to at most `limit` characters, backing up to the last word break
+ * so the clamp never lands mid-word, and mark it with an ellipsis.
+ */
+function clamp(text: string, limit: number) {
+  if (text.length <= limit) return text;
+  const head = text.slice(0, limit);
+  const lastSpace = head.lastIndexOf(" ");
+  const cut = lastSpace > limit * 0.6 ? head.slice(0, lastSpace) : head;
+  return `${cut.trimEnd()}…`;
+}
 
 type Props = {
   track: Track;
@@ -20,10 +41,14 @@ type Props = {
  * A track shown outside its album: the album cover doubles as the play control
  * (it becomes a pause button while this track is playing), the heading pairs
  * the track name with its album, and the description sits underneath like the
- * detailed album-page row.
+ * detailed album-page row — clamped to {@link DESCRIPTION_LIMIT} characters
+ * with a +/− toggle when it runs longer (the More/Less wording stays as the
+ * button's accessible name).
  */
 export default function StandaloneTrack({ track, queue }: Props) {
+  const m = useMessages();
   const { current, isPlaying, toggle, playFrom } = usePlayer();
+  const [expanded, setExpanded] = useState(false);
   const palette = useAlbumPalette({
     id: track.album_id ?? undefined,
     name: track.album_name ?? undefined,
@@ -33,6 +58,10 @@ export default function StandaloneTrack({ track, queue }: Props) {
 
   const playable = Boolean(track.latest_resource_url);
   const active = current?.id === track.track_id && isPlaying;
+
+  const description = track.track_description ?? "";
+  const clamped = clamp(description, DESCRIPTION_LIMIT);
+  const clampable = clamped !== description;
 
   const onPlayClick = () => {
     if (!playable) return;
@@ -100,8 +129,21 @@ export default function StandaloneTrack({ track, queue }: Props) {
         </div>
       </div>
 
-      {track.track_description && (
-        <p className={styles.description}>{track.track_description}</p>
+      {description && (
+        <p className={styles.description}>
+          {clampable && !expanded ? clamped : description}
+          {clampable && (
+            <button
+              type="button"
+              className={styles.more}
+              aria-expanded={expanded}
+              aria-label={expanded ? m.track.less : m.track.more}
+              onClick={() => setExpanded((v) => !v)}
+            >
+              <span aria-hidden>{expanded ? "−" : "+"}</span>
+            </button>
+          )}
+        </p>
       )}
     </li>
   );
