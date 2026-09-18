@@ -123,10 +123,27 @@
 
 /* ---------- description ---------- */
 
+/* the fade lives in the colour, not in `opacity`, so the inline "More" toggle
+   below can sit at full strength against the dimmed blurb */
 .description {
   width: 100%;
-  color: var(--album-light);
-  opacity: 0.5;
+  color: color-mix(in srgb, var(--album-light) 50%, transparent);
   font-size: 16px;
   line-height: 22px;
+}
+
+/* inline "More"/"Less" toggle, sitting right after the clamped text */
+.more {
+  margin-left: 6px;
+  color: var(--album-light);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.more:hover,
+.more:focus-visible {
+  color: var(--album-accent);
 }
