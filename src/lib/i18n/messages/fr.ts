@@ -34,6 +34,12 @@ export const fr: Messages = {
     lyrics: "Paroles",
     track: "Morceau",
   },
+  status: {
+    draft: "Brouillon",
+    demo: "Démo",
+    prototype: "Prototype",
+    final: "Version finale",
+  },
   likes: {
     title: "Mes favoris",
     empty:

@@ -37,6 +37,12 @@ export const en = {
     lyrics: "Lyrics",
     track: "Track",
   },
+  status: {
+    draft: "Draft",
+    demo: "Demo",
+    prototype: "Prototype",
+    final: "Final",
+  },
   likes: {
     title: "My likes",
     empty:
