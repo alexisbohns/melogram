@@ -23,7 +23,8 @@
   scroll-padding-inline: var(--rail-inset);
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
+  /* magnetic: every swipe settles on an item edge, never mid-item */
+  scroll-snap-type: x mandatory;
   /* Swapping a tab's items out from under the scroller makes the browser
      "helpfully" re-anchor the scroll offset to whatever it had latched onto.
      The rail has nothing worth anchoring to, so opt out. */
@@ -37,6 +38,14 @@
 
 .rail > * {
   scroll-snap-align: start;
+}
+
+/* Items whose own root is a `display: contents` wrapper (PaletteScope) leave
+   nothing for the snap alignment to latch onto, so they're wrapped in this. */
+.item {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 @media (max-width: 1023px) {

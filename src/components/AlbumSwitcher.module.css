@@ -57,6 +57,9 @@
     scrollbar-width: none;
     padding: 16px 24px;
     margin: 0 -24px;
+    /* magnetic: a swipe always settles on an album, never between two */
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 24px;
   }
 
   .switcher::-webkit-scrollbar {
@@ -65,5 +68,6 @@
 
   .item {
     flex-shrink: 0;
+    scroll-snap-align: start;
   }
 }
