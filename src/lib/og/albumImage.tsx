@@ -27,7 +27,6 @@ import {
 export const OG_SIZE = { width: 1200, height: 630 };
 export const OG_CONTENT_TYPE = "image/png";
 
-const BG = "#11090c"; // --bg
 const COVER = 356; // rendered cover square (px)
 const VINYL = Math.round(COVER * 0.94); // vinyl diameter (matches AlbumCover)
 const PEEK = Math.round(COVER * 0.16); // vinyl overhang past the cover's edge
@@ -170,6 +169,8 @@ export async function renderAlbumImage(album: OgAlbum): Promise<ImageResponse> {
     renderCover(album?.cover_url, RASTER),
   ]);
   const palette = resolvePalette(getPalette(album ?? {}), album, cover.accent);
+  // The album's own near-black, the same one its page sits on.
+  const BG = palette.shell;
   const vinyl = await vinylDataUri(palette.accent, RASTER);
 
   const sleeve = cover.image ? (
