@@ -1,36 +1,16 @@
+/* Copied from AlbumDetailCard.module.css's .hero/.heroBody — the track hero
+   mirrors the album hero's shape (cover beside a body column). */
 .hero {
-  display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
+  display: flex;
   gap: 24px;
-  align-items: start;
+  align-items: flex-start;
 }
 
-.cover {
-  position: relative;
-  width: 200px;
-  aspect-ratio: 1;
-  border-radius: var(--radius-button);
-  overflow: hidden;
-  background: color-mix(in srgb, var(--album-light) 8%, transparent);
-}
-
-.coverImg {
-  object-fit: cover;
-}
-
-.texture {
-  position: absolute;
-  inset: 0;
-  background: url("/cover-texture.png") center / cover;
-  mix-blend-mode: multiply;
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.body {
+.heroBody {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  flex: 1;
   min-width: 0;
 }
 
@@ -42,13 +22,12 @@
   color: var(--album-light);
 }
 
-.album {
+/* Release date · status, the same visual weight the hero's old album link
+   carried (AlbumTrack/AlbumHeader use this accent for secondary metadata). */
+.subtitle {
   color: var(--album-accent);
   font-size: 16px;
   line-height: 22px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  width: fit-content;
 }
 
 .description {
@@ -58,30 +37,24 @@
   line-height: 22px;
 }
 
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 4px;
-}
-
-.time {
-  color: var(--album-light);
-  opacity: 0.5;
-  font-size: 14px;
-  line-height: 18px;
-  min-width: 30px;
-}
-
 @media (max-width: 767px) {
   .hero {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
+    flex-direction: column;
+    align-items: center;
   }
 
-  .cover {
-    width: 100%;
-    max-width: 280px;
+  .heroBody {
+    align-self: stretch;
+    align-items: center;
+    text-align: center;
+  }
+
+  .heroBody > * {
+    align-self: stretch;
+  }
+
+  .description {
+    text-align: left;
   }
 
   .name {

@@ -1,18 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Mic } from "lucide-react";
-import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
-import { formatTime } from "@/player/durations";
-import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { usePlayer } from "@/player/PlayerProvider";
+import { useLocale, useMessages } from "@/lib/i18n/LocaleProvider";
 import { localized } from "@/lib/i18n/config";
 import type { Track } from "@/lib/types";
-import IconButton from "./IconButton";
-import LikeButton from "./LikeButton";
-import LyricsSheet from "./LyricsSheet";
-import PlayButton from "./PlayButton";
+import AlbumCoverLive from "./AlbumCoverLive";
+import TrackActionTiles from "./TrackActionTiles";
 import styles from "./TrackHero.module.css";
 
 type Props = {
@@ -20,17 +13,26 @@ type Props = {
   lyrics: string | null;
 };
 
+const STATUS_KEYS = ["draft", "demo", "prototype", "final"] as const;
+type Status = (typeof STATUS_KEYS)[number];
+
+function isStatus(value: string | null): value is Status {
+  return !!value && (STATUS_KEYS as readonly string[]).includes(value);
+}
+
 /**
- * The track page's header: cover, name, album link, and the same three
- * actions a strip item carries — play, like, lyrics. The page's palette is
- * already in scope (PaletteScope), so nothing here resolves colors.
+ * The track page's header — mirrors the album hero's shape (see
+ * AlbumDetailCard): the album's cover (vinyl and all) beside a body column of
+ * name, subtitle, description, and actions. Play lives in `SongVisualizer`
+ * below this, not here — the header only says what the track IS.
  */
 export default function TrackHero({ track, lyrics }: Props) {
-  const { current, isPlaying, toggle, playFrom } = usePlayer();
+  const { current, isPlaying } = usePlayer();
   const locale = useLocale();
-  const [lyricsOpen, setLyricsOpen] = useState(false);
+  const m = useMessages();
 
-  const playable = Boolean(track.latest_resource_url);
+  // Shimmer matches the treatment AlbumTrack/StandaloneTrack/PlayerBar give a
+  // track's name while it's the one actually playing.
   const active = current?.id === track.track_id && isPlaying;
   const description = localized(
     track.track_description,
@@ -38,82 +40,42 @@ export default function TrackHero({ track, lyrics }: Props) {
     locale
   );
 
-  const onPlayClick = () => {
-    if (!playable) return;
-    if (current?.id === track.track_id) {
-      toggle();
-      return;
-    }
-    playFrom([toPlayerTrack(track, lyrics, locale)], 0);
-  };
+  const date = track.latest_release_date
+    ? new Intl.DateTimeFormat(locale, {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }).format(new Date(track.latest_release_date))
+    : null;
+  const status = isStatus(track.latest_status)
+    ? m.status[track.latest_status]
+    : null;
+  const subtitle = [date, status].filter(Boolean).join(" · ");
 
   return (
     <header className={styles.hero}>
-      <div className={styles.cover}>
-        {track.album_cover_url && (
-          <Image
-            src={track.album_cover_url}
-            alt=""
-            fill
-            sizes="200px"
-            className={styles.coverImg}
-            priority
-          />
-        )}
-        <span className={styles.texture} />
-      </div>
+      {track.album_id && (
+        <AlbumCoverLive
+          albumId={track.album_id}
+          coverUrl={track.album_cover_url}
+          alt={track.album_name ?? ""}
+          size={165}
+          priority
+          reserve
+        />
+      )}
 
-      <div className={styles.body}>
+      <div className={styles.heroBody}>
         <h1 className={`${styles.name} ${active ? "shimmer" : ""}`}>
           {track.track_name}
         </h1>
 
-        {track.album_id && track.album_name && (
-          <Link href={`/albums/${track.album_id}`} className={styles.album}>
-            {track.album_name}
-          </Link>
-        )}
+        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
 
         {description && <p className={styles.description}>{description}</p>}
 
-        <div className={styles.controls}>
-          <PlayButton
-            playing={active}
-            disabled={!playable}
-            label={
-              active ? `Pause ${track.track_name}` : `Play ${track.track_name}`
-            }
-            onClick={onPlayClick}
-          />
-
-          <span className={styles.time}>
-            {track.duration !== null ? formatTime(track.duration) : "–:–"}
-          </span>
-
-          <LikeButton
-            trackId={track.track_id}
-            likeCount={track.like_count ?? 0}
-          />
-
-          {lyrics && (
-            <IconButton
-              label={`Lyrics of ${track.track_name}`}
-              onClick={() => setLyricsOpen(true)}
-            >
-              <Mic size={20} strokeWidth={2} />
-            </IconButton>
-          )}
-        </div>
+        <TrackActionTiles track={track} lyrics={lyrics} />
       </div>
-
-      {lyrics && (
-        <LyricsSheet
-          open={lyricsOpen}
-          onClose={() => setLyricsOpen(false)}
-          trackName={track.track_name}
-          lyrics={lyrics}
-        />
-      )}
     </header>
   );
 }
