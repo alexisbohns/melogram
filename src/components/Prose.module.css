@@ -1,0 +1,84 @@
+.prose {
+  color: var(--album-light);
+  font-size: 16px;
+  line-height: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--font-gloock), serif;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.prose h2 {
+  font-size: 24px;
+}
+
+.prose h3 {
+  font-size: 20px;
+}
+
+.prose h4 {
+  font-size: 18px;
+}
+
+.prose a {
+  color: var(--album-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose strong {
+  font-weight: 700;
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.prose ul {
+  list-style: disc;
+}
+
+.prose ol {
+  list-style: decimal;
+}
+
+.prose blockquote {
+  border-left: 2px solid color-mix(in srgb, var(--album-accent) 60%, transparent);
+  padding-left: 16px;
+  opacity: 0.85;
+  font-style: italic;
+}
+
+.prose hr {
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--album-light) 12%, transparent);
+}
+
+.prose code {
+  font-family: ui-monospace, monospace;
+  font-size: 0.9em;
+  background: color-mix(in srgb, var(--album-light) 8%, transparent);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-button);
+}

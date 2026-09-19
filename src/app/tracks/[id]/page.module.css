@@ -1,0 +1,45 @@
+.page {
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Same two-column shape as the album page (see src/app/albums/[id]/page.module.css):
+   album context on the left, the subject on the right. */
+.content {
+  display: grid;
+  grid-template-columns: 400px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+/* A track with no album has no aside to show. */
+.soloColumn {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.track {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding: 0 24px 48px;
+    gap: 16px;
+  }
+
+  .content {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .track {
+    gap: 24px;
+  }
+}

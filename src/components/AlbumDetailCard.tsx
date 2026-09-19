@@ -5,11 +5,14 @@ import { hasVersion, type AlbumWithTracks, type TrackLyrics } from "@/lib/types"
 import { paletteVars } from "@/lib/palettes";
 import { useAlbumPalette } from "@/lib/albumPalette";
 import { displayGenre } from "@/lib/genres";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { localized, type Locale } from "@/lib/i18n/config";
 import AlbumCoverLive from "./AlbumCoverLive";
 import AlbumHeader from "./AlbumHeader";
 import AlbumInfos from "./AlbumInfos";
 import AlbumMetaTiles from "./AlbumMetaTiles";
 import AlbumPlaylist from "./AlbumPlaylist";
+import AlbumStory from "./AlbumStory";
 import EditToggle from "./edit/EditToggle";
 import EditableText from "./edit/EditableText";
 import AlbumTypeSelect from "./edit/AlbumTypeSelect";
@@ -17,6 +20,7 @@ import GenrePicker from "./edit/GenrePicker";
 import CoverUploader from "./edit/CoverUploader";
 import EditableSetlist from "./edit/EditableSetlist";
 import TrackDrawer from "./edit/TrackDrawer";
+import LocaleTabs from "./edit/LocaleTabs";
 import { useAlbumEdit } from "./edit/AlbumEditProvider";
 import styles from "./AlbumDetailCard.module.css";
 
@@ -28,11 +32,14 @@ type Props = {
 /** Album page main card (Figma "AlbumCard" on Album frames). */
 export default function AlbumDetailCard({ album, lyrics }: Props) {
   const { editing, canEdit, draft, setField } = useAlbumEdit();
+  const locale = useLocale();
   const palette = useAlbumPalette({ ...album, coverUrl: album.cover_url });
+  const description = localized(album.description, album.description_fr, locale);
   // Track drawer target: null = closed, { trackId: null } = create mode.
   // Mounted at card level (not inside the setlist) so a setlist resync or a
   // staged row removal can't unmount it mid-upload.
   const [drawer, setDrawer] = useState<{ trackId: string | null } | null>(null);
+  const [descLocale, setDescLocale] = useState<Locale>("en");
 
   // Read mode shows the listener view (versioned tracks only); a signed-in
   // owner sees the full list, matching what they'd manage in edit mode.
@@ -92,17 +99,28 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
           )}
 
           {editing ? (
-            <EditableText
-              ariaLabel="Album description"
-              multiline
-              value={draft.description}
-              placeholder="Add a description…"
-              onCommit={(v) => setField("description", v)}
-              className={styles.description}
-            />
+            <div className={styles.descriptionEdit}>
+              <LocaleTabs value={descLocale} onChange={setDescLocale} />
+              <EditableText
+                key={descLocale}
+                ariaLabel={`Album description (${descLocale.toUpperCase()})`}
+                multiline
+                value={
+                  descLocale === "en" ? draft.description : draft.description_fr
+                }
+                placeholder="Add a description…"
+                onCommit={(v) =>
+                  setField(
+                    descLocale === "en" ? "description" : "description_fr",
+                    v
+                  )
+                }
+                className={styles.description}
+              />
+            </div>
           ) : (
-            album.description && (
-              <p className={styles.description}>{album.description}</p>
+            description && (
+              <p className={styles.description}>{description}</p>
             )
           )}
 
@@ -134,6 +152,7 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
       ) : (
         <AlbumPlaylist tracks={readTracks} variant="detailed" lyrics={lyrics} />
       )}
+      <AlbumStory album={album} />
       {drawer && (
         <TrackDrawer
           key={drawer.trackId ?? "new"}

@@ -1,0 +1,14 @@
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Copied from AlbumHeader.module.css's .name — same album-name typography. */
+.name {
+  color: var(--album-light);
+  font-family: var(--font-gloock), serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 29px;
+}

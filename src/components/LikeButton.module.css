@@ -68,3 +68,13 @@
   visibility: visible;
   transform: translateX(-50%) translateY(0);
 }
+
+/* Inline count, for callers that pass `showCount` — the track page, where the
+   heart sits on its own under the description rather than in a dense row and
+   a hover-only count would go unseen. */
+.count {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+}

@@ -15,6 +15,9 @@ export async function updateAlbum(
   albumId: string,
   name: string,
   description: string | null,
+  descriptionFr: string | null,
+  story: string | null,
+  storyFr: string | null,
   type: string
 ): Promise<void> {
   const supabase = createClient();
@@ -22,6 +25,9 @@ export async function updateAlbum(
     _album_id: albumId,
     _name: name,
     _description: description,
+    _description_fr: descriptionFr,
+    _story: story,
+    _story_fr: storyFr,
     _type: type,
   });
   if (error) throw new Error(error.message);
@@ -64,6 +70,9 @@ export async function createTrack(
   albumId: string,
   name: string,
   description: string | null,
+  descriptionFr: string | null,
+  story: string | null,
+  storyFr: string | null,
   lyrics: string | null
 ): Promise<TrackDetails> {
   const supabase = createClient();
@@ -71,6 +80,9 @@ export async function createTrack(
     _album_id: albumId,
     _name: name,
     _description: description,
+    _description_fr: descriptionFr,
+    _story: story,
+    _story_fr: storyFr,
     _lyrics: lyrics,
   });
   if (error) throw new Error(error.message);
@@ -78,12 +90,12 @@ export async function createTrack(
 }
 
 /** Authoritative editable fields, fetched fresh so update_track (a full
-    overwrite) never clobbers description/lyrics with stale props. */
+    overwrite) never clobbers the prose or lyrics with stale props. */
 export async function getTrackDetails(trackId: string): Promise<TrackDetails> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("tracks")
-    .select("id,name,description,lyrics")
+    .select("id,name,description,description_fr,story,story_fr,lyrics")
     .eq("id", trackId)
     .maybeSingle();
   if (error) throw new Error(error.message);
@@ -95,6 +107,9 @@ export async function updateTrack(
   trackId: string,
   name: string,
   description: string | null,
+  descriptionFr: string | null,
+  story: string | null,
+  storyFr: string | null,
   lyrics: string | null
 ): Promise<void> {
   const supabase = createClient();
@@ -102,6 +117,9 @@ export async function updateTrack(
     _track_id: trackId,
     _name: name,
     _description: description,
+    _description_fr: descriptionFr,
+    _story: story,
+    _story_fr: storyFr,
     _lyrics: lyrics,
   });
   if (error) throw new Error(error.message);
@@ -327,6 +345,7 @@ async function uploadToPath(
 ): Promise<void> {
   const supabase = createClient();
   const duration = await audioDurationFromFile(file);
+  const peaks = await audioPeaksFromFile(file);
   await uploadObject("versions", path, file);
   const base = supabase.storage
     .from("versions")
@@ -335,6 +354,7 @@ async function uploadToPath(
     _version_id: versionId,
     _resource_url: `${base}?v=${Date.now()}`,
     _duration: duration,
+    _peaks: peaks,
   });
   if (error) throw new Error(error.message);
 }
@@ -359,6 +379,52 @@ function audioDurationFromFile(file: File): Promise<number | null> {
     audio.addEventListener("error", () => finish(null));
     audio.src = url;
   });
+}
+
+/** Bars stored per version — see the waveform_peaks migration. */
+const PEAK_COUNT = 512;
+
+/**
+ * Downsample a file's first channel to {@link PEAK_COUNT} absolute-value
+ * buckets, normalized 0..1, for the stored waveform. Decoding a whole song is
+ * fine here: it happens once, on the artist's machine, at upload. It must never
+ * happen on a listener's page view — that is the whole point of storing this.
+ *
+ * Degrades to null (unsupported browser, undecodable file); a version without
+ * peaks still uploads and simply has no idle waveform.
+ */
+async function audioPeaksFromFile(file: File): Promise<number[] | null> {
+  const Ctx =
+    typeof window === "undefined"
+      ? undefined
+      : window.AudioContext ??
+        (window as unknown as { webkitAudioContext?: typeof AudioContext })
+          .webkitAudioContext;
+  if (!Ctx) return null;
+
+  const ctx = new Ctx();
+  try {
+    const buffer = await ctx.decodeAudioData(await file.arrayBuffer());
+    const data = buffer.getChannelData(0);
+    const bucket = Math.floor(data.length / PEAK_COUNT) || 1;
+    const peaks: number[] = [];
+    for (let i = 0; i < PEAK_COUNT; i += 1) {
+      // One instantaneous sample per bucket, taken at its midpoint — NOT the
+      // bucket's maximum. Max-pooling looks like the obvious choice and is
+      // wrong: over ~0.4s of a mixed track the loudest sample is near full
+      // scale almost every time, so every bar lands in the same narrow band
+      // and the wave flattens into a uniform squiggle. Sampling is what
+      // wavesurfer does against decoded audio, and it is why its waveform has
+      // any contrast at all. The renderer scales to fit, so raw amplitudes
+      // are stored as they are, unnormalized.
+      peaks.push(Math.abs(data[Math.min(i * bucket + (bucket >> 1), data.length - 1)]));
+    }
+    return peaks;
+  } catch {
+    return null;
+  } finally {
+    void ctx.close();
+  }
 }
 
 /** Put an object into a member-writable bucket via the server route.

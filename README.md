@@ -22,6 +22,20 @@ Home and Album pages.
   `src/lib/palettes.ts` for now (no Supabase model change, step 1).
 - Track durations are not stored in the database; they resolve client-side
   from audio metadata (`preload="metadata"`).
+- Waveforms are **precomputed and stored**, not decoded in the browser
+  (`versions.waveform_peaks`, 512 values normalised 0–1). New uploads compute
+  them client-side; existing rows were filled by
+  `scripts/backfill-version-waveforms.mjs` (needs `ffmpeg`). Same reasoning as
+  the stored durations — see
+  `supabase/migrations/20260919010000_waveform_peaks.sql`. Peaks are read only
+  by `getTrack`, never by the home or album queries, so those payloads stay
+  small.
+- Track and album copy comes in two fields: `description`, a short blurb for the
+  strips and rows (kept under 200 characters, clamped to two lines), and
+  `story`, long-form markdown shown on the track and album pages. Both are
+  bilingual — a `_fr` column alongside each, resolved by `localized()` in
+  `src/lib/i18n/config.ts`, falling back to English when a French value is
+  missing.
 
 ## Pages
 
@@ -32,7 +46,14 @@ Home and Album pages.
   (play totals come from the `track_play_counts` view)
 - `/albums/[id]` — compact header, album switcher (rail on desktop,
   horizontal strip on mobile) and album detail with track descriptions and a
-  lyrics sheet
+  lyrics sheet, then the album's long-form **Notes** below the tracklist
+- `/tracks/[id]` — a track's own page, laid out like the album page: a left
+  column of album context (name, *N songs · M min*, the album's tracklist with
+  the viewed track marked) beside a header built like the album header (the
+  album's vinyl, the track name, release date · status, description, and tiles
+  carrying the like and lyrics actions), then a **song visualizer** — play
+  button, waveform and duration in the song's colour — and the track's
+  long-form notes. Reached by clicking a track's name anywhere it appears
 - `/artist/albums` — artist-only: rank the albums shown in the home **Albums**
   section. Reached from the account menu's _Artist_ group (only rendered for
   artist members). Moves are staged locally and saved as one full ranking via

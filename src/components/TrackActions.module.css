@@ -1,0 +1,30 @@
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Mirrors LikeButton's geometry exactly (height, padding, gap, accent colour,
+   hover to the light tone) so the two sit as a matched pair. */
+.lyrics {
+  height: 40px;
+  padding: 0 10px;
+  border-radius: var(--radius-button);
+  color: var(--album-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  transition: color 0.15s ease-out, transform 0.1s ease-out;
+}
+
+.lyrics:hover,
+.lyrics:focus-visible {
+  color: var(--album-light);
+}
+
+.lyrics:active {
+  transform: scale(0.92);
+}

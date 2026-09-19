@@ -1,0 +1,63 @@
+/* Copied from AlbumDetailCard.module.css's .hero/.heroBody — the track hero
+   mirrors the album hero's shape (cover beside a body column). */
+.hero {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.heroBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  font-family: var(--font-gloock), serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 29px;
+  color: var(--album-light);
+}
+
+/* Release date · status, the same visual weight the hero's old album link
+   carried (AlbumTrack/AlbumHeader use this accent for secondary metadata). */
+/* The album header's equivalent line is AlbumInfos ("2 SONGS · 14 MIN"); this
+   copies its treatment so the two headers share a rhythm. */
+.subtitle {
+  color: var(--album-accent);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+
+.description {
+  color: var(--album-light);
+  font-size: 16px;
+  line-height: 22px;
+}
+
+@media (max-width: 767px) {
+  .hero {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .heroBody {
+    align-self: stretch;
+    align-items: center;
+    text-align: center;
+  }
+
+  .heroBody > * {
+    align-self: stretch;
+  }
+
+  .description {
+    text-align: left;
+  }
+}

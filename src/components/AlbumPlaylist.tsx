@@ -6,12 +6,15 @@ type Props = {
   tracks: Track[];
   variant?: "simple" | "detailed";
   lyrics?: TrackLyrics;
+  /** The track whose page we're on, if any — marks that row as `current`. */
+  currentTrackId?: string;
 };
 
 export default function AlbumPlaylist({
   tracks,
   variant = "simple",
   lyrics = {},
+  currentTrackId,
 }: Props) {
   if (tracks.length === 0) return null;
 
@@ -25,6 +28,7 @@ export default function AlbumPlaylist({
           variant={variant}
           lyrics={lyrics[track.track_id] ?? null}
           queueLyrics={lyrics}
+          current={track.track_id === currentTrackId}
         />
       ))}
     </ul>

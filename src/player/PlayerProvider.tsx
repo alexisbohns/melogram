@@ -12,6 +12,7 @@ import {
 } from "react";
 import type { Track } from "@/lib/types";
 import { recordPlay } from "@/lib/plays";
+import { DEFAULT_LOCALE, localized, type Locale } from "@/lib/i18n/config";
 
 export type PlayerTrack = {
   id: string;
@@ -30,6 +31,9 @@ export type PlayerTrack = {
    * the expanded player's Lyrics action.
    */
   lyrics: string | null;
+  /** Stored waveform, when the caller has it (the track page). Lets the bar
+      paint instantly instead of after decoding the file. */
+  peaks: number[] | null;
 };
 
 export type RepeatMode = "none" | "one" | "all";
@@ -66,10 +70,13 @@ const PlayerContext = createContext<PlayerContextValue | null>(null);
  * Map a `track_overview` row (with a playable URL) to a queue entry. Lyrics
  * live outside the view, so callers that have them (the album page) pass them
  * in; they default to null so the player's Lyrics action simply stays hidden.
+ * The blurb is resolved to the caller's locale here, once, because the player
+ * keeps queue entries rather than rows.
  */
 export function toPlayerTrack(
   track: Track,
-  lyrics: string | null = null
+  lyrics: string | null = null,
+  locale: Locale = DEFAULT_LOCALE
 ): PlayerTrack {
   return {
     id: track.track_id,
@@ -79,8 +86,13 @@ export function toPlayerTrack(
     albumName: track.album_name,
     coverUrl: track.album_cover_url,
     theme: track.album_theme ?? null,
-    description: track.track_description,
+    description: localized(
+      track.track_description,
+      track.track_description_fr,
+      locale
+    ),
     lyrics,
+    peaks: track.peaks ?? null,
   };
 }
 

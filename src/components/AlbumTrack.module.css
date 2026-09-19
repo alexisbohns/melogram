@@ -5,24 +5,17 @@
   align-items: center;
 }
 
-.play {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-button);
+.current {
   background: color-mix(in srgb, var(--album-accent) 10%, transparent);
-  color: var(--album-accent);
-  display: grid;
-  place-items: center;
-}
+  border-radius: var(--radius-button);
 
-.play:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-.playing {
-  background: var(--album-accent);
-  color: var(--album-light);
+  /* .track has no padding of its own, so the tint would sit flush against
+     the row's content. Padding gives it breathing room, and the matching
+     negative margin bleeds the row back out to its original bounds so the
+     40px/1fr/auto columns still line up with the untinted rows above and
+     below it. */
+  padding: 8px;
+  margin: -8px;
 }
 
 .name {
@@ -31,6 +24,13 @@
   font-weight: 500;
   line-height: 20px;
   min-width: 0;
+  text-decoration: none;
+}
+
+.name:hover,
+.name:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .footer {
@@ -46,20 +46,6 @@
   line-height: 18px;
   min-width: 30px;
   text-align: right;
-}
-
-.iconButton {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-button);
-  color: var(--album-accent);
-  display: grid;
-  place-items: center;
-}
-
-.iconButton:disabled {
-  cursor: default;
-  opacity: 0.4;
 }
 
 /* detailed rows (album page) — description under the name on desktop,
@@ -80,6 +66,13 @@
   opacity: 0.5;
   font-size: 16px;
   line-height: 22px;
+
+  /* Two lines, always: the rails read as one strip whatever the blurb's
+     length. The long prose lives on the track page now. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
   margin-top: 4px;
 }
 

@@ -13,6 +13,7 @@ export const fr: Messages = {
     popular: "Populaires",
     latests: "Récents",
     all: "Tous",
+    notes: "Notes",
   },
   account: {
     triggerLabel: "Menu du compte",
@@ -31,6 +32,13 @@ export const fr: Messages = {
     collapse: "Masquer les détails du titre",
     album: "Album",
     lyrics: "Paroles",
+    track: "Morceau",
+  },
+  status: {
+    draft: "Brouillon",
+    demo: "Démo",
+    prototype: "Prototype",
+    final: "Version finale",
   },
   likes: {
     title: "Mes favoris",

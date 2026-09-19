@@ -11,14 +11,14 @@ import {
 } from "./types";
 
 const ALBUM_COLS =
-  "id,artist_id,name,description,type,cover_url,theme,position,created_at";
+  "id,artist_id,name,description,description_fr,story,story_fr,type,cover_url,theme,position,created_at";
 
 /** Supabase errors are plain objects; wrap them so logs show a real message. */
 function fail(context: string, error: { message?: string }): never {
   throw new Error(`${context}: ${error.message ?? JSON.stringify(error)}`);
 }
 const TRACK_COLS =
-  "track_id,track_name,track_description,album_id,album_name,album_cover_url,latest_version_id,latest_status,latest_resource_url,latest_release_date,like_count";
+  "track_id,track_name,track_description,track_description_fr,track_story,track_story_fr,album_id,album_name,album_cover_url,latest_version_id,latest_status,latest_resource_url,latest_release_date,like_count";
 
 /**
  * Fill in each track's `duration` from `versions.duration_seconds`, keyed on
@@ -324,6 +324,70 @@ export async function getLyrics(trackIds: string[]): Promise<TrackLyrics> {
   return Object.fromEntries(
     (data ?? []).map((row) => [row.id as string, row.lyrics as string | null])
   );
+}
+
+/** Everything `/tracks/[id]` renders: the track, its album (for the palette,
+    the back-link, and the aside's tracklist) and its lyrics. */
+export type TrackPage = {
+  track: Track;
+  album: AlbumWithTracks | null;
+  lyrics: string | null;
+};
+
+/**
+ * One track for its own page. Returns null for an unknown track and for a
+ * versionless one — `hasVersion` governs public visibility everywhere else,
+ * and a direct link must not become the one door around it. (Unlike the album
+ * page there is no owner-sees-more branch: this read is anonymous, and an
+ * owner reaches an unreleased track through the album page's edit mode.)
+ */
+export async function getTrack(id: string): Promise<TrackPage | null> {
+  const { data, error } = await supabase
+    .from("track_overview")
+    .select(TRACK_COLS)
+    .eq("track_id", id)
+    .maybeSingle();
+  if (error || !data) return null;
+
+  const track = data as Track;
+  if (!hasVersion(track)) return null;
+
+  // Reuse the album-with-tracks read rather than a bare `albums` select: the
+  // aside needs the album's ordered tracklist (for AlbumPlaylist/AlbumInfos),
+  // which this already loads. It also loads genres, which the aside doesn't
+  // use — a narrower read would skip those, but this keeps one code path.
+  const [album, lyrics] = await Promise.all([
+    track.album_id ? getAlbumWithTracks(track.album_id) : Promise.resolve(null),
+    getLyrics([track.track_id]),
+  ]);
+
+  if (album) attachThemesFromAlbums([album], [track]);
+  await attachDurations(supabase, [track]);
+
+  if (track.latest_version_id) {
+    const { data: version } = await supabase
+      .from("versions")
+      .select("waveform_peaks")
+      .eq("id", track.latest_version_id)
+      .maybeSingle();
+    track.peaks = (version?.waveform_peaks as number[] | null) ?? null;
+  }
+
+  return { track, album, lyrics: lyrics[track.track_id] ?? null };
+}
+
+/** The album basics behind a track, for its share image. */
+export async function getTrackAlbumBasics(
+  trackId: string
+): Promise<Pick<Album, "id" | "name" | "cover_url" | "theme"> | null> {
+  const { data, error } = await supabase
+    .from("track_overview")
+    .select("album_id")
+    .eq("track_id", trackId)
+    .maybeSingle();
+  const albumId = (data?.album_id ?? null) as string | null;
+  if (error || !albumId) return null;
+  return getAlbumBasics(albumId);
 }
 
 /**

@@ -60,6 +60,13 @@
   font-size: 16px;
   font-weight: 500;
   line-height: 20px;
+  text-decoration: none;
+}
+
+.name:hover,
+.name:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* album name — same font props as the time */
@@ -78,31 +85,6 @@
   justify-content: space-between;
   gap: 16px;
 }
-
-/* same accent pill as the album-page rows */
-.play {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: var(--radius-button);
-  background: color-mix(in srgb, var(--album-accent) 10%, transparent);
-  color: var(--album-accent);
-  display: grid;
-  place-items: center;
-}
-
-.play:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-/* playing: the button fills with the accent */
-.playing {
-  background: var(--album-accent);
-  color: var(--album-light);
-}
-
-
 
 .footer {
   display: flex;
@@ -128,4 +110,11 @@
   opacity: 0.5;
   font-size: 16px;
   line-height: 22px;
+
+  /* Two lines, always: the rails read as one strip whatever the blurb's
+     length. The long prose lives on the track page now. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }

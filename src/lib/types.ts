@@ -3,6 +3,11 @@ export type Album = {
   artist_id: string | null;
   name: string;
   description: string | null;
+  /** French blurb; null falls back to `description` (see i18n/config localized). */
+  description_fr: string | null;
+  /** Long-form markdown shown on the album page, below the tracklist. */
+  story: string | null;
+  story_fr: string | null;
   type: string | null;
   cover_url: string | null;
   /** Color theme key (see src/lib/palettes.ts); 'auto' derives it from the cover. */
@@ -33,6 +38,9 @@ export type TrackDetails = {
   id: string;
   name: string;
   description: string | null;
+  description_fr: string | null;
+  story: string | null;
+  story_fr: string | null;
   lyrics: string | null;
 };
 
@@ -41,6 +49,10 @@ export type Track = {
   track_id: string;
   track_name: string;
   track_description: string | null;
+  track_description_fr: string | null;
+  /** Long-form markdown shown on /tracks/[id]. */
+  track_story: string | null;
+  track_story_fr: string | null;
   album_id: string | null;
   album_name: string | null;
   album_cover_url: string | null;
@@ -61,6 +73,13 @@ export type Track = {
    * (on upload, or by the backfill script for pre-existing rows).
    */
   duration: number | null;
+  /**
+   * Stored waveform of the latest version (512 values, 0..1), attached ONLY by
+   * getTrack — the track page draws it. Deliberately not attached by
+   * attachDurations: that runs for every track on the home and album pages, and
+   * 512 floats per row would bloat those payloads for a wave nobody draws there.
+   */
+  peaks?: number[] | null;
   /**
    * Total recorded plays, attached by the data layer from the
    * `track_play_counts` view. Only populated where a popularity ranking needs

@@ -1,13 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { Pause, Play } from "lucide-react";
+import Link from "next/link";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime } from "@/player/durations";
 import { paletteVars } from "@/lib/palettes";
 import { useAlbumPalette } from "@/lib/albumPalette";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { localized } from "@/lib/i18n/config";
 import type { Track } from "@/lib/types";
 import LikeButton from "./LikeButton";
+import PlayButton from "./PlayButton";
 import styles from "./StandaloneTrack.module.css";
 
 type Props = {
@@ -23,6 +26,7 @@ type Props = {
  */
 export default function StandaloneTrack({ track, queue }: Props) {
   const { current, isPlaying, toggle, playFrom } = usePlayer();
+  const locale = useLocale();
   const palette = useAlbumPalette({
     id: track.album_id ?? undefined,
     name: track.album_name ?? undefined,
@@ -32,6 +36,11 @@ export default function StandaloneTrack({ track, queue }: Props) {
 
   const playable = Boolean(track.latest_resource_url);
   const active = current?.id === track.track_id && isPlaying;
+  const description = localized(
+    track.track_description,
+    track.track_description_fr,
+    locale
+  );
 
   const onPlayClick = () => {
     if (!playable) return;
@@ -41,7 +50,7 @@ export default function StandaloneTrack({ track, queue }: Props) {
     }
     const playableTracks = queue.filter((t) => t.latest_resource_url);
     playFrom(
-      playableTracks.map((t) => toPlayerTrack(t)),
+      playableTracks.map((t) => toPlayerTrack(t, null, locale)),
       playableTracks.findIndex((t) => t.track_id === track.track_id)
     );
   };
@@ -63,36 +72,31 @@ export default function StandaloneTrack({ track, queue }: Props) {
         </div>
 
         <div className={styles.heading}>
-          <span className={`${styles.name} ${active ? "shimmer" : ""}`}>
+          <Link
+            href={`/tracks/${track.track_id}`}
+            className={`${styles.name} ${active ? "shimmer" : ""}`}
+          >
             {track.track_name}
-          </span>
+          </Link>
           {track.album_name && (
             <span className={styles.album}>{track.album_name}</span>
           )}
         </div>
       </div>
 
-      {track.track_description && (
-        <p className={styles.description}>{track.track_description}</p>
-      )}
+      {description && <p className={styles.description}>{description}</p>}
 
       {/* controls row: play on the left, duration and like on the right */}
       <div className={styles.controls}>
-        <button
-          type="button"
-          className={`${styles.play} ${active ? styles.playing : ""}`}
+        <PlayButton
+          playing={active}
           disabled={!playable}
-          aria-label={
+          label={
             active ? `Pause ${track.track_name}` : `Play ${track.track_name}`
           }
           onClick={onPlayClick}
-        >
-          {active ? (
-            <Pause size={20} strokeWidth={2} />
-          ) : (
-            <Play size={20} strokeWidth={2} />
-          )}
-        </button>
+          size={20}
+        />
 
         <div className={styles.footer}>
           <span className={styles.time}>

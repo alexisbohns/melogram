@@ -1,12 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Mic, Pause, Play } from "lucide-react";
+import Link from "next/link";
+import { Mic } from "lucide-react";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime } from "@/player/durations";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { localized } from "@/lib/i18n/config";
 import type { Track, TrackLyrics } from "@/lib/types";
+import IconButton from "./IconButton";
 import LikeButton from "./LikeButton";
 import LyricsSheet from "./LyricsSheet";
+import PlayButton from "./PlayButton";
 import styles from "./AlbumTrack.module.css";
 
 type Props = {
@@ -20,6 +25,9 @@ type Props = {
    * carries its lyrics into the global player's expanded view.
    */
   queueLyrics?: TrackLyrics;
+  /** This row is the track whose page we're on. Distinct from `active`, which
+      means playing — both can be true at once. */
+  current?: boolean;
 };
 
 export default function AlbumTrack({
@@ -28,14 +36,21 @@ export default function AlbumTrack({
   variant = "simple",
   lyrics = null,
   queueLyrics,
+  current: isCurrent = false,
 }: Props) {
   const { current, isPlaying, toggle, playFrom } = usePlayer();
+  const locale = useLocale();
   const duration = track.duration;
   const [lyricsOpen, setLyricsOpen] = useState(false);
 
   const playable = Boolean(track.latest_resource_url);
   const active = current?.id === track.track_id && isPlaying;
   const detailed = variant === "detailed";
+  const description = localized(
+    track.track_description,
+    track.track_description_fr,
+    locale
+  );
 
   const onPlayClick = () => {
     if (!playable) return;
@@ -45,30 +60,31 @@ export default function AlbumTrack({
     }
     const playableTracks = queue.filter((t) => t.latest_resource_url);
     playFrom(
-      playableTracks.map((t) => toPlayerTrack(t, queueLyrics?.[t.track_id] ?? null)),
+      playableTracks.map((t) =>
+        toPlayerTrack(t, queueLyrics?.[t.track_id] ?? null, locale)
+      ),
       playableTracks.findIndex((t) => t.track_id === track.track_id)
     );
   };
 
   return (
-    <li className={`${styles.track} ${detailed ? styles.detailed : ""}`}>
-      <button
-        type="button"
-        className={`${styles.play} ${active ? styles.playing : ""}`}
+    <li
+      className={`${styles.track} ${detailed ? styles.detailed : ""} ${isCurrent ? styles.current : ""}`}
+      aria-current={isCurrent ? "true" : undefined}
+    >
+      <PlayButton
+        playing={active}
         disabled={!playable}
-        aria-label={active ? `Pause ${track.track_name}` : `Play ${track.track_name}`}
+        label={active ? `Pause ${track.track_name}` : `Play ${track.track_name}`}
         onClick={onPlayClick}
-      >
-        {active ? (
-          <Pause size={24} strokeWidth={2} />
-        ) : (
-          <Play size={24} strokeWidth={2} />
-        )}
-      </button>
+      />
 
-      <span className={`${styles.name} ${active ? "shimmer" : ""}`}>
+      <Link
+        href={`/tracks/${track.track_id}`}
+        className={`${styles.name} ${active ? "shimmer" : ""}`}
+      >
         {track.track_name}
-      </span>
+      </Link>
 
       <div className={styles.footer}>
         <span className={styles.time}>
@@ -76,19 +92,17 @@ export default function AlbumTrack({
         </span>
         <LikeButton trackId={track.track_id} likeCount={track.like_count ?? 0} />
         {detailed && lyrics && (
-          <button
-            type="button"
-            className={styles.iconButton}
-            aria-label={`Lyrics of ${track.track_name}`}
+          <IconButton
+            label={`Lyrics of ${track.track_name}`}
             onClick={() => setLyricsOpen(true)}
           >
             <Mic size={20} strokeWidth={2} />
-          </button>
+          </IconButton>
         )}
       </div>
 
-      {detailed && track.track_description && (
-        <p className={styles.description}>{track.track_description}</p>
+      {detailed && description && (
+        <p className={styles.description}>{description}</p>
       )}
 
       {detailed && lyrics && (

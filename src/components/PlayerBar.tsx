@@ -6,6 +6,7 @@ import {
   ChevronDown,
   Disc3,
   Mic,
+  Music,
   Pause,
   Play,
   Repeat,
@@ -18,51 +19,12 @@ import { paletteVars } from "@/lib/palettes";
 import { useAlbumPalette } from "@/lib/albumPalette";
 import { formatTime } from "@/player/durations";
 import { usePlayer } from "@/player/PlayerProvider";
+import { renderWaveform, alpha } from "@/player/waveform";
 import { useMessages } from "@/lib/i18n/LocaleProvider";
 import { Vinyl } from "vinyl-kit";
 import { VINYL_MASK_URL, albumVinylVars, nextVinylImage } from "@/lib/vinyl";
 import LyricsSheet from "./LyricsSheet";
 import styles from "./PlayerBar.module.css";
-
-/** Rounded-pill waveform bars — carried over from the previous app's player. */
-function renderWaveform(channels: Array<Float32Array | number[]>, ctx: CanvasRenderingContext2D) {
-  const { width, height } = ctx.canvas;
-  const scale = channels[0].length / width;
-  const step = 7;
-
-  ctx.translate(0, height / 2);
-  ctx.strokeStyle = ctx.fillStyle as string;
-  ctx.beginPath();
-
-  for (let i = 0; i < width; i += step * 2) {
-    const index = Math.floor(i * scale);
-    const value = Math.abs(Number(channels[0][index]) || 0);
-    let x = i;
-    let y = value * height;
-
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, y);
-    ctx.arc(x + step / 2, y, step / 2, Math.PI, 0, true);
-    ctx.lineTo(x + step, 0);
-
-    x = x + step;
-    y = -y;
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, y);
-    ctx.arc(x + step / 2, y, step / 2, Math.PI, 0, false);
-    ctx.lineTo(x + step, 0);
-  }
-
-  ctx.stroke();
-  ctx.closePath();
-}
-
-function alpha(hex: string, fraction: number): string {
-  const a = Math.round(fraction * 255)
-    .toString(16)
-    .padStart(2, "0");
-  return `${hex}${a}`;
-}
 
 export default function PlayerBar() {
   const player = usePlayer();
@@ -124,6 +86,20 @@ export default function PlayerBar() {
     let cancelled = false;
     const media = audioElement;
     const url = current.url;
+    // Wavesurfer's `peaks` option wants one array per channel (we only ever
+    // stored one). Deliberately NOT passing a `duration` alongside it: the
+    // known footgun is a *wrong* duration — wavesurfer trusts whatever number
+    // you give it and stretches the wave to fit, and nothing here corrects it
+    // later. We have no duration we can vouch for at this instant (the
+    // player's live `duration` state is reset to 0 on every track change,
+    // until the shared element's own "loadedmetadata" fires). Leaving
+    // `duration` out is safe: wavesurfer's loader falls back to the real
+    // media duration itself (immediately if already known, else it waits for
+    // "loadedmetadata" the same way it would without peaks at all) and pairs
+    // it with these peaks — so what we skip is only the expensive part, the
+    // full-file fetch + client-side decode that building peaks from scratch
+    // requires, which is exactly the cost Task 2's migration exists to avoid.
+    const peaks = current.peaks ? [current.peaks] : undefined;
     import("wavesurfer.js").then(({ default: WS }) => {
       if (cancelled || wsRef.current || !containerRef.current) return;
       const ws = WS.create({
@@ -137,6 +113,7 @@ export default function PlayerBar() {
         media,
         waveColor,
         progressColor,
+        peaks,
       });
       ws.on("interaction", (newTime: number) => seekRef.current(newTime));
       wsRef.current = ws;
@@ -165,7 +142,15 @@ export default function PlayerBar() {
     ws.setOptions({ waveColor, progressColor });
     if (loadedUrl.current !== current.url) {
       loadedUrl.current = current.url;
-      ws.load(current.url).catch(() => {});
+      // Pass this track's own stored peaks (same reasoning as the creation
+      // effect above: no `duration` argument, so wavesurfer pairs them with
+      // the real media duration once it knows it, instead of a value we
+      // can't currently vouch for). Without this, the wave would only ever
+      // paint from stored peaks for the very first track played each
+      // session — every subsequent track lands here and would otherwise
+      // fall back to a full fetch + decode.
+      const peaks = current.peaks ? [current.peaks] : undefined;
+      ws.load(current.url, peaks).catch(() => {});
     }
   }, [wsReady, current, waveColor, progressColor]);
 
@@ -283,6 +268,16 @@ export default function PlayerBar() {
                 <p className={styles.description}>{current.description}</p>
               )}
               <div className={styles.expandActions}>
+                {current?.id && (
+                  <Link
+                    href={`/tracks/${current.id}`}
+                    className={styles.expandButton}
+                    onClick={() => setExpanded(false)}
+                  >
+                    <Music size={16} strokeWidth={2} aria-hidden />
+                    {m.player.track}
+                  </Link>
+                )}
                 {current?.albumId && (
                   <Link
                     href={`/albums/${current.albumId}`}
