@@ -3,6 +3,11 @@ export type Album = {
   artist_id: string | null;
   name: string;
   description: string | null;
+  /** French blurb; null falls back to `description` (see i18n/config localized). */
+  description_fr: string | null;
+  /** Long-form markdown shown on the album page, below the tracklist. */
+  story: string | null;
+  story_fr: string | null;
   type: string | null;
   cover_url: string | null;
   /** Color theme key (see src/lib/palettes.ts); 'auto' derives it from the cover. */
@@ -33,6 +38,9 @@ export type TrackDetails = {
   id: string;
   name: string;
   description: string | null;
+  description_fr: string | null;
+  story: string | null;
+  story_fr: string | null;
   lyrics: string | null;
 };
 
@@ -41,6 +49,10 @@ export type Track = {
   track_id: string;
   track_name: string;
   track_description: string | null;
+  track_description_fr: string | null;
+  /** Long-form markdown shown on /tracks/[id]. */
+  track_story: string | null;
+  track_story_fr: string | null;
   album_id: string | null;
   album_name: string | null;
   album_cover_url: string | null;

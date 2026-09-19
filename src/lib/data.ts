@@ -11,14 +11,14 @@ import {
 } from "./types";
 
 const ALBUM_COLS =
-  "id,artist_id,name,description,type,cover_url,theme,position,created_at";
+  "id,artist_id,name,description,description_fr,story,story_fr,type,cover_url,theme,position,created_at";
 
 /** Supabase errors are plain objects; wrap them so logs show a real message. */
 function fail(context: string, error: { message?: string }): never {
   throw new Error(`${context}: ${error.message ?? JSON.stringify(error)}`);
 }
 const TRACK_COLS =
-  "track_id,track_name,track_description,album_id,album_name,album_cover_url,latest_version_id,latest_status,latest_resource_url,latest_release_date,like_count";
+  "track_id,track_name,track_description,track_description_fr,track_story,track_story_fr,album_id,album_name,album_cover_url,latest_version_id,latest_status,latest_resource_url,latest_release_date,like_count";
 
 /**
  * Fill in each track's `duration` from `versions.duration_seconds`, keyed on
