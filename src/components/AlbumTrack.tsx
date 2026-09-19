@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Mic, Pause, Play } from "lucide-react";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime } from "@/player/durations";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 import type { Track, TrackLyrics } from "@/lib/types";
 import LikeButton from "./LikeButton";
 import LyricsSheet from "./LyricsSheet";
@@ -30,6 +31,7 @@ export default function AlbumTrack({
   queueLyrics,
 }: Props) {
   const { current, isPlaying, toggle, playFrom } = usePlayer();
+  const locale = useLocale();
   const duration = track.duration;
   const [lyricsOpen, setLyricsOpen] = useState(false);
 
@@ -45,7 +47,9 @@ export default function AlbumTrack({
     }
     const playableTracks = queue.filter((t) => t.latest_resource_url);
     playFrom(
-      playableTracks.map((t) => toPlayerTrack(t, queueLyrics?.[t.track_id] ?? null)),
+      playableTracks.map((t) =>
+        toPlayerTrack(t, queueLyrics?.[t.track_id] ?? null, locale)
+      ),
       playableTracks.findIndex((t) => t.track_id === track.track_id)
     );
   };

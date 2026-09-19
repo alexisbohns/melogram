@@ -6,6 +6,7 @@ import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime } from "@/player/durations";
 import { paletteVars } from "@/lib/palettes";
 import { useAlbumPalette } from "@/lib/albumPalette";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 import type { Track } from "@/lib/types";
 import LikeButton from "./LikeButton";
 import styles from "./StandaloneTrack.module.css";
@@ -23,6 +24,7 @@ type Props = {
  */
 export default function StandaloneTrack({ track, queue }: Props) {
   const { current, isPlaying, toggle, playFrom } = usePlayer();
+  const locale = useLocale();
   const palette = useAlbumPalette({
     id: track.album_id ?? undefined,
     name: track.album_name ?? undefined,
@@ -41,7 +43,7 @@ export default function StandaloneTrack({ track, queue }: Props) {
     }
     const playableTracks = queue.filter((t) => t.latest_resource_url);
     playFrom(
-      playableTracks.map((t) => toPlayerTrack(t)),
+      playableTracks.map((t) => toPlayerTrack(t, null, locale)),
       playableTracks.findIndex((t) => t.track_id === track.track_id)
     );
   };
