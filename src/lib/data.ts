@@ -326,6 +326,60 @@ export async function getLyrics(trackIds: string[]): Promise<TrackLyrics> {
   );
 }
 
+/** Everything `/tracks/[id]` renders: the track, its album (for the palette
+    and the back-link) and its lyrics. */
+export type TrackPage = {
+  track: Track;
+  album: Album | null;
+  lyrics: string | null;
+};
+
+/**
+ * One track for its own page. Returns null for an unknown track and for a
+ * versionless one — `hasVersion` governs public visibility everywhere else,
+ * and a direct link must not become the one door around it. (Unlike the album
+ * page there is no owner-sees-more branch: this read is anonymous, and an
+ * owner reaches an unreleased track through the album page's edit mode.)
+ */
+export async function getTrack(id: string): Promise<TrackPage | null> {
+  const { data, error } = await supabase
+    .from("track_overview")
+    .select(TRACK_COLS)
+    .eq("track_id", id)
+    .maybeSingle();
+  if (error || !data) return null;
+
+  const track = data as Track;
+  if (!hasVersion(track)) return null;
+
+  const [albumRes, lyrics] = await Promise.all([
+    track.album_id
+      ? supabase.from("albums").select(ALBUM_COLS).eq("id", track.album_id).maybeSingle()
+      : Promise.resolve({ data: null }),
+    getLyrics([track.track_id]),
+  ]);
+
+  const album = (albumRes.data ?? null) as Album | null;
+  if (album) attachThemesFromAlbums([album], [track]);
+  await attachDurations(supabase, [track]);
+
+  return { track, album, lyrics: lyrics[track.track_id] ?? null };
+}
+
+/** The album basics behind a track, for its share image. */
+export async function getTrackAlbumBasics(
+  trackId: string
+): Promise<Pick<Album, "id" | "name" | "cover_url" | "theme"> | null> {
+  const { data, error } = await supabase
+    .from("track_overview")
+    .select("album_id")
+    .eq("track_id", trackId)
+    .maybeSingle();
+  const albumId = (data?.album_id ?? null) as string | null;
+  if (error || !albumId) return null;
+  return getAlbumBasics(albumId);
+}
+
 /**
  * Tracks the given user has liked, most recently liked first.
  * Requires an authenticated client (RLS restricts track_likes to the owner).
