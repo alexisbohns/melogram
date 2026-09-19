@@ -22,8 +22,6 @@ type Props = {
    * to the right of the cover (album header, switcher) so it isn't overlapped.
    */
   reserve?: boolean;
-  /** Turn the extracted record — used while its album is playing. */
-  spinning?: boolean;
 };
 
 /**
@@ -38,7 +36,6 @@ export default function AlbumCover({
   priority,
   active = false,
   reserve = false,
-  spinning,
 }: Props) {
   return (
     <VinylSleeve
@@ -47,7 +44,6 @@ export default function AlbumCover({
       size={size}
       active={active}
       reserve={reserve}
-      spinning={spinning}
       maskUrl={VINYL_MASK_URL}
       textureUrl={VINYL_TEXTURE_URL}
       renderImage={nextVinylImage(priority)}

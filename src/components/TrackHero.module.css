@@ -1,5 +1,5 @@
-/* Copied from AlbumDetailCard.module.css's .hero/.heroBody — the track hero
-   mirrors the album hero's shape (cover beside a body column). */
+/* The album hero's shape (AlbumDetailCard.module.css .hero/.heroBody), down to
+   the desktop trick that dissolves it into the page grid. */
 .hero {
   display: flex;
   gap: 24px;
@@ -12,6 +12,52 @@
   gap: 16px;
   flex: 1;
   min-width: 0;
+}
+
+/* Pill, name and subtitle read as one block, tighter than the 16px the body
+   puts between its blocks — the album header groups name + infos the same. */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* The album the track belongs to, above its name and linking back to it.
+   Wears AlbumInfos' uppercase-accent treatment, so the pill and the subtitle
+   under the title frame the name with the same voice. */
+.albumPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 5px 12px 5px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--album-accent) 12%, transparent);
+  color: var(--album-accent);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.albumPill svg {
+  flex-shrink: 0;
+}
+
+/* The name is what gives out, not the icon, when the column is narrow. */
+.albumPillName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.albumPill:hover,
+.albumPill:focus-visible {
+  background: color-mix(in srgb, var(--album-accent) 22%, transparent);
+  color: var(--album-light);
 }
 
 .name {
@@ -57,7 +103,30 @@
     align-self: stretch;
   }
 
+  .header {
+    align-items: center;
+  }
+
   .description {
     text-align: left;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Same dissolve as the album card (AlbumDetailCard.module.css): the hero
+     generates no box of its own, so the cover and the body become items of
+     the page grid and the cover heads the sidebar's column. The `order`
+     values are shared with the sidebar (4) and the main body (5) — see
+     src/app/tracks/[id]/page.module.css. */
+  .hero {
+    display: contents;
+  }
+
+  .cover {
+    order: 2;
+  }
+
+  .heroBody {
+    order: 3;
   }
 }

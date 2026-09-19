@@ -1,14 +1,18 @@
+/* Fills the track page's sidebar cell, which does the placing — see
+   `.sidebar` in src/app/tracks/[id]/page.module.css. */
 .aside {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* Copied from AlbumHeader.module.css's .name — same album-name typography. */
-.name {
+/* Section.module.css's .heading, minus the hairline that separates sections
+   stacked in the main column — this one heads a column of its own. Rhymes
+   with the "Notes" and "Lyrics" titles alongside it. */
+.title {
   color: var(--album-light);
   font-family: var(--font-gloock), serif;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 400;
-  line-height: 29px;
+  line-height: 24px;
 }

@@ -14,6 +14,8 @@ export const fr: Messages = {
     latests: "Récents",
     all: "Tous",
     notes: "Notes",
+    lyrics: "Paroles",
+    albumTracks: "Tous les morceaux de l'album",
   },
   account: {
     triggerLabel: "Menu du compte",

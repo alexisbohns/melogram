@@ -82,3 +82,39 @@
     margin-top: 8px;
   }
 }
+
+/* nav rows (track page sidebar) — the row IS the link, so the grid columns
+   don't apply: name on the left, duration on the right, nothing clickable
+   between them. */
+.navRow {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.navRow .name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navRow:hover .name,
+.navRow:focus-visible .name {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Every nav row carries the tint's padding, not just the highlighted one, so
+   the list keeps a single rhythm whichever row is current — give it to that
+   row alone and it stands 16px taller than its neighbours. The inline
+   negative margin is what lets the tint reach the column's edges while the
+   text stays aligned with the title and meta above it. */
+.navTrack,
+.navTrack.current {
+  padding: 8px;
+  margin: 0 -8px;
+}
