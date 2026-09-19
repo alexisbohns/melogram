@@ -17,10 +17,9 @@ type Props = {
 };
 
 /**
- * A track shown outside its album: the album cover doubles as the play control
- * (it becomes a pause button while this track is playing), the heading pairs
- * the track name with its album, and the description sits underneath like the
- * detailed album-page row.
+ * A track shown outside its album: the cover and heading pair the track name
+ * with its album, the description follows like the detailed album-page row,
+ * and a controls row closes the item with play / duration / like.
  */
 export default function StandaloneTrack({ track, queue }: Props) {
   const { current, isPlaying, toggle, playFrom } = usePlayer();
@@ -50,35 +49,18 @@ export default function StandaloneTrack({ track, queue }: Props) {
   return (
     <li className={styles.track} style={paletteVars(palette)}>
       <div className={styles.header}>
-        <button
-          type="button"
-          className={`${styles.cover} ${active ? styles.playing : ""}`}
-          disabled={!playable}
-          aria-label={
-            active ? `Pause ${track.track_name}` : `Play ${track.track_name}`
-          }
-          onClick={onPlayClick}
-        >
-          {active ? (
-            <Pause size={20} strokeWidth={2} />
-          ) : (
-            <>
-              {track.album_cover_url && (
-                <Image
-                  src={track.album_cover_url}
-                  alt=""
-                  fill
-                  sizes="40px"
-                  className={styles.coverImg}
-                />
-              )}
-              <span className={styles.texture} />
-              <span className={styles.hint} aria-hidden>
-                <Play size={20} strokeWidth={2} />
-              </span>
-            </>
+        <div className={styles.cover}>
+          {track.album_cover_url && (
+            <Image
+              src={track.album_cover_url}
+              alt=""
+              fill
+              sizes="40px"
+              className={styles.coverImg}
+            />
           )}
-        </button>
+          <span className={styles.texture} />
+        </div>
 
         <div className={styles.heading}>
           <span className={`${styles.name} ${active ? "shimmer" : ""}`}>
@@ -88,6 +70,29 @@ export default function StandaloneTrack({ track, queue }: Props) {
             <span className={styles.album}>{track.album_name}</span>
           )}
         </div>
+      </div>
+
+      {track.track_description && (
+        <p className={styles.description}>{track.track_description}</p>
+      )}
+
+      {/* controls row: play on the left, duration and like on the right */}
+      <div className={styles.controls}>
+        <button
+          type="button"
+          className={`${styles.play} ${active ? styles.playing : ""}`}
+          disabled={!playable}
+          aria-label={
+            active ? `Pause ${track.track_name}` : `Play ${track.track_name}`
+          }
+          onClick={onPlayClick}
+        >
+          {active ? (
+            <Pause size={20} strokeWidth={2} />
+          ) : (
+            <Play size={20} strokeWidth={2} />
+          )}
+        </button>
 
         <div className={styles.footer}>
           <span className={styles.time}>
@@ -99,10 +104,6 @@ export default function StandaloneTrack({ track, queue }: Props) {
           />
         </div>
       </div>
-
-      {track.track_description && (
-        <p className={styles.description}>{track.track_description}</p>
-      )}
     </li>
   );
 }

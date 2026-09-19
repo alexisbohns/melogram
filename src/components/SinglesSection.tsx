@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { AlbumWithTracks } from "@/lib/types";
 import { useMessages } from "@/lib/i18n/LocaleProvider";
 import { ALL_GENRES, useGenreTabs } from "./useGenreTabs";
@@ -21,6 +21,7 @@ export default function SinglesSection({
   const m = useMessages();
   const [active, setActive] = useState(ALL_GENRES);
   const { tabs, filter } = useGenreTabs(singles);
+  const railRef = useRef<HTMLUListElement>(null);
 
   if (singles.length === 0) return null;
 
@@ -34,9 +35,10 @@ export default function SinglesSection({
         tabs={tabs}
         activeKey={active}
         onSelect={setActive}
+        scrollerRef={railRef}
       />
       {/* Keyed per tab — see TracksSection: a fresh scroller per filter. */}
-      <ul key={active} className={rail.rail}>
+      <ul key={active} ref={railRef} className={rail.rail}>
         {tracks.map((track) => (
           <StandaloneTrack key={track.track_id} track={track} queue={tracks} />
         ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { AlbumWithTracks } from "@/lib/types";
 import { useMessages } from "@/lib/i18n/LocaleProvider";
 import { ALL_GENRES, useGenreTabs } from "./useGenreTabs";
@@ -14,6 +14,7 @@ export default function AlbumsSection({ albums }: { albums: AlbumWithTracks[] })
   const m = useMessages();
   const [active, setActive] = useState(ALL_GENRES);
   const { tabs, filter } = useGenreTabs(albums);
+  const railRef = useRef<HTMLDivElement>(null);
 
   if (albums.length === 0) return null;
 
@@ -24,11 +25,14 @@ export default function AlbumsSection({ albums }: { albums: AlbumWithTracks[] })
         tabs={tabs}
         activeKey={active}
         onSelect={setActive}
+        scrollerRef={railRef}
       />
       {/* Keyed per tab — see TracksSection: a fresh scroller per filter. */}
-      <div key={active} className={`${rail.rail} ${rail.bleed}`}>
+      <div key={active} ref={railRef} className={`${rail.rail} ${rail.bleed}`}>
         {filter(active).map((album) => (
-          <AlbumCard key={album.id} album={album} />
+          <div key={album.id} className={rail.item}>
+            <AlbumCard album={album} />
+          </div>
         ))}
       </div>
     </section>
