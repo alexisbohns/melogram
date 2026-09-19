@@ -326,11 +326,11 @@ export async function getLyrics(trackIds: string[]): Promise<TrackLyrics> {
   );
 }
 
-/** Everything `/tracks/[id]` renders: the track, its album (for the palette
-    and the back-link) and its lyrics. */
+/** Everything `/tracks/[id]` renders: the track, its album (for the palette,
+    the back-link, and the aside's tracklist) and its lyrics. */
 export type TrackPage = {
   track: Track;
-  album: Album | null;
+  album: AlbumWithTracks | null;
   lyrics: string | null;
 };
 
@@ -352,14 +352,15 @@ export async function getTrack(id: string): Promise<TrackPage | null> {
   const track = data as Track;
   if (!hasVersion(track)) return null;
 
-  const [albumRes, lyrics] = await Promise.all([
-    track.album_id
-      ? supabase.from("albums").select(ALBUM_COLS).eq("id", track.album_id).maybeSingle()
-      : Promise.resolve({ data: null }),
+  // Reuse the album-with-tracks read rather than a bare `albums` select: the
+  // aside needs the album's ordered tracklist (for AlbumPlaylist/AlbumInfos),
+  // which this already loads. It also loads genres, which the aside doesn't
+  // use — a narrower read would skip those, but this keeps one code path.
+  const [album, lyrics] = await Promise.all([
+    track.album_id ? getAlbumWithTracks(track.album_id) : Promise.resolve(null),
     getLyrics([track.track_id]),
   ]);
 
-  const album = (albumRes.data ?? null) as Album | null;
   if (album) attachThemesFromAlbums([album], [track]);
   await attachDurations(supabase, [track]);
 
