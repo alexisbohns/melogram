@@ -86,6 +86,20 @@ export default function PlayerBar() {
     let cancelled = false;
     const media = audioElement;
     const url = current.url;
+    // Wavesurfer's `peaks` option wants one array per channel (we only ever
+    // stored one). Deliberately NOT passing a `duration` alongside it: the
+    // known footgun is a *wrong* duration — wavesurfer trusts whatever number
+    // you give it and stretches the wave to fit, and nothing here corrects it
+    // later. We have no duration we can vouch for at this instant (the
+    // player's live `duration` state is reset to 0 on every track change,
+    // until the shared element's own "loadedmetadata" fires). Leaving
+    // `duration` out is safe: wavesurfer's loader falls back to the real
+    // media duration itself (immediately if already known, else it waits for
+    // "loadedmetadata" the same way it would without peaks at all) and pairs
+    // it with these peaks — so what we skip is only the expensive part, the
+    // full-file fetch + client-side decode that building peaks from scratch
+    // requires, which is exactly the cost Task 2's migration exists to avoid.
+    const peaks = current.peaks ? [current.peaks] : undefined;
     import("wavesurfer.js").then(({ default: WS }) => {
       if (cancelled || wsRef.current || !containerRef.current) return;
       const ws = WS.create({
@@ -99,6 +113,7 @@ export default function PlayerBar() {
         media,
         waveColor,
         progressColor,
+        peaks,
       });
       ws.on("interaction", (newTime: number) => seekRef.current(newTime));
       wsRef.current = ws;
@@ -127,7 +142,15 @@ export default function PlayerBar() {
     ws.setOptions({ waveColor, progressColor });
     if (loadedUrl.current !== current.url) {
       loadedUrl.current = current.url;
-      ws.load(current.url).catch(() => {});
+      // Pass this track's own stored peaks (same reasoning as the creation
+      // effect above: no `duration` argument, so wavesurfer pairs them with
+      // the real media duration once it knows it, instead of a value we
+      // can't currently vouch for). Without this, the wave would only ever
+      // paint from stored peaks for the very first track played each
+      // session — every subsequent track lands here and would otherwise
+      // fall back to a full fetch + decode.
+      const peaks = current.peaks ? [current.peaks] : undefined;
+      ws.load(current.url, peaks).catch(() => {});
     }
   }, [wsReady, current, waveColor, progressColor]);
 

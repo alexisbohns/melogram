@@ -31,6 +31,9 @@ export type PlayerTrack = {
    * the expanded player's Lyrics action.
    */
   lyrics: string | null;
+  /** Stored waveform, when the caller has it (the track page). Lets the bar
+      paint instantly instead of after decoding the file. */
+  peaks: number[] | null;
 };
 
 export type RepeatMode = "none" | "one" | "all";
@@ -89,6 +92,7 @@ export function toPlayerTrack(
       locale
     ),
     lyrics,
+    peaks: track.peaks ?? null,
   };
 }
 

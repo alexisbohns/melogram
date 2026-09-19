@@ -248,6 +248,10 @@ export default function VersionsSection({
         theme: album.theme,
         description: track.description,
         lyrics: track.lyrics,
+        // Previewing an arbitrary version here, not necessarily the track's
+        // latest — track.peaks (when present) belongs to latest_version_id
+        // only, so it would be wrong to attach to a different version's file.
+        peaks: null,
       })),
       playable.findIndex((v) => v.id === version.id)
     );
