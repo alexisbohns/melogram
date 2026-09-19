@@ -22,3 +22,17 @@ export const LOCALE_META: Record<Locale, { nativeName: string; flag: string }> =
 export function isLocale(value: string | undefined): value is Locale {
   return !!value && (LOCALES as readonly string[]).includes(value);
 }
+
+/**
+ * Resolve a bilingual content pair for a locale. Content columns come in
+ * `x` / `x_fr` pairs (see the Album and Track types); a missing French value
+ * falls back to English silently — no "untranslated" badge, the reader just
+ * gets the English text.
+ */
+export function localized(
+  en: string | null,
+  fr: string | null,
+  locale: Locale
+): string | null {
+  return (locale === "fr" ? fr : null) ?? en;
+}
