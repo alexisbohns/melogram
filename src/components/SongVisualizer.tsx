@@ -75,7 +75,12 @@ export default function SongVisualizer({ track, lyrics }: Props) {
       />
 
       {live ? (
-        <LiveWave key="live" player={player} palette={palette} />
+        <LiveWave
+          key="live"
+          player={player}
+          palette={palette}
+          peaks={track.peaks ?? null}
+        />
       ) : (
         <IdleWave
           key="idle"
@@ -185,9 +190,17 @@ function IdleWave({
 function LiveWave({
   player,
   palette,
+  peaks,
 }: {
   player: ReturnType<typeof usePlayer>;
   palette: AlbumPalette;
+  /**
+   * The PAGE's stored peaks, not `player.current.peaks`. A queue entry built
+   * on the home or album page carries none — those pages deliberately don't
+   * fetch them — so reading them off the player left this with nothing to
+   * draw whenever playback started somewhere else.
+   */
+  peaks: number[] | null;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const wsRef = useRef<WaveSurfer | null>(null);
@@ -210,7 +223,8 @@ function LiveWave({
       return;
     let cancelled = false;
     const media = audioElement;
-    const peaks = current.peaks ? [current.peaks] : undefined;
+    const channels = peaks ? [peaks] : undefined;
+    const url = current.url;
     import("wavesurfer.js").then(({ default: WS }) => {
       if (cancelled || wsRef.current || !containerRef.current) return;
       const ws = WS.create({
@@ -224,16 +238,22 @@ function LiveWave({
         media,
         waveColor,
         progressColor,
-        peaks,
       });
       ws.on("interaction", (newTime: number) => seekRef.current(newTime));
       wsRef.current = ws;
+      // Load explicitly rather than relying on wavesurfer picking up the
+      // shared element's src: this component usually mounts into playback
+      // that is ALREADY under way (you navigate here from wherever you
+      // pressed play), and in that case nothing triggers an automatic load.
+      // With peaks it draws without touching the network; without them it
+      // falls back to decoding the file, exactly as the player bar does.
+      ws.load(url, channels).catch(() => {});
     });
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- creation guarded by wsRef.current; recoloring handled by the effect below
-  }, [current, audioElement]);
+  }, [current, audioElement, peaks]);
 
   // Recolor if the palette resolves (or changes) after wavesurfer already
   // exists — e.g. a cover-derived accent arriving late.
