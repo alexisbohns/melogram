@@ -76,8 +76,9 @@ function loadFonts(): Promise<[Buffer, Buffer]> {
 const asset = (file: string) => join(process.cwd(), "public", file);
 
 /**
- * Fetch the cover, square-crop it, and apply the app's cover texture (a 0.6
- * multiply overlay). Also reports the cover's dominant color, so an album with
+ * Fetch the cover, square-crop it, and dress it the way the site does: the
+ * paper grain multiplied on, then the sleeve wear screened over it. Also
+ * reports the cover's dominant color, so an album with
  * no theme of its own can be dressed from its artwork — the server-side
  * counterpart of `useCoverAccent` in the app.
  *
@@ -86,20 +87,30 @@ const asset = (file: string) => join(process.cwd(), "public", file);
  */
 async function renderCover(
   coverUrl: string | null | undefined,
-  size: number
+  size: number,
 ): Promise<{ image: string | null; accent: string | null }> {
   if (!coverUrl) return { image: null, accent: null };
   try {
     const res = await fetch(coverUrl);
     if (!res.ok) return { image: null, accent: null };
     const input = Buffer.from(await res.arrayBuffer());
-    const texture = await sharp(asset("cover-texture.png"))
-      .resize(size, size)
-      .ensureAlpha(0.6)
-      .toBuffer();
+    const [texture, wear] = await Promise.all([
+      sharp(asset("cover-texture.png"))
+        .resize(size, size)
+        .ensureAlpha(0.6)
+        .toBuffer(),
+      sharp(asset("cover-wear.webp"))
+        .resize(size, size)
+        .ensureAlpha(0.55)
+        .toBuffer(),
+    ]);
+    // Grain first, wear over it — the order the browser paints the two layers.
     const buf = await sharp(input)
       .resize(size, size, { fit: "cover", position: "attention" })
-      .composite([{ input: texture, blend: "multiply" }])
+      .composite([
+        { input: texture, blend: "multiply" },
+        { input: wear, blend: "screen" },
+      ])
       .png()
       .toBuffer();
 
@@ -149,7 +160,7 @@ async function vinylDataUri(accent: string, size: number): Promise<string> {
 function resolvePalette(
   base: AlbumPalette,
   album: OgAlbum,
-  accent: string | null
+  accent: string | null,
 ): AlbumPalette {
   if (!accent || !album) return base;
   if (!needsCoverAccent({ name: album.name, theme: album.theme })) return base;
@@ -189,7 +200,7 @@ export async function renderAlbumImage(album: OgAlbum): Promise<ImageResponse> {
         background: `linear-gradient(135deg, ${palette.deep}, ${mix(
           palette.accent,
           BG,
-          0.6
+          0.6,
         )})`,
       }}
     >
@@ -206,95 +217,93 @@ export async function renderAlbumImage(album: OgAlbum): Promise<ImageResponse> {
   );
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: OG_SIZE.width,
+        height: OG_SIZE.height,
+        display: "flex",
+        alignItems: "center",
+        background: BG,
+        backgroundImage: `radial-gradient(680px 520px at 24% 52%, ${palette.deep}40, ${BG} 68%)`,
+        padding: `0 ${PAD}px`,
+        gap: GAP,
+      }}
+    >
       <div
         style={{
-          width: OG_SIZE.width,
-          height: OG_SIZE.height,
+          position: "relative",
           display: "flex",
-          alignItems: "center",
-          background: BG,
-          backgroundImage: `radial-gradient(680px 520px at 24% 52%, ${palette.deep}40, ${BG} 68%)`,
-          padding: `0 ${PAD}px`,
-          gap: GAP,
+          width: GROUP_W,
+          height: COVER,
+          flexShrink: 0,
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={vinyl}
+          width={VINYL}
+          height={VINYL}
+          alt=""
+          style={{
+            position: "absolute",
+            top: (COVER - VINYL) / 2,
+            left: GROUP_W - VINYL,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: COVER,
+            height: COVER,
+            display: "flex",
+            borderRadius: 18,
+            overflow: "hidden",
+            boxShadow: "0 12px 44px rgba(0,0,0,0.55)",
+          }}
+        >
+          {sleeve}
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          maxWidth: OG_SIZE.width - GROUP_W - PAD * 2 - GAP,
         }}
       >
         <div
           style={{
-            position: "relative",
-            display: "flex",
-            width: GROUP_W,
-            height: COVER,
-            flexShrink: 0,
+            fontFamily: "Gloock",
+            fontSize: titleSize(name),
+            lineHeight: 1.06,
+            color: palette.light,
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={vinyl}
-            width={VINYL}
-            height={VINYL}
-            alt=""
-            style={{
-              position: "absolute",
-              top: (COVER - VINYL) / 2,
-              left: GROUP_W - VINYL,
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: COVER,
-              height: COVER,
-              display: "flex",
-              borderRadius: 18,
-              overflow: "hidden",
-              boxShadow: "0 12px 44px rgba(0,0,0,0.55)",
-            }}
-          >
-            {sleeve}
-          </div>
+          {name}
         </div>
-
         <div
           style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            maxWidth: OG_SIZE.width - GROUP_W - PAD * 2 - GAP,
+            fontFamily: "SpaceGrotesk",
+            fontSize: 25,
+            letterSpacing: 8,
+            marginTop: 18,
+            color: mix(palette.accent, palette.light, 0.15),
           }}
         >
-          <div
-            style={{
-              fontFamily: "Gloock",
-              fontSize: titleSize(name),
-              lineHeight: 1.06,
-              color: palette.light,
-            }}
-          >
-            {name}
-          </div>
-          <div
-            style={{
-              fontFamily: "SpaceGrotesk",
-              fontSize: 25,
-              letterSpacing: 8,
-              marginTop: 18,
-              color: mix(palette.accent, palette.light, 0.15),
-            }}
-          >
-            MELOGRAM
-          </div>
+          MELOGRAM
         </div>
       </div>
-    ),
+    </div>,
     {
       ...OG_SIZE,
       fonts: [
         { name: "Gloock", data: gloock, weight: 400, style: "normal" },
         { name: "SpaceGrotesk", data: grotesk, weight: 500, style: "normal" },
       ],
-    }
+    },
   );
 }
