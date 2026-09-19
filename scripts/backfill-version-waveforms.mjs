@@ -111,26 +111,25 @@ const PEAK_COUNT = 512;
 
 /**
  * Downsample a decoded mono PCM signal to {@link PEAK_COUNT} absolute-value
- * buckets, normalized 0..1. Mirrors audioPeaksFromFile in src/lib/edit.ts
- * exactly: same bucket count, same max-abs per bucket, same
- * normalize-by-observed-max.
+ * amplitudes, stored raw. Mirrors audioPeaksFromFile in src/lib/edit.ts
+ * exactly: same bucket count, one instantaneous sample per bucket taken at its
+ * midpoint, no normalization.
+ *
+ * NOT the per-bucket maximum, which is the obvious choice and is wrong: over
+ * ~0.4s of a mixed track the loudest sample is near full scale almost every
+ * time, so every bar lands in the same narrow band and the wave flattens into
+ * a uniform squiggle. Sampling is what wavesurfer does against decoded audio,
+ * and it is why its waveform has any contrast at all.
  */
 function bucketPeaks(data) {
   const bucket = Math.floor(data.length / PEAK_COUNT) || 1;
   const peaks = [];
-  let max = 0;
   for (let i = 0; i < PEAK_COUNT; i += 1) {
-    let peak = 0;
-    const start = i * bucket;
-    for (let j = start; j < start + bucket && j < data.length; j += 1) {
-      const value = Math.abs(data[j]);
-      if (value > peak) peak = value;
-    }
-    peaks.push(peak);
-    if (peak > max) max = peak;
+    peaks.push(
+      Math.abs(data[Math.min(i * bucket + (bucket >> 1), data.length - 1)])
+    );
   }
-  // Normalize so quiet masters still fill the bar height.
-  return max > 0 ? peaks.map((p) => p / max) : peaks;
+  return peaks;
 }
 
 /**

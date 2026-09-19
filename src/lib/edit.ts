@@ -408,19 +408,18 @@ async function audioPeaksFromFile(file: File): Promise<number[] | null> {
     const data = buffer.getChannelData(0);
     const bucket = Math.floor(data.length / PEAK_COUNT) || 1;
     const peaks: number[] = [];
-    let max = 0;
     for (let i = 0; i < PEAK_COUNT; i += 1) {
-      let peak = 0;
-      const start = i * bucket;
-      for (let j = start; j < start + bucket && j < data.length; j += 1) {
-        const value = Math.abs(data[j]);
-        if (value > peak) peak = value;
-      }
-      peaks.push(peak);
-      if (peak > max) max = peak;
+      // One instantaneous sample per bucket, taken at its midpoint — NOT the
+      // bucket's maximum. Max-pooling looks like the obvious choice and is
+      // wrong: over ~0.4s of a mixed track the loudest sample is near full
+      // scale almost every time, so every bar lands in the same narrow band
+      // and the wave flattens into a uniform squiggle. Sampling is what
+      // wavesurfer does against decoded audio, and it is why its waveform has
+      // any contrast at all. The renderer scales to fit, so raw amplitudes
+      // are stored as they are, unnormalized.
+      peaks.push(Math.abs(data[Math.min(i * bucket + (bucket >> 1), data.length - 1)]));
     }
-    // Normalize so quiet masters still fill the bar height.
-    return max > 0 ? peaks.map((p) => p / max) : peaks;
+    return peaks;
   } catch {
     return null;
   } finally {

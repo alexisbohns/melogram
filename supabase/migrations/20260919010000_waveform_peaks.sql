@@ -5,9 +5,13 @@
 -- sessions, and iOS WebContent OOM crashes. A track page that decoded its song
 -- just to paint a waveform would walk straight back into it.
 --
--- 512 absolute-value buckets, normalized 0..1 — enough resolution for any width
--- the app renders, a few KB per version. Written on upload by set_version_file
--- and backfilled for existing rows by scripts/backfill-version-waveforms.mjs.
+-- 512 amplitudes: one instantaneous sample per bucket, stored raw. NOT the
+-- per-bucket maximum — over ~0.4s of a mixed track the loudest sample is near
+-- full scale almost every time, which flattens the wave into a uniform
+-- squiggle. Sampling is what wavesurfer does against decoded audio, and it is
+-- why its waveform has contrast. The renderer scales to fit, so nothing is
+-- normalized here. Written on upload by set_version_file and backfilled for
+-- existing rows by scripts/backfill-version-waveforms.mjs.
 
 alter table public.versions
   add column if not exists waveform_peaks real[];

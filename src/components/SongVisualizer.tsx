@@ -224,7 +224,6 @@ function LiveWave({
     let cancelled = false;
     const media = audioElement;
     const channels = peaks ? [peaks] : undefined;
-    const url = current.url;
     import("wavesurfer.js").then(({ default: WS }) => {
       if (cancelled || wsRef.current || !containerRef.current) return;
       const ws = WS.create({
@@ -238,16 +237,16 @@ function LiveWave({
         media,
         waveColor,
         progressColor,
+        // Peaks MUST go in the constructor options, not a later ws.load():
+        // wavesurfer's constructor queues its own load from
+        // `options.url || getSrc()`, and getSrc() returns the shared audio
+        // element's already-playing src. Left without peaks, that queued load
+        // fetches and decodes the whole file — which is why the wave used to
+        // appear instantly and then get replaced ~25s later by a decoded one.
+        peaks: channels,
       });
       ws.on("interaction", (newTime: number) => seekRef.current(newTime));
       wsRef.current = ws;
-      // Load explicitly rather than relying on wavesurfer picking up the
-      // shared element's src: this component usually mounts into playback
-      // that is ALREADY under way (you navigate here from wherever you
-      // pressed play), and in that case nothing triggers an automatic load.
-      // With peaks it draws without touching the network; without them it
-      // falls back to decoding the file, exactly as the player bar does.
-      ws.load(url, channels).catch(() => {});
     });
     return () => {
       cancelled = true;
