@@ -5,7 +5,7 @@ import { useLocale, useMessages } from "@/lib/i18n/LocaleProvider";
 import { localized } from "@/lib/i18n/config";
 import type { Track } from "@/lib/types";
 import AlbumCoverLive from "./AlbumCoverLive";
-import TrackActionTiles from "./TrackActionTiles";
+import TrackActions from "./TrackActions";
 import styles from "./TrackHero.module.css";
 
 type Props = {
@@ -74,7 +74,7 @@ export default function TrackHero({ track, lyrics }: Props) {
 
         {description && <p className={styles.description}>{description}</p>}
 
-        <TrackActionTiles track={track} lyrics={lyrics} />
+        <TrackActions track={track} lyrics={lyrics} />
       </div>
     </header>
   );

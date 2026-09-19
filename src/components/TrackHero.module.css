@@ -16,23 +16,27 @@
 
 .name {
   font-family: var(--font-gloock), serif;
-  font-size: 40px;
+  font-size: 24px;
   font-weight: 400;
-  line-height: 1.1;
+  line-height: 29px;
   color: var(--album-light);
 }
 
 /* Release date · status, the same visual weight the hero's old album link
    carried (AlbumTrack/AlbumHeader use this accent for secondary metadata). */
+/* The album header's equivalent line is AlbumInfos ("2 SONGS · 14 MIN"); this
+   copies its treatment so the two headers share a rhythm. */
 .subtitle {
   color: var(--album-accent);
-  font-size: 16px;
-  line-height: 22px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
 }
 
 .description {
   color: var(--album-light);
-  opacity: 0.5;
   font-size: 16px;
   line-height: 22px;
 }
@@ -55,9 +59,5 @@
 
   .description {
     text-align: left;
-  }
-
-  .name {
-    font-size: 32px;
   }
 }

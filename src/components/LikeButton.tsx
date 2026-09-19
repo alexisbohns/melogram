@@ -8,10 +8,20 @@ import styles from "./LikeButton.module.css";
 type Props = {
   trackId: string;
   likeCount: number;
+  /**
+   * Show the count beside the heart instead of only on hover. The count is
+   * owned here — it updates optimistically and rolls back on failure — so a
+   * caller that wants it visible asks for it rather than rendering its own.
+   */
+  showCount?: boolean;
 };
 
 /** Heart toggle + like count with optimistic update and rollback. */
-export default function LikeButton({ trackId, likeCount }: Props) {
+export default function LikeButton({
+  trackId,
+  likeCount,
+  showCount = false,
+}: Props) {
   const { signedIn, isLiked, toggle } = useLikes();
   const [count, setCount] = useState(likeCount);
   const [busy, setBusy] = useState(false);
@@ -54,10 +64,14 @@ export default function LikeButton({ trackId, likeCount }: Props) {
       }
     >
       <Heart size={20} strokeWidth={2} fill={liked ? "currentColor" : "none"} />
-      {count > 0 && (
-        <span className={styles.tooltip} role="tooltip">
-          {count} {count === 1 ? "like" : "likes"}
-        </span>
+      {showCount ? (
+        <span className={styles.count}>{count}</span>
+      ) : (
+        count > 0 && (
+          <span className={styles.tooltip} role="tooltip">
+            {count} {count === 1 ? "like" : "likes"}
+          </span>
+        )
       )}
     </button>
   );
