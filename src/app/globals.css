@@ -73,6 +73,41 @@ body:has([data-player-visible="true"]) {
   padding-bottom: calc(132px + env(safe-area-inset-bottom));
 }
 
+/* Even the corners. vinyl-kit rounds the sleeve asymmetrically — tight at the
+   spine, twice as soft at the opening — to hint at which edge the record comes
+   out of. Melogram pulls the right-hand pair back to match the left, so the
+   cover is an evenly rounded square: the record sliding out already says where
+   the opening is, and the lopsided radius only reads as a wonky corner. */
+.vk-sleeve-cover {
+  border-radius: calc(var(--vinyl-size) * 0.05);
+}
+
+/* Sleeve wear: the ring the record rubs into the card, plus scratches and a
+   scuffed edge, laid over every album cover.
+
+   vinyl-kit's own texture layer is the paper grain — a mid-grey image
+   multiplied onto the artwork. This is the other half: a near-black image
+   carrying the light marks a sleeve picks up from being handled. `soft-light`
+   rather than `screen` because screen can only add light, and on pale artwork
+   it lifted the blacks until the whole cover went milky. Soft light darkens as
+   well as lightens, so the ring arrives without washing the album out.
+
+   It lives here, on one of the package's classes, because `VinylSleeve` takes a
+   single texture and no children — and because hanging it off the cover means
+   it inherits that cover's radius, its clipping and its active-state tilt
+   rather than restating all three. The cover already carries a `transform`, so
+   it is its own stacking context and the blend can never reach the page behind
+   it. */
+.vk-sleeve-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("/cover-wear.webp") center / cover;
+  mix-blend-mode: soft-light;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
 /* Expressive buttons. Reach for one and it rounds itself and swells a little;
    press it and it shrinks. Opt in from a CSS module with
    `composes: springy from global;`.

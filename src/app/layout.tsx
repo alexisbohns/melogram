@@ -53,7 +53,10 @@ export default async function RootLayout({
   const messages = getMessages(locale);
 
   return (
-    <html lang={locale} className={`${gloock.variable} ${spaceGrotesk.variable}`}>
+    <html
+      lang={locale}
+      className={`${gloock.variable} ${spaceGrotesk.variable}`}
+    >
       <body>
         <LocaleProvider locale={locale} messages={messages}>
           <LikesProvider>
