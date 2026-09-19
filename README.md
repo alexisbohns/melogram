@@ -22,6 +22,12 @@ Home and Album pages.
   `src/lib/palettes.ts` for now (no Supabase model change, step 1).
 - Track durations are not stored in the database; they resolve client-side
   from audio metadata (`preload="metadata"`).
+- Track and album copy comes in two fields: `description`, a short blurb for the
+  strips and rows (kept under 200 characters, clamped to two lines), and
+  `story`, long-form markdown shown on the track and album pages. Both are
+  bilingual — a `_fr` column alongside each, resolved by `localized()` in
+  `src/lib/i18n/config.ts`, falling back to English when a French value is
+  missing.
 
 ## Pages
 
@@ -32,7 +38,10 @@ Home and Album pages.
   (play totals come from the `track_play_counts` view)
 - `/albums/[id]` — compact header, album switcher (rail on desktop,
   horizontal strip on mobile) and album detail with track descriptions and a
-  lyrics sheet
+  lyrics sheet, then the album's long-form **Notes** below the tracklist
+- `/tracks/[id]` — a track's own page: cover, name, album link and playback
+  controls, then its long-form notes (markdown) and a lyrics sheet. Reached by
+  clicking a track's name anywhere it appears
 - `/artist/albums` — artist-only: rank the albums shown in the home **Albums**
   section. Reached from the account menu's _Artist_ group (only rendered for
   artist members). Moves are staged locally and saved as one full ranking via
