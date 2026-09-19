@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
+import AlbumAside from "@/components/AlbumAside";
 import PaletteScope from "@/components/PaletteScope";
 import Prose from "@/components/Prose";
+import SongVisualizer from "@/components/SongVisualizer";
 import TrackHero from "@/components/TrackHero";
 import { getTrack } from "@/lib/data";
 import { getLocale } from "@/lib/i18n";
@@ -56,10 +58,18 @@ export default async function TrackPage({ params }: Props) {
           coverUrl: track.album_cover_url,
         }}
       >
-        <article className={styles.content}>
-          <TrackHero track={track} lyrics={lyrics} />
-          {story && <Prose markdown={story} />}
-        </article>
+        <div
+          className={`${styles.content} ${album ? "" : styles.soloColumn}`}
+        >
+          {album && (
+            <AlbumAside album={album} currentTrackId={track.track_id} />
+          )}
+          <article className={styles.track}>
+            <TrackHero track={track} lyrics={lyrics} />
+            <SongVisualizer track={track} lyrics={lyrics} />
+            {story && <Prose markdown={story} />}
+          </article>
+        </div>
       </PaletteScope>
     </div>
   );
