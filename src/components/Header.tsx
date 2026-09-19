@@ -28,7 +28,13 @@ function Social() {
       {SOCIAL_LINKS.map((link) => (
         <a key={link.name} href={link.href} className={styles.socialItem}>
           <span className={styles.socialName}>{link.name}</span>
-          <img src={link.icon} alt="" width={40} height={40} />
+          <img
+            src={link.icon}
+            alt=""
+            width={40}
+            height={40}
+            className={styles.socialIcon}
+          />
         </a>
       ))}
     </div>

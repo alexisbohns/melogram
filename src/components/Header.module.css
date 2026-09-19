@@ -94,7 +94,11 @@
   white-space: nowrap;
 }
 
-.socialItem img {
+/* The icons are 40px squares with their rounded corners baked into the SVG,
+   so `springy`'s radius clips the artwork itself into a circle on hover. */
+.socialIcon {
+  composes: springy from global;
+
   width: 40px;
   height: 40px;
   flex-shrink: 0;

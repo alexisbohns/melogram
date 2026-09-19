@@ -7,23 +7,26 @@
 }
 
 .link {
+  composes: springy from global;
+
   position: relative; /* anchors the pastille */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 44px;
   height: 44px;
-  border-radius: 999px;
+  /* Half the box — a circle, like 999px, but a value `springy` can spring to
+     and from. From 999px the bounce undershoots by hundreds of pixels, the
+     browser clamps the negative radius to 0, and the button flashes square. */
+  border-radius: 22px;
   color: var(--album-light);
   background: color-mix(in srgb, var(--bg) 55%, transparent);
   backdrop-filter: blur(8px);
   border: 1px solid color-mix(in srgb, var(--album-light) 14%, transparent);
-  transition: transform 0.2s ease-out, background 0.2s ease-out;
 }
 
 .link:hover {
   background: color-mix(in srgb, var(--bg) 70%, transparent);
-  transform: translateY(1px);
 }
 
 /* current-locale flag, punched out of the button with a bg-colored ring */

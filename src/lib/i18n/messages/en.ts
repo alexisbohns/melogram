@@ -18,7 +18,7 @@ export const en = {
     all: "All",
     notes: "Notes",
     lyrics: "Lyrics",
-    albumTracks: "All album's tracks",
+    albumTracks: "From the same album",
   },
   account: {
     triggerLabel: "Account menu",

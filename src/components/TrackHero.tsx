@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { Disc3 } from "lucide-react";
-import { usePlayer } from "@/player/PlayerProvider";
 import { useLocale, useMessages } from "@/lib/i18n/LocaleProvider";
 import { localized } from "@/lib/i18n/config";
 import type { Track } from "@/lib/types";
@@ -34,13 +33,9 @@ function isStatus(value: string | null): value is Status {
  * below this, not here — the header only says what the track IS.
  */
 export default function TrackHero({ track, lyrics }: Props) {
-  const { current, isPlaying } = usePlayer();
   const locale = useLocale();
   const m = useMessages();
 
-  // Shimmer matches the treatment AlbumTrack/StandaloneTrack/PlayerBar give a
-  // track's name while it's the one actually playing.
-  const active = current?.id === track.track_id && isPlaying;
   const description = localized(
     track.track_description,
     track.track_description_fr,
@@ -90,7 +85,7 @@ export default function TrackHero({ track, lyrics }: Props) {
             </Link>
           )}
 
-          <h1 className={`${styles.name} ${active ? "shimmer" : ""}`}>
+          <h1 className={styles.name}>
             {track.track_name}
           </h1>
 

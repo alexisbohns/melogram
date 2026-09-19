@@ -1,4 +1,6 @@
 .like {
+  composes: springy from global;
+
   position: relative;
   height: 40px;
   padding: 0 10px;
@@ -7,15 +9,10 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: color 0.15s ease-out, transform 0.1s ease-out, opacity 0.15s ease-out;
 }
 
 .like:hover {
   color: var(--album-light);
-}
-
-.like:active {
-  transform: scale(0.92);
 }
 
 .like:disabled {
@@ -66,7 +63,7 @@
 .like:focus-visible .tooltip {
   opacity: 1;
   visibility: visible;
-  transform: translateX(-50%) translateY(0);
+  transform: translateX(-50%);
 }
 
 /* Inline count, for callers that pass `showCount` — the track page, where the
