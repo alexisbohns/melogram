@@ -19,7 +19,7 @@ export default async function Home() {
 
   return (
     <div className={styles.page}>
-      <Header variant="home" />
+      <Header />
       <TracksSection popular={popular} latest={latest} />
       <AlbumsSection albums={albums} />
       <SinglesSection singles={singles} />

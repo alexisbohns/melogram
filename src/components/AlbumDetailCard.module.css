@@ -18,6 +18,14 @@
   min-width: 0;
 }
 
+/* Tracklist + notes, kept together so they share one cell of the page grid. */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  min-width: 0;
+}
+
 .description {
   color: var(--album-light);
   font-size: 16px;
@@ -29,6 +37,12 @@
   flex-direction: column;
   gap: 8px;
   align-items: flex-start;
+}
+
+/* The "not out yet" card sits outside the two-column shape. */
+.notice {
+  display: flex;
+  flex-direction: column;
 }
 
 .unavailable {
@@ -74,5 +88,41 @@
 
   .description {
     text-align: left;
+  }
+}
+
+@media (min-width: 768px) {
+  /* The card and its hero generate no box of their own: their four blocks
+     become items of the page grid, which pairs the cover with the rail of
+     other albums in one 300px column. See src/app/albums/[id]/page.module.css
+     for the resulting shape — the `order` values below are what produce it. */
+  .card,
+  .hero {
+    display: contents;
+  }
+
+  .editBar {
+    order: 1;
+    grid-column: 1 / -1;
+    /* the grid's row-gap replaces it */
+    margin-bottom: 0;
+  }
+
+  .cover {
+    order: 2;
+  }
+
+  .heroBody {
+    order: 3;
+  }
+
+  /* the rail is order 4 — see AlbumSwitcher.module.css */
+
+  .body {
+    order: 5;
+  }
+
+  .notice {
+    grid-column: 1 / -1;
   }
 }

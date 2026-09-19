@@ -1,4 +1,7 @@
+/* Desktop: an item of the album page's grid, under the current album's cover
+   in the same 300px column (see src/app/albums/[id]/page.module.css). */
 .switcher {
+  order: 4;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -41,9 +44,9 @@
 .name {
   color: var(--album-light);
   font-family: var(--font-gloock), serif;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 400;
-  line-height: 29px;
+  line-height: 24px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -51,6 +54,8 @@
 
 @media (max-width: 767px) {
   .switcher {
+    /* last of the page column, after the album's own content */
+    order: 1;
     flex-direction: row;
     gap: 32px;
     overflow-x: auto;

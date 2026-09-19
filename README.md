@@ -17,6 +17,10 @@ Home and Album pages.
 
 - The site header renders with `mix-blend-mode: color-dodge` over the dark
   mauve background (`#11090C`) — its soft-grey content composites to pink.
+- Only the home carries that full header. Every other page pins the Bohns
+  signature top-left (`<SiteLogo />`, fixed, the counterpart to the account
+  button top-right) and closes with the same brand · menu · social row as a
+  `<Footer />`. Both composite with `color-dodge` like the header.
 - Each album has a color palette theme (`light` / `accent` / `deep`) applied
   through CSS custom properties. Palettes are hardcoded in
   `src/lib/palettes.ts` for now (no Supabase model change, step 1).
@@ -44,9 +48,12 @@ Home and Album pages.
   control) under _Popular_ / _Latests_ tabs, and an **Albums** section of album
   cards filtered by genre. Popularity ranks a track by `likes × 10 + plays ÷ 10`
   (play totals come from the `track_play_counts` view)
-- `/albums/[id]` — compact header, album switcher (rail on desktop,
-  horizontal strip on mobile) and album detail with track descriptions and a
-  lyrics sheet, then the album's long-form **Notes** below the tracklist
+- `/albums/[id]` — one grid on desktop: the album's cover heads a 300px column
+  with the rail of other albums running down it, beside the album's header
+  (name, meta, description, tiles) over its tracklist and long-form **Notes**.
+  `AlbumDetailCard` and its hero dissolve into that grid with
+  `display: contents`, so the same markup collapses to a plain column on
+  mobile, where the rail becomes a horizontal strip below the album's content
 - `/tracks/[id]` — a track's own page, laid out like the album page: a left
   column of album context (name, *N songs · M min*, the album's tracklist with
   the viewed track marked) beside a header built like the album header (the

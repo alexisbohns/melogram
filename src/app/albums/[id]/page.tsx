@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Header from "@/components/Header";
+import SiteLogo from "@/components/SiteLogo";
+import Footer from "@/components/Footer";
 import AlbumSwitcher from "@/components/AlbumSwitcher";
 import AlbumDetailCard from "@/components/AlbumDetailCard";
 import { AlbumEditProvider } from "@/components/edit/AlbumEditProvider";
@@ -44,13 +45,14 @@ export default async function AlbumPage({ params }: Props) {
 
   return (
     <div className={styles.page}>
-      <Header variant="compact" />
+      <SiteLogo />
       <div className={styles.content}>
         <AlbumSwitcher albums={albums} activeId={album.id} />
         <AlbumEditProvider album={album}>
           <AlbumDetailCard album={album} lyrics={lyrics} />
         </AlbumEditProvider>
       </div>
+      <Footer />
     </div>
   );
 }
