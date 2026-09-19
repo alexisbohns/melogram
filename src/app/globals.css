@@ -39,6 +39,11 @@ body {
   color: var(--album-light);
   font-family: var(--font-grotesk), sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* Album and track pages override `--bg` with their own near-black (see
+     ShellColor). Fading it turns both moves into a change of light in the
+     room: album to album, and the later switch to a cover-derived shade.
+     Kept under reduced motion — it is a colour change, not movement. */
+  transition: background-color 800ms ease;
 }
 
 a {
