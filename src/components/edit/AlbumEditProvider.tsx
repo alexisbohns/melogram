@@ -23,6 +23,9 @@ import { revalidateContent } from "@/lib/revalidate";
 type Draft = {
   name: string;
   description: string;
+  description_fr: string;
+  story: string;
+  story_fr: string;
   type: string;
   genres: Genre[];
 };
@@ -60,6 +63,9 @@ function draftFrom(album: AlbumWithTracks): Draft {
   return {
     name: album.name,
     description: album.description ?? "",
+    description_fr: album.description_fr ?? "",
+    story: album.story ?? "",
+    story_fr: album.story_fr ?? "",
     type: album.type ?? "album",
     genres: album.genres,
   };
@@ -139,6 +145,9 @@ export function AlbumEditProvider({
     return (
       draft.name !== album.name ||
       draft.description !== (album.description ?? "") ||
+      draft.description_fr !== (album.description_fr ?? "") ||
+      draft.story !== (album.story ?? "") ||
+      draft.story_fr !== (album.story_fr ?? "") ||
       draft.type !== (album.type ?? "album") ||
       a !== b
     );
@@ -200,7 +209,15 @@ export function AlbumEditProvider({
     setSaveError(null);
     try {
       if (albumDirty) {
-        await updateAlbum(album.id, draft.name, draft.description || null, draft.type);
+        await updateAlbum(
+          album.id,
+          draft.name,
+          draft.description || null,
+          draft.description_fr || null,
+          draft.story || null,
+          draft.story_fr || null,
+          draft.type
+        );
         await setAlbumGenres(album.id, draft.genres.map((g) => g.id));
       }
       if (setlistDirty) {
