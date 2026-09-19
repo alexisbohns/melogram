@@ -15,6 +15,9 @@ export async function updateAlbum(
   albumId: string,
   name: string,
   description: string | null,
+  descriptionFr: string | null,
+  story: string | null,
+  storyFr: string | null,
   type: string
 ): Promise<void> {
   const supabase = createClient();
@@ -22,6 +25,9 @@ export async function updateAlbum(
     _album_id: albumId,
     _name: name,
     _description: description,
+    _description_fr: descriptionFr,
+    _story: story,
+    _story_fr: storyFr,
     _type: type,
   });
   if (error) throw new Error(error.message);
@@ -64,6 +70,9 @@ export async function createTrack(
   albumId: string,
   name: string,
   description: string | null,
+  descriptionFr: string | null,
+  story: string | null,
+  storyFr: string | null,
   lyrics: string | null
 ): Promise<TrackDetails> {
   const supabase = createClient();
@@ -71,6 +80,9 @@ export async function createTrack(
     _album_id: albumId,
     _name: name,
     _description: description,
+    _description_fr: descriptionFr,
+    _story: story,
+    _story_fr: storyFr,
     _lyrics: lyrics,
   });
   if (error) throw new Error(error.message);
@@ -78,12 +90,12 @@ export async function createTrack(
 }
 
 /** Authoritative editable fields, fetched fresh so update_track (a full
-    overwrite) never clobbers description/lyrics with stale props. */
+    overwrite) never clobbers the prose or lyrics with stale props. */
 export async function getTrackDetails(trackId: string): Promise<TrackDetails> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("tracks")
-    .select("id,name,description,lyrics")
+    .select("id,name,description,description_fr,story,story_fr,lyrics")
     .eq("id", trackId)
     .maybeSingle();
   if (error) throw new Error(error.message);
@@ -95,6 +107,9 @@ export async function updateTrack(
   trackId: string,
   name: string,
   description: string | null,
+  descriptionFr: string | null,
+  story: string | null,
+  storyFr: string | null,
   lyrics: string | null
 ): Promise<void> {
   const supabase = createClient();
@@ -102,6 +117,9 @@ export async function updateTrack(
     _track_id: trackId,
     _name: name,
     _description: description,
+    _description_fr: descriptionFr,
+    _story: story,
+    _story_fr: storyFr,
     _lyrics: lyrics,
   });
   if (error) throw new Error(error.message);
