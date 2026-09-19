@@ -5,6 +5,7 @@ import { useLocale, useMessages } from "@/lib/i18n/LocaleProvider";
 import { localized, type Locale } from "@/lib/i18n/config";
 import type { Album } from "@/lib/types";
 import Prose from "./Prose";
+import Section from "./Section";
 import LocaleTabs from "./edit/LocaleTabs";
 import { useAlbumEdit } from "./edit/AlbumEditProvider";
 import controls from "./edit/controls.module.css";
@@ -25,11 +26,10 @@ export default function AlbumStory({ album }: { album: Album }) {
   if (editing) {
     const key = editLocale === "en" ? "story" : "story_fr";
     return (
-      <section className={styles.section}>
-        <div className={styles.headingRow}>
-          <h2 className={styles.heading}>{m.sections.notes}</h2>
-          <LocaleTabs value={editLocale} onChange={setEditLocale} />
-        </div>
+      <Section
+        title={m.sections.notes}
+        action={<LocaleTabs value={editLocale} onChange={setEditLocale} />}
+      >
         <textarea
           className={`${controls.textarea} ${styles.editor}`}
           value={draft[key]}
@@ -38,7 +38,7 @@ export default function AlbumStory({ album }: { album: Album }) {
           aria-label={`Album notes (${editLocale.toUpperCase()})`}
           onChange={(e) => setField(key, e.target.value)}
         />
-      </section>
+      </Section>
     );
   }
 
@@ -46,9 +46,8 @@ export default function AlbumStory({ album }: { album: Album }) {
   if (!story) return null;
 
   return (
-    <section className={styles.section}>
-      <h2 className={styles.heading}>{m.sections.notes}</h2>
+    <Section title={m.sections.notes}>
       <Prose markdown={story} />
-    </section>
+    </Section>
   );
 }

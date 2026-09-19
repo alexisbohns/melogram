@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { hasVersion, type AlbumWithTracks } from "@/lib/types";
 import { getMyArtistIds } from "@/lib/edit";
+import { useMessages } from "@/lib/i18n/LocaleProvider";
 import PaletteScope from "./PaletteScope";
 import AlbumInfos from "./AlbumInfos";
 import AlbumPlaylist from "./AlbumPlaylist";
@@ -16,10 +16,11 @@ type Props = {
 };
 
 /**
- * The track page's left column: the album the track belongs to, without its
- * cover (the hero already shows the vinyl). Mirrors `AlbumSwitcher`'s column
- * idiom, wrapped in its own `PaletteScope` the same way that switcher scopes
- * each of its items.
+ * The track page's left column: the rest of the album the track belongs to,
+ * without its cover (the hero already shows the vinyl) and without its name
+ * (the hero's pill carries it, and links back). Mirrors `AlbumSwitcher`'s
+ * column idiom, wrapped in its own `PaletteScope` the same way that switcher
+ * scopes each of its items.
  *
  * Versionless tracks are hidden from listeners here exactly as they are
  * everywhere else — a track is public once it carries a version — while a
@@ -29,6 +30,7 @@ type Props = {
  * track that isn't out yet.
  */
 export default function AlbumAside({ album, currentTrackId }: Props) {
+  const m = useMessages();
   const [isMember, setIsMember] = useState(false);
 
   useEffect(() => {
@@ -51,13 +53,11 @@ export default function AlbumAside({ album, currentTrackId }: Props) {
   return (
     <PaletteScope album={{ ...album, coverUrl: album.cover_url }}>
       <aside className={styles.aside}>
-        <h2 className={styles.name}>
-          <Link href={`/albums/${album.id}`}>{album.name}</Link>
-        </h2>
+        <h2 className={styles.title}>{m.sections.albumTracks}</h2>
         <AlbumInfos tracks={tracks} />
         <AlbumPlaylist
           tracks={tracks}
-          variant="simple"
+          variant="nav"
           currentTrackId={currentTrackId}
         />
       </aside>

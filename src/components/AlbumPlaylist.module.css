@@ -4,3 +4,11 @@
   gap: 16px;
   align-self: stretch;
 }
+
+/* Nav rows carry their own vertical padding (AlbumTrack.module.css
+   `.navTrack`) so the highlighted row's tint fills its row exactly. The gap
+   lives in that padding instead of here, or the two would add up around the
+   one row that has both. */
+.nav {
+  gap: 0;
+}

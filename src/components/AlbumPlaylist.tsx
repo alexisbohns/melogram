@@ -4,7 +4,7 @@ import styles from "./AlbumPlaylist.module.css";
 
 type Props = {
   tracks: Track[];
-  variant?: "simple" | "detailed";
+  variant?: "simple" | "detailed" | "nav";
   lyrics?: TrackLyrics;
   /** The track whose page we're on, if any — marks that row as `current`. */
   currentTrackId?: string;
@@ -19,7 +19,9 @@ export default function AlbumPlaylist({
   if (tracks.length === 0) return null;
 
   return (
-    <ul className={styles.playlist}>
+    <ul
+      className={`${styles.playlist} ${variant === "nav" ? styles.nav : ""}`}
+    >
       {tracks.map((track) => (
         <AlbumTrack
           key={track.track_id}

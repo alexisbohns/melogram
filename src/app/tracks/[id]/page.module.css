@@ -7,18 +7,29 @@
   gap: 32px;
 }
 
-/* Same two-column shape as the album page (see src/app/albums/[id]/page.module.css):
-   album context on the left, the subject on the right. */
+/* The album page's grid, exactly (see src/app/albums/[id]/page.module.css):
+   the track's article and its hero dissolve into it with `display: contents`,
+   so the cover heads the same 300px column the sidebar runs down.
+
+     [ cover   ][ album pill · name · subtitle · description · actions ]
+     [ sidebar ][ waveform · notes · lyrics                            ]
+
+   Auto-placement rather than named areas; `order` moves the sidebar below the
+   header while it stays first in the DOM, which is the order mobile wants for
+   the tab sequence. */
 .content {
   display: grid;
-  grid-template-columns: 400px minmax(0, 1fr);
-  gap: 24px;
+  grid-template-columns: 300px minmax(0, 1fr);
+  column-gap: 24px;
+  row-gap: 32px;
   align-items: start;
 }
 
-/* A track with no album has no aside to show. */
-.soloColumn {
-  grid-template-columns: minmax(0, 1fr);
+/* The left column's cell, whichever sidebar fills it — the album's tracklist
+   or the rail of other albums. Owning the cell here (rather than letting each
+   sidebar place itself) keeps `order` and the mobile separator in one place. */
+.sidebar {
+  min-width: 0;
 }
 
 .track {
@@ -28,6 +39,32 @@
   min-width: 0;
 }
 
+/* Waveform + notes + lyrics, kept together so they share one cell of the
+   grid — the album card's `.body` does the same for tracklist + notes. */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  /* The article generates no box of its own: the hero's two halves (order 2
+     and 3, set in TrackHero.module.css), the sidebar (order 4) and this body
+     become the grid's four items. */
+  .track {
+    display: contents;
+  }
+
+  .sidebar {
+    order: 4;
+  }
+
+  .body {
+    order: 5;
+  }
+}
+
 @media (max-width: 767px) {
   .page {
     /* clears the fixed signature top-left and the account button top-right */
@@ -35,12 +72,28 @@
     gap: 16px;
   }
 
+  /* A plain column: the track keeps its own flex layout and the sidebar
+     follows it, last before the footer. `align-items` has to be reset — the
+     grid above wants `start`, but in a column flex that shrink-wraps every
+     child to its text instead of filling the page. */
   .content {
-    grid-template-columns: minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     gap: 24px;
   }
 
-  .track {
+  /* Coming after the track's notes and lyrics, the sidebar is a new section
+     and needs to read as one: the hairline Section.module.css gives every
+     other block down this page. */
+  .sidebar {
+    order: 1;
+    padding-top: 32px;
+    border-top: 1px solid color-mix(in srgb, var(--album-light) 8%, transparent);
+  }
+
+  .track,
+  .body {
     gap: 24px;
   }
 }

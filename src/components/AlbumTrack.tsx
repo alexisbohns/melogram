@@ -18,7 +18,7 @@ type Props = {
   track: Track;
   /** All tracks of the surrounding playlist — queued together on play. */
   queue: Track[];
-  variant?: "simple" | "detailed";
+  variant?: "simple" | "detailed" | "nav";
   lyrics?: string | null;
   /**
    * Lyrics keyed by track id for the whole `queue`, so each queued entry
@@ -46,6 +46,7 @@ export default function AlbumTrack({
   const playable = Boolean(track.latest_resource_url);
   const active = current?.id === track.track_id && isPlaying;
   const detailed = variant === "detailed";
+  const rowClass = `${styles.track} ${detailed ? styles.detailed : ""} ${isCurrent ? styles.current : ""}`;
   const description = localized(
     track.track_description,
     track.track_description_fr,
@@ -67,11 +68,30 @@ export default function AlbumTrack({
     );
   };
 
+  // The track page's sidebar: a list to move around the album by, not a
+  // second transport. The whole row is the link, and it carries no control —
+  // play lives in the page's own visualizer, and liking a track is something
+  // you do on the track itself.
+  if (variant === "nav") {
+    return (
+      <li
+        className={`${rowClass} ${styles.navTrack}`}
+        aria-current={isCurrent ? "true" : undefined}
+      >
+        <Link href={`/tracks/${track.track_id}`} className={styles.navRow}>
+          <span className={`${styles.name} ${active ? "shimmer" : ""}`}>
+            {track.track_name}
+          </span>
+          <span className={styles.time}>
+            {duration !== null ? formatTime(duration) : "–:–"}
+          </span>
+        </Link>
+      </li>
+    );
+  }
+
   return (
-    <li
-      className={`${styles.track} ${detailed ? styles.detailed : ""} ${isCurrent ? styles.current : ""}`}
-      aria-current={isCurrent ? "true" : undefined}
-    >
+    <li className={rowClass} aria-current={isCurrent ? "true" : undefined}>
       <PlayButton
         playing={active}
         disabled={!playable}
