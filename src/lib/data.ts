@@ -363,6 +363,15 @@ export async function getTrack(id: string): Promise<TrackPage | null> {
   if (album) attachThemesFromAlbums([album], [track]);
   await attachDurations(supabase, [track]);
 
+  if (track.latest_version_id) {
+    const { data: version } = await supabase
+      .from("versions")
+      .select("waveform_peaks")
+      .eq("id", track.latest_version_id)
+      .maybeSingle();
+    track.peaks = (version?.waveform_peaks as number[] | null) ?? null;
+  }
+
   return { track, album, lyrics: lyrics[track.track_id] ?? null };
 }
 

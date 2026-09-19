@@ -74,6 +74,13 @@ export type Track = {
    */
   duration: number | null;
   /**
+   * Stored waveform of the latest version (512 values, 0..1), attached ONLY by
+   * getTrack — the track page draws it. Deliberately not attached by
+   * attachDurations: that runs for every track on the home and album pages, and
+   * 512 floats per row would bloat those payloads for a wave nobody draws there.
+   */
+  peaks?: number[] | null;
+  /**
    * Total recorded plays, attached by the data layer from the
    * `track_play_counts` view. Only populated where a popularity ranking needs
    * it (the home "Popular" tab); undefined elsewhere, treated as 0.
