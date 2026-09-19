@@ -345,6 +345,7 @@ async function uploadToPath(
 ): Promise<void> {
   const supabase = createClient();
   const duration = await audioDurationFromFile(file);
+  const peaks = await audioPeaksFromFile(file);
   await uploadObject("versions", path, file);
   const base = supabase.storage
     .from("versions")
@@ -353,6 +354,7 @@ async function uploadToPath(
     _version_id: versionId,
     _resource_url: `${base}?v=${Date.now()}`,
     _duration: duration,
+    _peaks: peaks,
   });
   if (error) throw new Error(error.message);
 }
@@ -377,6 +379,53 @@ function audioDurationFromFile(file: File): Promise<number | null> {
     audio.addEventListener("error", () => finish(null));
     audio.src = url;
   });
+}
+
+/** Bars stored per version — see the waveform_peaks migration. */
+const PEAK_COUNT = 512;
+
+/**
+ * Downsample a file's first channel to {@link PEAK_COUNT} absolute-value
+ * buckets, normalized 0..1, for the stored waveform. Decoding a whole song is
+ * fine here: it happens once, on the artist's machine, at upload. It must never
+ * happen on a listener's page view — that is the whole point of storing this.
+ *
+ * Degrades to null (unsupported browser, undecodable file); a version without
+ * peaks still uploads and simply has no idle waveform.
+ */
+async function audioPeaksFromFile(file: File): Promise<number[] | null> {
+  const Ctx =
+    typeof window === "undefined"
+      ? undefined
+      : window.AudioContext ??
+        (window as unknown as { webkitAudioContext?: typeof AudioContext })
+          .webkitAudioContext;
+  if (!Ctx) return null;
+
+  const ctx = new Ctx();
+  try {
+    const buffer = await ctx.decodeAudioData(await file.arrayBuffer());
+    const data = buffer.getChannelData(0);
+    const bucket = Math.floor(data.length / PEAK_COUNT) || 1;
+    const peaks: number[] = [];
+    let max = 0;
+    for (let i = 0; i < PEAK_COUNT; i += 1) {
+      let peak = 0;
+      const start = i * bucket;
+      for (let j = start; j < start + bucket && j < data.length; j += 1) {
+        const value = Math.abs(data[j]);
+        if (value > peak) peak = value;
+      }
+      peaks.push(peak);
+      if (peak > max) max = peak;
+    }
+    // Normalize so quiet masters still fill the bar height.
+    return max > 0 ? peaks.map((p) => p / max) : peaks;
+  } catch {
+    return null;
+  } finally {
+    void ctx.close();
+  }
 }
 
 /** Put an object into a member-writable bucket via the server route.
