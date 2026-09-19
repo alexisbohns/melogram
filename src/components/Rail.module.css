@@ -66,10 +66,19 @@
   }
 }
 
-/** Items that carry their own padding (album cards) sit flush with the edge. */
+/**
+ * Items that carry their own padding (album cards) sit flush with the edge.
+ * Those cards centre their content inside 24px of padding, so a peek narrower
+ * than that shows nothing but background and the strip reads as a single
+ * album. Tighten the gap and widen the peek until a slice of the next cover
+ * actually shows.
+ */
 @media (max-width: 767px) {
   .bleed {
-    --rail-gap: 16px;
+    --rail-gap: 8px;
     --rail-inset: 0px;
+    /* 64 - 8 = 56px of the next card visible: its 24px padding plus a real
+       slice of the cover behind it */
+    grid-auto-columns: calc(100% - 64px);
   }
 }
