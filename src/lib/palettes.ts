@@ -13,6 +13,12 @@ export type AlbumPalette = {
   /** Deep shade: times, meta tile icons. */
   deep: string;
   /**
+   * The page background this palette sits on — a near-black carrying the
+   * theme's hue. Album and track pages paint it over `--bg`; every other
+   * route keeps the site's own `--bg`.
+   */
+  shell: string;
+  /**
    * Display genre for the meta tile. Album-specific, NOT part of the theme —
    * a temporary override kept from the pre-theme palette map until real album
    * genres flow through every view (the list view doesn't load them yet).
@@ -26,8 +32,8 @@ export type AlbumTheme = {
   key: string;
   /** Human-readable label shown in the picker. */
   name: string;
-  /** The three colors this theme paints. */
-  palette: { light: string; accent: string; deep: string };
+  /** The four colors this theme paints. */
+  palette: { light: string; accent: string; deep: string; shell: string };
 };
 
 /**
@@ -46,42 +52,42 @@ export const THEMES: AlbumTheme[] = [
   {
     key: "amber",
     name: "Amber",
-    palette: { light: "#F6EFE6", accent: "#A15C08", deep: "#714006" },
+    palette: { light: "#F6EFE6", accent: "#A15C08", deep: "#714006", shell: "#1B0E03" },
   },
   {
     key: "violet",
     name: "Violet",
-    palette: { light: "#F2EFF5", accent: "#7B5E99", deep: "#56426B" },
+    palette: { light: "#F2EFF5", accent: "#7B5E99", deep: "#56426B", shell: "#140D1E" },
   },
   {
     key: "slate",
     name: "Slate",
-    palette: { light: "#EEF0F3", accent: "#59658A", deep: "#3E4761" },
+    palette: { light: "#EEF0F3", accent: "#59658A", deep: "#3E4761", shell: "#0C1120" },
   },
   {
     key: "brick",
     name: "Brick",
-    palette: { light: "#F4ECEC", accent: "#8E4242", deep: "#632E2E" },
+    palette: { light: "#F4ECEC", accent: "#8E4242", deep: "#632E2E", shell: "#1C0909" },
   },
   {
     key: "iron",
     name: "Iron",
-    palette: { light: "#F3F3F3", accent: "#868686", deep: "#5E5E5E" },
+    palette: { light: "#F3F3F3", accent: "#868686", deep: "#5E5E5E", shell: "#121212" },
   },
   {
     key: "amethyst",
     name: "Amethyst",
-    palette: { light: "#F6EDF3", accent: "#A9478A", deep: "#763261" },
+    palette: { light: "#F6EDF3", accent: "#A9478A", deep: "#763261", shell: "#1C0715" },
   },
   {
     key: "forest",
     name: "Forest",
-    palette: { light: "#EDF2EE", accent: "#487C5A", deep: "#32573F" },
+    palette: { light: "#EDF2EE", accent: "#487C5A", deep: "#32573F", shell: "#06190D" },
   },
   {
     key: "linen",
     name: "Linen",
-    palette: { light: "#E9E2E4", accent: "#7A5E64", deep: "#4A3639" },
+    palette: { light: "#E9E2E4", accent: "#7A5E64", deep: "#4A3639", shell: "#1A0F11" },
   }
 ];
 
@@ -159,7 +165,13 @@ export function nearestThemeKey(hex: string): string {
   return THEMES[nearestColor(accents, hex)].key;
 }
 
-/** Inline CSS custom properties consumed by every album-scoped component. */
+/**
+ * Inline CSS custom properties consumed by every album-scoped component.
+ *
+ * `shell` is deliberately absent: it belongs to the page, not to a subtree,
+ * and is applied at `:root` by `ShellColor`. Emitting it here would let the
+ * album rail — where each sibling album gets its own scope — repaint the page.
+ */
 export function paletteVars(palette: AlbumPalette): CSSProperties {
   return {
     "--album-light": palette.light,

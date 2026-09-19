@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import SiteLogo from "@/components/SiteLogo";
 import Footer from "@/components/Footer";
@@ -7,12 +7,14 @@ import AlbumSwitcher from "@/components/AlbumSwitcher";
 import PaletteScope from "@/components/PaletteScope";
 import Prose from "@/components/Prose";
 import Section from "@/components/Section";
+import ShellColor from "@/components/ShellColor";
 import SongVisualizer from "@/components/SongVisualizer";
 import TrackHero from "@/components/TrackHero";
 import TrackLyrics from "@/components/TrackLyrics";
 import { getAlbumsWithTracks, getTrack } from "@/lib/data";
 import { getLocale, getMessages } from "@/lib/i18n";
 import { localized } from "@/lib/i18n/config";
+import { getPalette } from "@/lib/palettes";
 import { hasVersion } from "@/lib/types";
 import styles from "./page.module.css";
 
@@ -43,6 +45,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+/**
+ * Tints the mobile browser chrome and the PWA status bar with the album's own
+ * background. Server-resolved only: metadata cannot wait for the cover-derived
+ * measurement, so an album without a stored theme gets its fallback's shade.
+ */
+export async function generateViewport({ params }: Props): Promise<Viewport> {
+  const { id } = await params;
+  const page = await getTrack(id);
+  return { themeColor: getPalette(page?.album ?? {}).shell };
+}
+
 export default async function TrackPage({ params }: Props) {
   const { id } = await params;
   const page = await getTrack(id);
@@ -63,6 +76,14 @@ export default async function TrackPage({ params }: Props) {
 
   return (
     <div className={styles.page}>
+      <ShellColor
+        album={{
+          id: album?.id,
+          name: album?.name,
+          theme: album?.theme,
+          coverUrl: track.album_cover_url,
+        }}
+      />
       <SiteLogo />
       <PaletteScope
         album={{
