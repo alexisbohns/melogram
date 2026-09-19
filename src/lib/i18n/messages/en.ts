@@ -16,6 +16,7 @@ export const en = {
     popular: "Popular",
     latests: "Latests",
     all: "All",
+    notes: "Notes",
   },
   account: {
     triggerLabel: "Account menu",
@@ -34,6 +35,7 @@ export const en = {
     collapse: "Hide track details",
     album: "Album",
     lyrics: "Lyrics",
+    track: "Track",
   },
   likes: {
     title: "My likes",
