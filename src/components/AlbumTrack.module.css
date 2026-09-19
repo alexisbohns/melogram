@@ -5,6 +5,19 @@
   align-items: center;
 }
 
+.current {
+  background: color-mix(in srgb, var(--album-accent) 10%, transparent);
+  border-radius: var(--radius-button);
+
+  /* .track has no padding of its own, so the tint would sit flush against
+     the row's content. Padding gives it breathing room, and the matching
+     negative margin bleeds the row back out to its original bounds so the
+     40px/1fr/auto columns still line up with the untinted rows above and
+     below it. */
+  padding: 8px;
+  margin: -8px;
+}
+
 .name {
   color: var(--album-light);
   font-size: 16px;

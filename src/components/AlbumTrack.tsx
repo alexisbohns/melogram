@@ -25,6 +25,9 @@ type Props = {
    * carries its lyrics into the global player's expanded view.
    */
   queueLyrics?: TrackLyrics;
+  /** This row is the track whose page we're on. Distinct from `active`, which
+      means playing — both can be true at once. */
+  current?: boolean;
 };
 
 export default function AlbumTrack({
@@ -33,6 +36,7 @@ export default function AlbumTrack({
   variant = "simple",
   lyrics = null,
   queueLyrics,
+  current: isCurrent = false,
 }: Props) {
   const { current, isPlaying, toggle, playFrom } = usePlayer();
   const locale = useLocale();
@@ -64,7 +68,10 @@ export default function AlbumTrack({
   };
 
   return (
-    <li className={`${styles.track} ${detailed ? styles.detailed : ""}`}>
+    <li
+      className={`${styles.track} ${detailed ? styles.detailed : ""} ${isCurrent ? styles.current : ""}`}
+      aria-current={isCurrent ? "true" : undefined}
+    >
       <PlayButton
         playing={active}
         disabled={!playable}
