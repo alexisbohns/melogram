@@ -1,0 +1,29 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 32px;
+  border-top: 1px solid color-mix(in srgb, var(--album-light) 8%, transparent);
+}
+
+.headingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.heading {
+  font-family: var(--font-gloock), serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--album-light);
+}
+
+.editor {
+  min-height: 220px;
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  line-height: 22px;
+}

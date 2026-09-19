@@ -12,6 +12,7 @@ import AlbumHeader from "./AlbumHeader";
 import AlbumInfos from "./AlbumInfos";
 import AlbumMetaTiles from "./AlbumMetaTiles";
 import AlbumPlaylist from "./AlbumPlaylist";
+import AlbumStory from "./AlbumStory";
 import EditToggle from "./edit/EditToggle";
 import EditableText from "./edit/EditableText";
 import AlbumTypeSelect from "./edit/AlbumTypeSelect";
@@ -151,6 +152,7 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
       ) : (
         <AlbumPlaylist tracks={readTracks} variant="detailed" lyrics={lyrics} />
       )}
+      <AlbumStory album={album} />
       {drawer && (
         <TrackDrawer
           key={drawer.trackId ?? "new"}
