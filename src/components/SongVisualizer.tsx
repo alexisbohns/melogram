@@ -1,10 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type WaveSurfer from "wavesurfer.js";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { useAlbumPalette } from "@/lib/albumPalette";
-import type { AlbumPalette } from "@/lib/palettes";
 import { formatTime } from "@/player/durations";
 import { renderWaveform, alpha } from "@/player/waveform";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
@@ -18,26 +16,26 @@ type Props = {
 };
 
 /**
- * The track page's transport — the ONLY place to play on that page (the
- * hero's own play button is being removed once this ships). A play button, a
- * waveform, and a duration.
+ * The track page's transport — the only place to play on that page. A play
+ * button, the song's waveform, and a duration.
  *
- * This track is usually NOT the one playing, so the component has two
- * genuinely different modes:
+ * The wave is drawn straight onto a canvas from the track's stored peaks,
+ * with no wavesurfer instance, whether or not this track is the one playing.
+ * That is deliberate, and it is the second design this component has had.
  *
- *  - idle (`current?.id !== track.track_id`): an own `<canvas>`, painted once
- *    from the track's stored `peaks`. No wavesurfer, no audio element, no
- *    network — this is the common case (browsing a track you're not
- *    listening to) and it must stay cheap.
- *  - live (this track IS `player.current`): a wavesurfer instance attached to
- *    the provider's single shared `<audio>` element, exactly as PlayerBar
- *    does it (see the long comment on its creation effect — a second media
- *    element confuses iOS's lock-screen controls).
+ * Attaching a second wavesurfer to the provider's shared <audio> element —
+ * which is what a "live" mode did — turned out to be a bug factory. The
+ * constructor auto-loads from `options.url || getSrc()`, and `getSrc()` is
+ * `media.currentSrc || media.src`, where `currentSrc` still holds the
+ * PREVIOUS track's URL until the browser's resource selection catches up. So
+ * pressing play captured a stale URL, and the queued load then reassigned
+ * `media.src` — a fresh load that aborted the in-flight play() with
+ * "The play() request was interrupted by a new load request."
  *
- * Rather than one component mutating itself across that transition, `IdleWave`
- * and `LiveWave` are separate components picked by `live`, each keyed to its
- * mode — React remounts (destroying any wavesurfer instance / canvas) instead
- * of trying to migrate one rendering strategy into the other.
+ * Drawing it ourselves removes that whole class of problem: one wavesurfer in
+ * the app (PlayerBar's, which owns the shared element), no second loader
+ * racing it, and the wave is identical whether the song is playing or not
+ * because it is literally the same drawing code.
  */
 export default function SongVisualizer({ track, lyrics }: Props) {
   const player = usePlayer();
@@ -45,16 +43,24 @@ export default function SongVisualizer({ track, lyrics }: Props) {
   const live = player.current?.id === track.track_id;
   const playing = live && player.isPlaying;
   const playable = Boolean(track.latest_resource_url);
+  const peaks = track.peaks ?? null;
 
-  // Resolved independently of the page's PaletteScope, same as PlayerBar:
-  // the CSS custom properties from PaletteScope aren't readable from JS, and
-  // the wavesurfer options / canvas fill below need real hex values.
+  // Resolved independently of the page's PaletteScope, same as PlayerBar: the
+  // custom properties PaletteScope sets aren't readable from JS, and the
+  // canvas needs real hex values to paint with.
   const palette = useAlbumPalette({
     id: track.album_id ?? undefined,
     name: track.album_name ?? undefined,
     theme: track.album_theme ?? undefined,
     coverUrl: track.album_cover_url,
   });
+
+  // How much of the wave is behind us. Only meaningful while this track is the
+  // one playing; an idle wave is drawn entirely in the unplayed colour.
+  const progress =
+    live && player.duration > 0
+      ? Math.min(1, Math.max(0, player.time / player.duration))
+      : 0;
 
   const onPlayClick = () => {
     if (!playable) return;
@@ -63,6 +69,20 @@ export default function SongVisualizer({ track, lyrics }: Props) {
       return;
     }
     player.playFrom([toPlayerTrack(track, lyrics, locale)], 0);
+  };
+
+  // Clicking the wave seeks while the track is playing, and starts it
+  // otherwise — the same two behaviours the player bar's waveform has.
+  const onWaveClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!live) {
+      onPlayClick();
+      return;
+    }
+    if (player.duration <= 0) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    if (bounds.width <= 0) return;
+    const fraction = (event.clientX - bounds.left) / bounds.width;
+    player.seek(Math.min(1, Math.max(0, fraction)) * player.duration);
   };
 
   return (
@@ -74,21 +94,13 @@ export default function SongVisualizer({ track, lyrics }: Props) {
         onClick={onPlayClick}
       />
 
-      {live ? (
-        <LiveWave
-          key="live"
-          player={player}
-          palette={palette}
-          peaks={track.peaks ?? null}
-        />
-      ) : (
-        <IdleWave
-          key="idle"
-          peaks={track.peaks ?? null}
-          palette={palette}
-          onPlayClick={onPlayClick}
-        />
-      )}
+      <Wave
+        peaks={peaks}
+        waveColor={alpha(palette.accent, 0.4)}
+        progressColor={palette.light}
+        progress={progress}
+        onClick={onWaveClick}
+      />
 
       <span className={styles.time}>
         {live
@@ -102,31 +114,23 @@ export default function SongVisualizer({ track, lyrics }: Props) {
 }
 
 /**
- * Idle mode: paints the stored waveform once onto a plain canvas. No
- * wavesurfer import, no audio element — just `renderWaveform` against a 2D
- * context, the same renderer PlayerBar hands to wavesurfer as its
- * `renderFunction` (its signature is exactly a canvas renderFunction's,
- * which is why it also works called directly like this).
- *
- * The canvas is repainted (not just resized) on every ResizeObserver tick:
- * changing `canvas.width`/`height` clears the bitmap AND resets the 2D
- * context's transform, so there's nothing stale to carry across a resize.
- *
- * Accessibility: this container is `aria-hidden` and not a real button. It's
- * a mouse/touch convenience — clicking it plays the track — but the
- * accessible, keyboard-reachable control is the adjacent `PlayButton`, which
- * covers the same action. This mirrors PlayerBar's own waveform container,
- * which is likewise a plain interactive div beside an explicit play button
- * rather than a second labeled control duplicating the first one's name.
+ * The waveform itself: the stored peaks painted in the unplayed colour, then
+ * repainted in the played colour clipped to the progress point. Both passes go
+ * through the same {@link renderWaveform} the player bar hands wavesurfer, so
+ * the two waveforms in the app cannot drift apart.
  */
-function IdleWave({
+function Wave({
   peaks,
-  palette,
-  onPlayClick,
+  waveColor,
+  progressColor,
+  progress,
+  onClick,
 }: {
   peaks: number[] | null;
-  palette: AlbumPalette;
-  onPlayClick: () => void;
+  waveColor: string;
+  progressColor: string;
+  progress: number;
+  onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -139,12 +143,11 @@ function IdleWave({
       const width = container.clientWidth;
       const height = 32;
       if (width <= 0) return;
-      // Match wavesurfer's own canvas sizing exactly (renderer.js
-      // `renderSingleCanvas`): the backing buffer is CSS size × device pixel
-      // ratio, the CSS size stays as-is, and — crucially — the render
-      // function draws directly against `ctx.canvas.width/height` in that
-      // device-pixel space rather than through a scaled context. Calling
-      // `ctx.scale(dpr, dpr)` on top would double-scale the wave.
+      // Match wavesurfer's own canvas sizing (renderer.js `renderSingleCanvas`):
+      // the backing buffer is CSS size × device pixel ratio, the CSS size stays
+      // as-is, and the render function draws against `ctx.canvas.width/height`
+      // in that device-pixel space rather than through a scaled context.
+      // Calling `ctx.scale(dpr, dpr)` on top would double-scale the wave.
       const pixelRatio = Math.max(1, window.devicePixelRatio || 1);
       canvas.width = Math.round(width * pixelRatio);
       canvas.height = Math.round(height * pixelRatio);
@@ -152,121 +155,37 @@ function IdleWave({
       canvas.style.height = `${height}px`;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
-      ctx.fillStyle = alpha(palette.accent, 0.4);
+
+      ctx.fillStyle = waveColor;
       renderWaveform([peaks], ctx);
+
+      if (progress > 0) {
+        // Same wave again in the played colour, clipped to where we are. The
+        // context was translated by the pass above, so it is reset first.
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, canvas.width * progress, canvas.height);
+        ctx.clip();
+        ctx.fillStyle = progressColor;
+        renderWaveform([peaks], ctx);
+        ctx.restore();
+      }
     };
 
     paint();
     const observer = new ResizeObserver(paint);
     observer.observe(container);
     return () => observer.disconnect();
-  }, [peaks, palette.accent]);
+  }, [peaks, waveColor, progressColor, progress]);
 
-  // A version the backfill couldn't decode has no peaks: render the same
-  // height so the transport doesn't jump, but no canvas and no fabricated
-  // wave.
+  // A version the backfill couldn't decode has no peaks: hold the same height
+  // so the transport doesn't jump, but draw nothing rather than a fake wave.
   if (!peaks) return <div className={styles.wave} />;
 
   return (
-    <div className={styles.wave} onClick={onPlayClick} aria-hidden="true">
+    <div className={styles.wave} onClick={onClick} aria-hidden="true">
       <canvas ref={canvasRef} className={styles.canvas} />
     </div>
   );
-}
-
-/**
- * Live mode: a wavesurfer instance sharing the provider's single `<audio>`
- * element, created with the exact option set PlayerBar uses — read its
- * creation effect for why each one is there (`media` instead of a second
- * audio source, `peaks` so it never fetches/decodes, no `duration` so it
- * takes the shared element's real one instead of a wrong guess).
- *
- * Unlike PlayerBar, this component only ever exists for ONE fixed track — the
- * parent remounts it (via `key`) rather than keep it alive across a track
- * change — so there's no need for PlayerBar's second effect that reloads a
- * new URL into a persistent instance. Wavesurfer auto-loads from the shared
- * element's already-playing src.
- */
-function LiveWave({
-  player,
-  palette,
-  peaks,
-}: {
-  player: ReturnType<typeof usePlayer>;
-  palette: AlbumPalette;
-  /**
-   * The PAGE's stored peaks, not `player.current.peaks`. A queue entry built
-   * on the home or album page carries none — those pages deliberately don't
-   * fetch them — so reading them off the player left this with nothing to
-   * draw whenever playback started somewhere else.
-   */
-  peaks: number[] | null;
-}) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const wsRef = useRef<WaveSurfer | null>(null);
-
-  // The seek callback changes identity across renders; the wavesurfer
-  // 'interaction' handler is registered once, so it reads through a ref —
-  // same reasoning as PlayerBar.
-  const seekRef = useRef(player.seek);
-  useEffect(() => {
-    seekRef.current = player.seek;
-  }, [player.seek]);
-
-  const current = player.current;
-  const audioElement = player.audioElement;
-  const waveColor = alpha(palette.accent, 0.4);
-  const progressColor = palette.light;
-
-  useEffect(() => {
-    if (!current || wsRef.current || !containerRef.current || !audioElement)
-      return;
-    let cancelled = false;
-    const media = audioElement;
-    const channels = peaks ? [peaks] : undefined;
-    import("wavesurfer.js").then(({ default: WS }) => {
-      if (cancelled || wsRef.current || !containerRef.current) return;
-      const ws = WS.create({
-        container: containerRef.current,
-        height: 32,
-        interact: true,
-        dragToSeek: true,
-        cursorWidth: 0,
-        renderFunction: renderWaveform,
-        // Share the provider's audio element instead of creating a second one.
-        media,
-        waveColor,
-        progressColor,
-        // Peaks MUST go in the constructor options, not a later ws.load():
-        // wavesurfer's constructor queues its own load from
-        // `options.url || getSrc()`, and getSrc() returns the shared audio
-        // element's already-playing src. Left without peaks, that queued load
-        // fetches and decodes the whole file — which is why the wave used to
-        // appear instantly and then get replaced ~25s later by a decoded one.
-        peaks: channels,
-      });
-      ws.on("interaction", (newTime: number) => seekRef.current(newTime));
-      wsRef.current = ws;
-    });
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- creation guarded by wsRef.current; recoloring handled by the effect below
-  }, [current, audioElement, peaks]);
-
-  // Recolor if the palette resolves (or changes) after wavesurfer already
-  // exists — e.g. a cover-derived accent arriving late.
-  useEffect(() => {
-    wsRef.current?.setOptions({ waveColor, progressColor });
-  }, [waveColor, progressColor]);
-
-  useEffect(
-    () => () => {
-      wsRef.current?.destroy();
-      wsRef.current = null;
-    },
-    []
-  );
-
-  return <div ref={containerRef} className={styles.wave} />;
 }
