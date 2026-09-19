@@ -1,0 +1,26 @@
+.page {
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.content {
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding: 0 24px 48px;
+    gap: 16px;
+  }
+
+  .content {
+    gap: 24px;
+  }
+}
