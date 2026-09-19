@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Mic, Pause, Play } from "lucide-react";
+import { Mic } from "lucide-react";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime } from "@/player/durations";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { localized } from "@/lib/i18n/config";
 import type { Track, TrackLyrics } from "@/lib/types";
+import IconButton from "./IconButton";
 import LikeButton from "./LikeButton";
 import LyricsSheet from "./LyricsSheet";
+import PlayButton from "./PlayButton";
 import styles from "./AlbumTrack.module.css";
 
 type Props = {
@@ -63,19 +65,12 @@ export default function AlbumTrack({
 
   return (
     <li className={`${styles.track} ${detailed ? styles.detailed : ""}`}>
-      <button
-        type="button"
-        className={`${styles.play} ${active ? styles.playing : ""}`}
+      <PlayButton
+        playing={active}
         disabled={!playable}
-        aria-label={active ? `Pause ${track.track_name}` : `Play ${track.track_name}`}
+        label={active ? `Pause ${track.track_name}` : `Play ${track.track_name}`}
         onClick={onPlayClick}
-      >
-        {active ? (
-          <Pause size={24} strokeWidth={2} />
-        ) : (
-          <Play size={24} strokeWidth={2} />
-        )}
-      </button>
+      />
 
       <Link
         href={`/tracks/${track.track_id}`}
@@ -90,14 +85,12 @@ export default function AlbumTrack({
         </span>
         <LikeButton trackId={track.track_id} likeCount={track.like_count ?? 0} />
         {detailed && lyrics && (
-          <button
-            type="button"
-            className={styles.iconButton}
-            aria-label={`Lyrics of ${track.track_name}`}
+          <IconButton
+            label={`Lyrics of ${track.track_name}`}
             onClick={() => setLyricsOpen(true)}
           >
             <Mic size={20} strokeWidth={2} />
-          </button>
+          </IconButton>
         )}
       </div>
 

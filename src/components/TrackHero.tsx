@@ -3,14 +3,16 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Mic, Pause, Play } from "lucide-react";
+import { Mic } from "lucide-react";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime } from "@/player/durations";
-import { useLocale, useMessages } from "@/lib/i18n/LocaleProvider";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { localized } from "@/lib/i18n/config";
 import type { Track } from "@/lib/types";
+import IconButton from "./IconButton";
 import LikeButton from "./LikeButton";
 import LyricsSheet from "./LyricsSheet";
+import PlayButton from "./PlayButton";
 import styles from "./TrackHero.module.css";
 
 type Props = {
@@ -26,7 +28,6 @@ type Props = {
 export default function TrackHero({ track, lyrics }: Props) {
   const { current, isPlaying, toggle, playFrom } = usePlayer();
   const locale = useLocale();
-  const m = useMessages();
   const [lyricsOpen, setLyricsOpen] = useState(false);
 
   const playable = Boolean(track.latest_resource_url);
@@ -76,21 +77,14 @@ export default function TrackHero({ track, lyrics }: Props) {
         {description && <p className={styles.description}>{description}</p>}
 
         <div className={styles.controls}>
-          <button
-            type="button"
-            className={`${styles.play} ${active ? styles.playing : ""}`}
+          <PlayButton
+            playing={active}
             disabled={!playable}
-            aria-label={
+            label={
               active ? `Pause ${track.track_name}` : `Play ${track.track_name}`
             }
             onClick={onPlayClick}
-          >
-            {active ? (
-              <Pause size={24} strokeWidth={2} />
-            ) : (
-              <Play size={24} strokeWidth={2} />
-            )}
-          </button>
+          />
 
           <span className={styles.time}>
             {track.duration !== null ? formatTime(track.duration) : "–:–"}
@@ -102,15 +96,12 @@ export default function TrackHero({ track, lyrics }: Props) {
           />
 
           {lyrics && (
-            <button
-              type="button"
-              className={styles.iconButton}
-              aria-label={`Lyrics of ${track.track_name}`}
+            <IconButton
+              label={`Lyrics of ${track.track_name}`}
               onClick={() => setLyricsOpen(true)}
             >
-              <Mic size={20} strokeWidth={2} aria-hidden />
-              {m.player.lyrics}
-            </button>
+              <Mic size={20} strokeWidth={2} />
+            </IconButton>
           )}
         </div>
       </div>

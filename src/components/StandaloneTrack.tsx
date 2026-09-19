@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Pause, Play } from "lucide-react";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime } from "@/player/durations";
 import { paletteVars } from "@/lib/palettes";
@@ -11,6 +10,7 @@ import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { localized } from "@/lib/i18n/config";
 import type { Track } from "@/lib/types";
 import LikeButton from "./LikeButton";
+import PlayButton from "./PlayButton";
 import styles from "./StandaloneTrack.module.css";
 
 type Props = {
@@ -88,21 +88,15 @@ export default function StandaloneTrack({ track, queue }: Props) {
 
       {/* controls row: play on the left, duration and like on the right */}
       <div className={styles.controls}>
-        <button
-          type="button"
-          className={`${styles.play} ${active ? styles.playing : ""}`}
+        <PlayButton
+          playing={active}
           disabled={!playable}
-          aria-label={
+          label={
             active ? `Pause ${track.track_name}` : `Play ${track.track_name}`
           }
           onClick={onPlayClick}
-        >
-          {active ? (
-            <Pause size={20} strokeWidth={2} />
-          ) : (
-            <Play size={20} strokeWidth={2} />
-          )}
-        </button>
+          size={20}
+        />
 
         <div className={styles.footer}>
           <span className={styles.time}>
