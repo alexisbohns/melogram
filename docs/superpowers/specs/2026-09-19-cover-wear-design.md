@@ -13,10 +13,13 @@ vinyl-kit's `VinylSleeve` already carries one texture layer,
 darkens the artwork unevenly.
 
 The wear is its opposite. The source is near-black, carrying a bright ring
-where the record has rubbed the card, plus scratches and a scuffed edge — so
-the blend that suits it is `screen`: black leaves the artwork untouched and
-only the light marks survive. Grain darkens, wear lightens; together they are
-the usual recipe for a worn sleeve, and neither can do the other's job.
+where the record has rubbed the card, plus scratches and a scuffed edge.
+
+`screen` is the obvious blend for a near-black texture and it is the wrong one
+here. Screen can only add light, so on pale artwork it lifted the blacks until
+the linen went milky and the cover lost its bite — the ring arrived at the cost
+of the album. `soft-light` at 0.8 darkens as well as lightens: the ring reads
+at full strength and the artwork keeps its contrast.
 
 The ring is centred and roughly square-filling, which is why the texture can be
 shared by every cover without looking pasted on: it lands where the record
@@ -62,11 +65,15 @@ One rule in `src/app/globals.css`:
   position: absolute;
   inset: 0;
   background: url("/cover-wear.webp") center / cover;
-  mix-blend-mode: screen;
-  opacity: 0.55;
+  mix-blend-mode: soft-light;
+  opacity: 0.8;
   pointer-events: none;
 }
 ```
+
+The blend and the opacity were settled on the real page, against a light cover
+and a dark one, using a throwaway control panel — not picked here. This
+document records where they landed, not a guess made in advance.
 
 A pseudo-element on vinyl-kit's own class, rather than a second layer passed
 into the component, for three reasons:
@@ -83,7 +90,23 @@ into the component, for three reasons:
 This is the app's first override of a vinyl-kit class, so the rule carries a
 comment saying why it lives here rather than in the package.
 
-## 3. The share images
+## 3. Even corners
+
+vinyl-kit rounds the sleeve asymmetrically — 5% at the spine, 10% at the
+opening — to hint at which edge the record comes out of. Melogram pulls the
+right-hand pair back to 5% so the cover is an evenly rounded square:
+
+```css
+.vk-sleeve-cover {
+  border-radius: calc(var(--vinyl-size) * 0.05);
+}
+```
+
+The record sliding out of the sleeve already says where the opening is. With
+that cue present, the lopsided radius stops reading as a hint and starts
+reading as a wonky corner.
+
+## 4. The share images
 
 `renderCover` in `src/lib/og/albumImage.tsx` composites the grain server-side
 with sharp so a shared link matches the page it points at. The wear follows the

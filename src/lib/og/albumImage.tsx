@@ -77,7 +77,7 @@ const asset = (file: string) => join(process.cwd(), "public", file);
 
 /**
  * Fetch the cover, square-crop it, and dress it the way the site does: the
- * paper grain multiplied on, then the sleeve wear screened over it. Also
+ * paper grain multiplied on, then the sleeve wear soft-lit over it. Also
  * reports the cover's dominant color, so an album with
  * no theme of its own can be dressed from its artwork — the server-side
  * counterpart of `useCoverAccent` in the app.
@@ -101,7 +101,7 @@ async function renderCover(
         .toBuffer(),
       sharp(asset("cover-wear.webp"))
         .resize(size, size)
-        .ensureAlpha(0.55)
+        .ensureAlpha(0.8)
         .toBuffer(),
     ]);
     // Grain first, wear over it — the order the browser paints the two layers.
@@ -109,7 +109,7 @@ async function renderCover(
       .resize(size, size, { fit: "cover", position: "attention" })
       .composite([
         { input: texture, blend: "multiply" },
-        { input: wear, blend: "screen" },
+        { input: wear, blend: "soft-light" },
       ])
       .png()
       .toBuffer();
