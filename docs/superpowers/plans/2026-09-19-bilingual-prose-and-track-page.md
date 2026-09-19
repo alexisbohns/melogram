@@ -285,47 +285,93 @@ git commit -m "Thread the prose columns through the album and track RPCs"
 
 **This task is blocked on Alexis.** The view predates the migrations folder and its definition is nowhere in the repo. Do not guess it, and do not work around it by adding another `attach*` helper in the data layer — the spec chose recovery precisely to stop that pattern from spreading.
 
-- [ ] **Step 1: Ask for the dump**
+- [ ] **Step 1: The dump (already supplied)**
 
-Ask Alexis to run this in the Supabase SQL editor and paste the result:
+Alexis ran `select pg_get_viewdef('public.track_overview'::regclass, true);` and the definition is reproduced in Step 2 below. Nothing to ask for.
 
-```sql
-select pg_get_viewdef('public.track_overview'::regclass, true);
-```
+- [ ] **Step 2: Append the recovered view**
 
-- [ ] **Step 2: Append the recovered view with three new columns**
+Two properties of the original are load-bearing and easy to lose:
 
-Write the returned definition verbatim under a `create or replace view public.track_overview as`, adding exactly three columns to the select list, next to the existing `t.description as track_description`:
+1. **The new columns go at the END of the select list, not next to `track_description`.** `create or replace view` may only *append* columns — it refuses a query whose existing columns are renamed, retyped, or **reordered**, and inserting a column mid-list is a reorder. The app selects by name (`TRACK_COLS` in `src/lib/data.ts`), so position is irrelevant to it.
+2. **`security_invoker` stays OFF.** `like_count` aggregates `public.track_likes`, which RLS locks to its owner. Under invoker rights an anonymous visitor's `like_count` would silently read `0` — see the comment in `20260715000000_track_play_counts.sql`, which spells out the same reasoning for its own view.
 
-```sql
-       t.description_fr as track_description_fr,
-       t.story          as track_story,
-       t.story_fr       as track_story_fr,
-```
-
-(`t` is whatever alias the dump gives the `tracks` table — use that alias, not a new one.) Prepend this comment:
+Append to the migration, verbatim:
 
 ```sql
 -- track_overview, recovered via pg_get_viewdef and brought under version
 -- control for the first time (it predates this folder), plus the three new
--- track prose columns. Column ORDER and names of everything already present
--- must not change: TRACK_COLS in src/lib/data.ts selects them by name, and
--- `create or replace view` refuses to drop or reorder existing columns.
+-- track prose columns.
+--
+-- The new columns are appended at the END of the select list: `create or
+-- replace view` may only add columns, never rename, retype or reorder the
+-- existing ones, and slotting track_description_fr in next to
+-- track_description would count as a reorder. src/lib/data.ts selects by
+-- name, so position doesn't matter to the app.
+--
+-- security_invoker stays OFF (the view owner's rights), exactly as it was:
+-- like_count aggregates public.track_likes, which RLS locks to its owner, so
+-- under invoker rights an anonymous visitor's like_count would silently read
+-- 0. Same reasoning as public.track_play_counts.
+create or replace view public.track_overview
+  with (security_invoker = off) as
+  with latest_version as (
+    select tv.track_id,
+      v.id as latest_version_id,
+      v.status as latest_status,
+      v.resource_url as latest_resource_url,
+      v.release_date as latest_release_date,
+      row_number() over (
+        partition by tv.track_id
+        order by v.release_date desc, v.created_at desc, tv.created_at desc
+      ) as rn
+    from public.track_versions tv
+      join public.versions v on v.id = tv.version_id
+  ), primary_album as (
+    select at.track_id,
+      a.id as album_id,
+      a.name as album_name,
+      a.cover_url as album_cover_url,
+      row_number() over (
+        partition by at.track_id
+        order by at.created_at desc
+      ) as rn
+    from public.album_tracks at
+      join public.albums a on a.id = at.album_id
+  )
+  select t.id as track_id,
+    t.name as track_name,
+    t.description as track_description,
+    pa.album_id,
+    pa.album_name,
+    pa.album_cover_url,
+    lv.latest_version_id,
+    lv.latest_status,
+    lv.latest_resource_url,
+    lv.latest_release_date,
+    coalesce(tlc.like_count, 0::bigint) as like_count,
+    t.description_fr as track_description_fr,
+    t.story as track_story,
+    t.story_fr as track_story_fr
+  from public.tracks t
+    left join latest_version lv on lv.track_id = t.id and lv.rn = 1
+    left join primary_album pa on pa.track_id = t.id and pa.rn = 1
+    left join public.track_like_counts tlc on tlc.track_id = t.id;
+
+grant select on public.track_overview to anon, authenticated;
 ```
 
-- [ ] **Step 3: Preserve `security_invoker`**
+The only differences from the dump are: the three appended columns, `public.` qualification on the base tables (the dump relies on `search_path`), the `with (security_invoker = off)` clause made explicit, lowercased keywords to match the house style, and the window clauses wrapped for width. The column list, the CTEs, the join conditions and the `coalesce` are untouched.
 
-Run:
+- [ ] **Step 3: Confirm the replace is legal**
+
+`create or replace view` fails outright on a reorder, so the check is simply that the first eleven output columns appear in the dump's order, with the three new ones after them. Run:
 
 ```bash
-grep -n "security_invoker" supabase/migrations/20260715000000_track_play_counts.sql
+grep -n "as track_id\|as track_name\|as track_description\|album_id,\|album_name,\|album_cover_url,\|latest_version_id,\|latest_status,\|latest_resource_url,\|latest_release_date,\|as like_count\|as track_description_fr\|as track_story\|as track_story_fr" supabase/migrations/20260919000000_bilingual_prose.sql
 ```
 
-`create or replace view` **keeps** existing view options, so nothing is needed if the view already sets it. If the dump or that grep shows `track_overview` was created with `security_invoker = true`, append it explicitly so the file is self-contained:
-
-```sql
-alter view public.track_overview set (security_invoker = true);
-```
+Expected: the eleven original columns in their original order, then the three new ones last.
 
 - [ ] **Step 4: Commit**
 

@@ -144,3 +144,64 @@ begin
     returning * into _album;
   return _album;
 end $$;
+
+-- track_overview, recovered via pg_get_viewdef and brought under version
+-- control for the first time (it predates this folder), plus the three new
+-- track prose columns.
+--
+-- The new columns are appended at the END of the select list: `create or
+-- replace view` may only add columns, never rename, retype or reorder the
+-- existing ones, and slotting track_description_fr in next to
+-- track_description would count as a reorder. src/lib/data.ts selects by
+-- name, so position doesn't matter to the app.
+--
+-- security_invoker stays OFF (the view owner's rights), exactly as it was:
+-- like_count aggregates public.track_likes, which RLS locks to its owner, so
+-- under invoker rights an anonymous visitor's like_count would silently read
+-- 0. Same reasoning as public.track_play_counts.
+create or replace view public.track_overview
+  with (security_invoker = off) as
+  with latest_version as (
+    select tv.track_id,
+      v.id as latest_version_id,
+      v.status as latest_status,
+      v.resource_url as latest_resource_url,
+      v.release_date as latest_release_date,
+      row_number() over (
+        partition by tv.track_id
+        order by v.release_date desc, v.created_at desc, tv.created_at desc
+      ) as rn
+    from public.track_versions tv
+      join public.versions v on v.id = tv.version_id
+  ), primary_album as (
+    select at.track_id,
+      a.id as album_id,
+      a.name as album_name,
+      a.cover_url as album_cover_url,
+      row_number() over (
+        partition by at.track_id
+        order by at.created_at desc
+      ) as rn
+    from public.album_tracks at
+      join public.albums a on a.id = at.album_id
+  )
+  select t.id as track_id,
+    t.name as track_name,
+    t.description as track_description,
+    pa.album_id,
+    pa.album_name,
+    pa.album_cover_url,
+    lv.latest_version_id,
+    lv.latest_status,
+    lv.latest_resource_url,
+    lv.latest_release_date,
+    coalesce(tlc.like_count, 0::bigint) as like_count,
+    t.description_fr as track_description_fr,
+    t.story as track_story,
+    t.story_fr as track_story_fr
+  from public.tracks t
+    left join latest_version lv on lv.track_id = t.id and lv.rn = 1
+    left join primary_album pa on pa.track_id = t.id and pa.rn = 1
+    left join public.track_like_counts tlc on tlc.track_id = t.id;
+
+grant select on public.track_overview to anon, authenticated;
