@@ -233,3 +233,17 @@
   color: var(--album-light);
   opacity: 0.5;
 }
+
+.counter {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--album-light);
+  opacity: 0.5;
+  align-self: flex-end;
+}
+
+/* Warns, never blocks — the rewrite is a manual pass, not a form error. */
+.counterOver {
+  color: #e8b04b;
+  opacity: 1;
+}

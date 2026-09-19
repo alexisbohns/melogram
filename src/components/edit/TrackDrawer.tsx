@@ -15,20 +15,44 @@ import {
   getTrackDetails,
   updateTrack,
 } from "@/lib/edit";
+import type { Locale } from "@/lib/i18n/config";
 import { usePlayer } from "@/player/PlayerProvider";
 import { useAlbumEdit } from "./AlbumEditProvider";
 import VersionsSection from "./VersionsSection";
+import LocaleTabs from "./LocaleTabs";
 import controls from "./controls.module.css";
 import styles from "./TrackDrawer.module.css";
 
-type Fields = { name: string; description: string; lyrics: string };
+type Fields = {
+  name: string;
+  description: string;
+  description_fr: string;
+  story: string;
+  story_fr: string;
+  lyrics: string;
+};
 
-const EMPTY: Fields = { name: "", description: "", lyrics: "" };
+const EMPTY: Fields = {
+  name: "",
+  description: "",
+  description_fr: "",
+  story: "",
+  story_fr: "",
+  lyrics: "",
+};
+
+/** Soft limit on the short blurb. Warns, never blocks: the descriptions are
+    being rewritten by hand (design spec §9, phase 2) and the hard constraint
+    lands in a later migration. */
+const DESCRIPTION_SOFT_LIMIT = 200;
 
 function fieldsFrom(track: TrackDetails): Fields {
   return {
     name: track.name,
     description: track.description ?? "",
+    description_fr: track.description_fr ?? "",
+    story: track.story ?? "",
+    story_fr: track.story_fr ?? "",
     lyrics: track.lyrics ?? "",
   };
 }
@@ -69,6 +93,7 @@ export default function TrackDrawer({
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [discardArmed, setDiscardArmed] = useState(false);
+  const [editLocale, setEditLocale] = useState<Locale>("en");
 
   const sheetRef = useRef<HTMLElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
@@ -80,9 +105,15 @@ export default function TrackDrawer({
   const detailsDirty = track
     ? fields.name !== track.name ||
       orNull(fields.description) !== track.description ||
+      orNull(fields.description_fr) !== track.description_fr ||
+      orNull(fields.story) !== track.story ||
+      orNull(fields.story_fr) !== track.story_fr ||
       orNull(fields.lyrics) !== track.lyrics
     : fields.name.trim() !== "" ||
       fields.description.trim() !== "" ||
+      fields.description_fr.trim() !== "" ||
+      fields.story.trim() !== "" ||
+      fields.story_fr.trim() !== "" ||
       fields.lyrics.trim() !== "";
   const dirty = detailsDirty || versionsDirty;
   const busy = busySubmit || deleting || versionsBusy;
@@ -214,14 +245,18 @@ export default function TrackDrawer({
     // Apply the saved (normalized) values without clobbering anything the
     // user typed while the request was in flight.
     const applySaved = (saved: Fields) =>
-      setFields((cur) => ({
-        name: cur.name === submitted.name ? saved.name : cur.name,
-        description:
-          cur.description === submitted.description
-            ? saved.description
-            : cur.description,
-        lyrics: cur.lyrics === submitted.lyrics ? saved.lyrics : cur.lyrics,
-      }));
+      setFields((cur) => {
+        const keep = <K extends keyof Fields>(key: K): Fields[K] =>
+          cur[key] === submitted[key] ? saved[key] : cur[key];
+        return {
+          name: keep("name"),
+          description: keep("description"),
+          description_fr: keep("description_fr"),
+          story: keep("story"),
+          story_fr: keep("story_fr"),
+          lyrics: keep("lyrics"),
+        };
+      });
     setDiscardArmed(false);
     setBusySubmit(true);
     setSubmitError(null);
@@ -231,12 +266,18 @@ export default function TrackDrawer({
           track.id,
           name,
           orNull(submitted.description),
+          orNull(submitted.description_fr),
+          orNull(submitted.story),
+          orNull(submitted.story_fr),
           orNull(submitted.lyrics)
         );
         const next = {
           ...track,
           name,
           description: orNull(submitted.description),
+          description_fr: orNull(submitted.description_fr),
+          story: orNull(submitted.story),
+          story_fr: orNull(submitted.story_fr),
           lyrics: orNull(submitted.lyrics),
         };
         setTrack(next);
@@ -248,6 +289,9 @@ export default function TrackDrawer({
           album.id,
           name,
           orNull(submitted.description),
+          orNull(submitted.description_fr),
+          orNull(submitted.story),
+          orNull(submitted.story_fr),
           orNull(submitted.lyrics)
         );
         setTrack(row);
@@ -281,6 +325,9 @@ export default function TrackDrawer({
   }
 
   const title = isCreate ? "New track" : track?.name ?? "Track";
+  const descKey = editLocale === "en" ? "description" : "description_fr";
+  const storyKey = editLocale === "en" ? "story" : "story_fr";
+  const overLimit = fields[descKey].length > DESCRIPTION_SOFT_LIMIT;
 
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true" aria-labelledby="track-drawer-title">
@@ -358,19 +405,51 @@ export default function TrackDrawer({
               onChange={(e) => setFields((f) => ({ ...f, name: e.target.value }))}
             />
           </div>
+          <div className={styles.localeRow}>
+            <span className={controls.label}>Description &amp; notes</span>
+            <LocaleTabs
+              value={editLocale}
+              onChange={setEditLocale}
+              disabled={!seeded}
+            />
+          </div>
           <div className={controls.field}>
             <label className={controls.label} htmlFor="track-description">
-              Description
+              Description ({editLocale.toUpperCase()})
             </label>
             <textarea
               id="track-description"
               className={controls.textarea}
-              value={fields.description}
+              value={fields[descKey]}
               disabled={!seeded}
-              placeholder="A few words about this track…"
+              placeholder="One or two lines — this is what the strips show…"
               rows={3}
               onChange={(e) =>
-                setFields((f) => ({ ...f, description: e.target.value }))
+                setFields((f) => ({ ...f, [descKey]: e.target.value }))
+              }
+            />
+            <span
+              className={`${controls.counter} ${
+                overLimit ? controls.counterOver : ""
+              }`}
+            >
+              {fields[descKey].length} / {DESCRIPTION_SOFT_LIMIT}
+              {overLimit ? " — long for a strip" : ""}
+            </span>
+          </div>
+          <div className={controls.field}>
+            <label className={controls.label} htmlFor="track-story">
+              Notes ({editLocale.toUpperCase()})
+            </label>
+            <textarea
+              id="track-story"
+              className={`${controls.textarea} ${controls.lyrics}`}
+              value={fields[storyKey]}
+              disabled={!seeded}
+              placeholder="The long version — markdown welcome…"
+              rows={8}
+              onChange={(e) =>
+                setFields((f) => ({ ...f, [storyKey]: e.target.value }))
               }
             />
           </div>
