@@ -19,51 +19,12 @@ import { paletteVars } from "@/lib/palettes";
 import { useAlbumPalette } from "@/lib/albumPalette";
 import { formatTime } from "@/player/durations";
 import { usePlayer } from "@/player/PlayerProvider";
+import { renderWaveform, alpha } from "@/player/waveform";
 import { useMessages } from "@/lib/i18n/LocaleProvider";
 import { Vinyl } from "vinyl-kit";
 import { VINYL_MASK_URL, albumVinylVars, nextVinylImage } from "@/lib/vinyl";
 import LyricsSheet from "./LyricsSheet";
 import styles from "./PlayerBar.module.css";
-
-/** Rounded-pill waveform bars — carried over from the previous app's player. */
-function renderWaveform(channels: Array<Float32Array | number[]>, ctx: CanvasRenderingContext2D) {
-  const { width, height } = ctx.canvas;
-  const scale = channels[0].length / width;
-  const step = 7;
-
-  ctx.translate(0, height / 2);
-  ctx.strokeStyle = ctx.fillStyle as string;
-  ctx.beginPath();
-
-  for (let i = 0; i < width; i += step * 2) {
-    const index = Math.floor(i * scale);
-    const value = Math.abs(Number(channels[0][index]) || 0);
-    let x = i;
-    let y = value * height;
-
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, y);
-    ctx.arc(x + step / 2, y, step / 2, Math.PI, 0, true);
-    ctx.lineTo(x + step, 0);
-
-    x = x + step;
-    y = -y;
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, y);
-    ctx.arc(x + step / 2, y, step / 2, Math.PI, 0, false);
-    ctx.lineTo(x + step, 0);
-  }
-
-  ctx.stroke();
-  ctx.closePath();
-}
-
-function alpha(hex: string, fraction: number): string {
-  const a = Math.round(fraction * 255)
-    .toString(16)
-    .padStart(2, "0");
-  return `${hex}${a}`;
-}
 
 export default function PlayerBar() {
   const player = usePlayer();
