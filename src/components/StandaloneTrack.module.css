@@ -128,4 +128,11 @@
   opacity: 0.5;
   font-size: 16px;
   line-height: 22px;
+
+  /* Two lines, always: the rails read as one strip whatever the blurb's
+     length. The long prose lives on the track page now. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
