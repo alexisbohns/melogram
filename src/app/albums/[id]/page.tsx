@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import SiteLogo from "@/components/SiteLogo";
 import Footer from "@/components/Footer";
 import AlbumSwitcher from "@/components/AlbumSwitcher";
 import AlbumDetailCard from "@/components/AlbumDetailCard";
+import ShellColor from "@/components/ShellColor";
 import { AlbumEditProvider } from "@/components/edit/AlbumEditProvider";
 import { getAlbumsWithTracks, getAlbumWithTracks, getLyrics } from "@/lib/data";
+import { getPalette } from "@/lib/palettes";
 import styles from "./page.module.css";
 
 export const revalidate = 300;
@@ -32,6 +34,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+/**
+ * Tints the mobile browser chrome and the PWA status bar with the album's own
+ * background. Server-resolved only: metadata cannot wait for the cover-derived
+ * measurement, so an album without a stored theme gets its fallback's shade.
+ */
+export async function generateViewport({ params }: Props): Promise<Viewport> {
+  const { id } = await params;
+  const albums = await getAlbumsWithTracks();
+  const album = albums.find((a) => a.id === id);
+  return { themeColor: getPalette(album ?? {}).shell };
+}
+
 export default async function AlbumPage({ params }: Props) {
   const { id } = await params;
 
@@ -45,6 +59,7 @@ export default async function AlbumPage({ params }: Props) {
 
   return (
     <div className={styles.page}>
+      <ShellColor album={{ ...album, coverUrl: album.cover_url }} />
       <SiteLogo />
       <div className={styles.content}>
         <AlbumSwitcher albums={albums} activeId={album.id} />
