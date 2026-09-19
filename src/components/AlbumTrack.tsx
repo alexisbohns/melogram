@@ -6,6 +6,7 @@ import { Mic, Pause, Play } from "lucide-react";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime } from "@/player/durations";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { localized } from "@/lib/i18n/config";
 import type { Track, TrackLyrics } from "@/lib/types";
 import LikeButton from "./LikeButton";
 import LyricsSheet from "./LyricsSheet";
@@ -39,6 +40,11 @@ export default function AlbumTrack({
   const playable = Boolean(track.latest_resource_url);
   const active = current?.id === track.track_id && isPlaying;
   const detailed = variant === "detailed";
+  const description = localized(
+    track.track_description,
+    track.track_description_fr,
+    locale
+  );
 
   const onPlayClick = () => {
     if (!playable) return;
@@ -95,8 +101,8 @@ export default function AlbumTrack({
         )}
       </div>
 
-      {detailed && track.track_description && (
-        <p className={styles.description}>{track.track_description}</p>
+      {detailed && description && (
+        <p className={styles.description}>{description}</p>
       )}
 
       {detailed && lyrics && (

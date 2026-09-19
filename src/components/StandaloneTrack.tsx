@@ -8,6 +8,7 @@ import { formatTime } from "@/player/durations";
 import { paletteVars } from "@/lib/palettes";
 import { useAlbumPalette } from "@/lib/albumPalette";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { localized } from "@/lib/i18n/config";
 import type { Track } from "@/lib/types";
 import LikeButton from "./LikeButton";
 import styles from "./StandaloneTrack.module.css";
@@ -35,6 +36,11 @@ export default function StandaloneTrack({ track, queue }: Props) {
 
   const playable = Boolean(track.latest_resource_url);
   const active = current?.id === track.track_id && isPlaying;
+  const description = localized(
+    track.track_description,
+    track.track_description_fr,
+    locale
+  );
 
   const onPlayClick = () => {
     if (!playable) return;
@@ -78,9 +84,7 @@ export default function StandaloneTrack({ track, queue }: Props) {
         </div>
       </div>
 
-      {track.track_description && (
-        <p className={styles.description}>{track.track_description}</p>
-      )}
+      {description && <p className={styles.description}>{description}</p>}
 
       {/* controls row: play on the left, duration and like on the right */}
       <div className={styles.controls}>

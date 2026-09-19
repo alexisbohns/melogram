@@ -5,6 +5,8 @@ import { hasVersion, type AlbumWithTracks, type TrackLyrics } from "@/lib/types"
 import { paletteVars } from "@/lib/palettes";
 import { useAlbumPalette } from "@/lib/albumPalette";
 import { displayGenre } from "@/lib/genres";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { localized } from "@/lib/i18n/config";
 import AlbumCoverLive from "./AlbumCoverLive";
 import AlbumHeader from "./AlbumHeader";
 import AlbumInfos from "./AlbumInfos";
@@ -28,7 +30,9 @@ type Props = {
 /** Album page main card (Figma "AlbumCard" on Album frames). */
 export default function AlbumDetailCard({ album, lyrics }: Props) {
   const { editing, canEdit, draft, setField } = useAlbumEdit();
+  const locale = useLocale();
   const palette = useAlbumPalette({ ...album, coverUrl: album.cover_url });
+  const description = localized(album.description, album.description_fr, locale);
   // Track drawer target: null = closed, { trackId: null } = create mode.
   // Mounted at card level (not inside the setlist) so a setlist resync or a
   // staged row removal can't unmount it mid-upload.
@@ -101,8 +105,8 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
               className={styles.description}
             />
           ) : (
-            album.description && (
-              <p className={styles.description}>{album.description}</p>
+            description && (
+              <p className={styles.description}>{description}</p>
             )
           )}
 
