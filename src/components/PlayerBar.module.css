@@ -187,6 +187,8 @@
 }
 
 .controlButton {
+  composes: springy from global;
+
   width: 40px;
   height: 40px;
   border-radius: var(--radius-button);
@@ -204,6 +206,8 @@
 }
 
 .playButton {
+  composes: springy from global;
+
   width: 40px;
   height: 40px;
   border-radius: var(--radius-button);
@@ -289,6 +293,8 @@
 }
 
 .expandButton {
+  composes: springy from global;
+
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -299,7 +305,6 @@
   color: var(--album-light);
   font-size: 13px;
   font-weight: 500;
-  transition: background 0.2s ease;
 }
 
 .expandButton:hover {

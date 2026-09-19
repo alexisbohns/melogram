@@ -25,12 +25,15 @@
   line-height: 20px;
   min-width: 0;
   text-decoration: none;
+  transition: color 0.15s ease-out;
 }
 
+/* Hover/focus warms the title to the album's accent rather than underlining
+   it — the colour shift carries the same affordance without the rule cutting
+   through the row. */
 .name:hover,
 .name:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  color: var(--album-accent);
 }
 
 .footer {
@@ -104,8 +107,7 @@
 
 .navRow:hover .name,
 .navRow:focus-visible .name {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  color: var(--album-accent);
 }
 
 /* Every nav row carries the tint's padding, not just the highlighted one, so

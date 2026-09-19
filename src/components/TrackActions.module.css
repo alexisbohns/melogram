@@ -7,6 +7,8 @@
 /* Mirrors LikeButton's geometry exactly (height, padding, gap, accent colour,
    hover to the light tone) so the two sit as a matched pair. */
 .lyrics {
+  composes: springy from global;
+
   height: 40px;
   padding: 0 10px;
   border-radius: var(--radius-button);
@@ -17,14 +19,9 @@
   font-size: 14px;
   font-weight: 500;
   line-height: 18px;
-  transition: color 0.15s ease-out, transform 0.1s ease-out;
 }
 
 .lyrics:hover,
 .lyrics:focus-visible {
   color: var(--album-light);
-}
-
-.lyrics:active {
-  transform: scale(0.92);
 }

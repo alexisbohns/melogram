@@ -46,7 +46,13 @@ export default async function Footer() {
             className={styles.socialItem}
             aria-label={link.name}
           >
-            <img src={link.icon} alt="" width={40} height={40} />
+            <img
+              src={link.icon}
+              alt=""
+              width={40}
+              height={40}
+              className={styles.socialIcon}
+            />
           </a>
         ))}
       </div>

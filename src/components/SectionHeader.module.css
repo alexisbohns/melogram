@@ -87,13 +87,14 @@
 }
 
 .arrow {
+  composes: springy from global;
+
   width: 32px;
   height: 32px;
   display: grid;
   place-items: center;
   color: var(--header-fg);
   opacity: 0.6;
-  transition: opacity 0.15s ease;
 }
 
 .arrow:hover {

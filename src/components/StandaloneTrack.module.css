@@ -61,12 +61,13 @@
   font-weight: 500;
   line-height: 20px;
   text-decoration: none;
+  transition: color 0.15s ease-out;
 }
 
+/* See AlbumTrack's `.name` — accent on hover, no underline. */
 .name:hover,
 .name:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  color: var(--album-accent);
 }
 
 /* album name — same font props as the time */
