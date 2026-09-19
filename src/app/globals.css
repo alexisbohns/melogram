@@ -73,8 +73,8 @@ body:has([data-player-visible="true"]) {
   padding-bottom: calc(132px + env(safe-area-inset-bottom));
 }
 
-/* Sleeve wear: scuffs, creases and a rubbed edge, screened over every album
-   cover. vinyl-kit's own texture layer is the paper grain, a mid-grey image
+/* Sleeve wear: the ring the record rubs into the card, plus scratches and a
+   scuffed edge, screened over every album cover. vinyl-kit's own texture layer is the paper grain, a mid-grey image
    multiplied onto the artwork; this is its opposite — a near-black image whose
    white marks are the only thing `screen` lets through. Grain darkens, wear
    lightens, and together they read as a sleeve that has been handled.
