@@ -84,14 +84,18 @@ body:has([data-player-visible="true"]) {
    it inherits that cover's asymmetric corners, its clipping and its
    active-state tilt rather than restating all three. The cover already carries
    a `transform`, so it is its own stacking context and the blend can never
-   reach the page behind it. */
+   reach the page behind it.
+
+   The blend and the opacity are read from custom properties so the dev-only
+   `CoverWearTuner` can drive them live from the page. The fallbacks here are
+   the real, shipped values — nothing declares those properties in production. */
 .vk-sleeve-cover::after {
   content: "";
   position: absolute;
   inset: 0;
   background: url("/cover-wear.webp") center / cover;
-  mix-blend-mode: screen;
-  opacity: 0.55;
+  mix-blend-mode: var(--cover-wear-blend, screen);
+  opacity: var(--cover-wear-opacity, 0.55);
   pointer-events: none;
 }
 

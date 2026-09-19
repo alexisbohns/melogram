@@ -1,0 +1,135 @@
+/* Development-only chrome, so this is deliberately plain: it must not look
+   like part of Melogram, or it stops reading as scaffolding to be deleted. */
+
+.panel {
+  position: fixed;
+  right: 16px;
+  bottom: calc(148px + env(safe-area-inset-bottom));
+  z-index: 9999;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(12, 12, 14, 0.92);
+  backdrop-filter: blur(8px);
+  color: #eee;
+  font:
+    12px/1.4 var(--font-grotesk),
+    system-ui,
+    sans-serif;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.head button {
+  border: 0;
+  background: none;
+  color: #999;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.solo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field[data-muted] {
+  opacity: 0.4;
+}
+
+.label {
+  display: flex;
+  justify-content: space-between;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10px;
+}
+
+.label code {
+  color: #eee;
+  letter-spacing: 0;
+}
+
+.blends {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.blends button,
+.actions button {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: transparent;
+  color: #ccc;
+  font: inherit;
+  cursor: pointer;
+}
+
+.blends button[data-on] {
+  background: #eee;
+  border-color: #eee;
+  color: #111;
+}
+
+.blends button:disabled,
+.actions button:disabled {
+  cursor: not-allowed;
+}
+
+.field input[type="range"] {
+  width: 100%;
+  accent-color: #eee;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.out {
+  margin: 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #bbb;
+  font-size: 11px;
+  white-space: pre-wrap;
+}
+
+.reopen {
+  position: fixed;
+  right: 16px;
+  bottom: calc(148px + env(safe-area-inset-bottom));
+  z-index: 9999;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(12, 12, 14, 0.92);
+  color: #ccc;
+  font:
+    12px var(--font-grotesk),
+    system-ui,
+    sans-serif;
+  cursor: pointer;
+}

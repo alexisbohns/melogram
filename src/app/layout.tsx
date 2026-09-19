@@ -3,6 +3,7 @@ import { Gloock, Space_Grotesk } from "next/font/google";
 import { PlayerProvider } from "@/player/PlayerProvider";
 import PlayerBar from "@/components/PlayerBar";
 import AccountMenu from "@/components/AccountMenu";
+import CoverWearTuner from "@/components/CoverWearTuner";
 import { LikesProvider } from "@/components/LikesProvider";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 import { getLocale, getMessages } from "@/lib/i18n";
@@ -53,7 +54,10 @@ export default async function RootLayout({
   const messages = getMessages(locale);
 
   return (
-    <html lang={locale} className={`${gloock.variable} ${spaceGrotesk.variable}`}>
+    <html
+      lang={locale}
+      className={`${gloock.variable} ${spaceGrotesk.variable}`}
+    >
       <body>
         <LocaleProvider locale={locale} messages={messages}>
           <LikesProvider>
@@ -61,6 +65,9 @@ export default async function RootLayout({
               <AccountMenu />
               {children}
               <PlayerBar />
+              {/* Temporary: dialling in the sleeve wear. Remove with the
+                  component once the values are settled. */}
+              {process.env.NODE_ENV === "development" && <CoverWearTuner />}
             </PlayerProvider>
           </LikesProvider>
         </LocaleProvider>
