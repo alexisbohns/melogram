@@ -32,7 +32,8 @@
 
 @media (max-width: 767px) {
   .page {
-    padding: 0 24px 48px;
+    /* clears the fixed signature top-left and the account button top-right */
+    padding: 72px 24px 48px;
     gap: 16px;
   }
 }

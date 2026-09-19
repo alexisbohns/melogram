@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Heart } from "lucide-react";
-import Header from "@/components/Header";
+import SiteLogo from "@/components/SiteLogo";
+import Footer from "@/components/Footer";
 import UserAvatar from "@/components/UserAvatar";
 import { createClient } from "@/lib/supabase/server";
 import { getLocale, getMessages } from "@/lib/i18n";
@@ -28,7 +29,7 @@ export default async function ProfilePage() {
 
   return (
     <div className={styles.page}>
-      <Header variant="compact" />
+      <SiteLogo />
       <main className={styles.content}>
         <section className={styles.card}>
           <UserAvatar user={user} size={96} />
@@ -49,6 +50,7 @@ export default async function ProfilePage() {
           </form>
         </section>
       </main>
+      <Footer />
     </div>
   );
 }

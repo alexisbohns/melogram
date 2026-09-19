@@ -4,10 +4,6 @@ import { ARTIST, MENU_ITEMS, SOCIAL_LINKS } from "@/lib/site";
 import { getLocale, getMessages, type Messages } from "@/lib/i18n";
 import styles from "./Header.module.css";
 
-type Props = {
-  variant: "home" | "compact";
-};
-
 function Menu({ nav, className }: { nav: Messages["nav"]; className?: string }) {
   return (
     <nav className={`${styles.menu} ${className ?? ""}`}>
@@ -26,33 +22,30 @@ function Menu({ nav, className }: { nav: Messages["nav"]; className?: string }) 
   );
 }
 
-function Social({ withLabels }: { withLabels: boolean }) {
+function Social() {
   return (
     <div className={styles.social}>
       {SOCIAL_LINKS.map((link) => (
         <a key={link.name} href={link.href} className={styles.socialItem}>
-          {withLabels && (
-            <span className={styles.socialName}>{link.name}</span>
-          )}
-          <img
-            src={link.icon}
-            alt={withLabels ? "" : link.name}
-            width={40}
-            height={40}
-          />
+          <span className={styles.socialName}>{link.name}</span>
+          <img src={link.icon} alt="" width={40} height={40} />
         </a>
       ))}
     </div>
   );
 }
 
-export default async function Header({ variant }: Props) {
-  const isHome = variant === "home";
+/**
+ * The home page's opening block: brand, bio, menu and social links. Every
+ * other page carries the same identity as a fixed <SiteLogo /> plus the
+ * <Footer /> row instead.
+ */
+export default async function Header() {
   const m = getMessages(await getLocale());
 
   return (
     /* the whole header composites over the page background */
-    <header className={`${styles.header} ${styles[variant]}`}>
+    <header className={styles.header}>
       <div className={styles.brand}>
         <Link href="/" className={styles.composer}>
           <img src="/brand-picture.png" alt="" className={styles.picture} />
@@ -62,13 +55,13 @@ export default async function Header({ variant }: Props) {
 
       <div className={styles.body}>
         <p className={styles.name}>{ARTIST.name}</p>
-        {isHome && <p className={styles.bio}>{ARTIST.bio}</p>}
+        <p className={styles.bio}>{ARTIST.bio}</p>
         <Menu nav={m.nav} className={styles.bodyMenu} />
       </div>
 
-      <Social withLabels={isHome} />
+      <Social />
 
-      {isHome && <Menu nav={m.nav} className={styles.bottomMenu} />}
+      <Menu nav={m.nav} className={styles.bottomMenu} />
     </header>
   );
 }

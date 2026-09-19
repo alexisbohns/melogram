@@ -54,7 +54,7 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
   // on a direct link (it never appears in any listing). Owners still reach it.
   if (versioned.length === 0 && !canEdit) {
     return (
-      <article className={styles.card} style={paletteVars(palette)}>
+      <article className={styles.notice} style={paletteVars(palette)}>
         <p className={styles.unavailable}>This album isn’t available yet.</p>
       </article>
     );
@@ -62,27 +62,33 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
 
   return (
     <article className={styles.card} style={paletteVars(palette)}>
-      <div className={styles.editBar}>
-        <EditToggle />
-      </div>
+      {/* Listeners get no bar at all — an empty one would still spend the
+          card's 32px gap and push the hero down the page. */}
+      {canEdit && (
+        <div className={styles.editBar}>
+          <EditToggle />
+        </div>
+      )}
       <div className={styles.hero}>
-        {editing ? (
-          <CoverUploader
-            albumId={album.id}
-            coverUrl={album.cover_url}
-            alt={album.name}
-            size={165}
-          />
-        ) : (
-          <AlbumCoverLive
-            albumId={album.id}
-            coverUrl={album.cover_url}
-            alt={album.name}
-            size={165}
-            priority
-            reserve
-          />
-        )}
+        <div className={styles.cover}>
+          {editing ? (
+            <CoverUploader
+              albumId={album.id}
+              coverUrl={album.cover_url}
+              alt={album.name}
+              size={165}
+            />
+          ) : (
+            <AlbumCoverLive
+              albumId={album.id}
+              coverUrl={album.cover_url}
+              alt={album.name}
+              size={165}
+              priority
+              reserve
+            />
+          )}
+        </div>
         <div className={styles.heroBody}>
           {editing ? (
             <div className={styles.header}>
@@ -144,15 +150,21 @@ export default function AlbumDetailCard({ album, lyrics }: Props) {
           )}
         </div>
       </div>
-      {editing ? (
-        <EditableSetlist
-          onEditTrack={(trackId) => setDrawer({ trackId })}
-          onAddTrack={() => setDrawer({ trackId: null })}
-        />
-      ) : (
-        <AlbumPlaylist tracks={readTracks} variant="detailed" lyrics={lyrics} />
-      )}
-      <AlbumStory album={album} />
+      <div className={styles.body}>
+        {editing ? (
+          <EditableSetlist
+            onEditTrack={(trackId) => setDrawer({ trackId })}
+            onAddTrack={() => setDrawer({ trackId: null })}
+          />
+        ) : (
+          <AlbumPlaylist
+            tracks={readTracks}
+            variant="detailed"
+            lyrics={lyrics}
+          />
+        )}
+        <AlbumStory album={album} />
+      </div>
       {drawer && (
         <TrackDrawer
           key={drawer.trackId ?? "new"}

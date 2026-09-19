@@ -7,21 +7,39 @@
   gap: 32px;
 }
 
+/* One grid shared by the album card and the rail of other albums: the card and
+   its hero dissolve into it with `display: contents` (see
+   AlbumDetailCard.module.css), so the current album's cover heads the same
+   300px column the rail runs down.
+
+     [ edit bar, both columns — only when a member is signed in ]
+     [ cover ][ name · meta · description · tiles ]
+     [ rail  ][ tracklist · notes                 ]
+
+   Auto-placement rather than named areas, so the optional edit bar doesn't
+   reserve an empty first row (and its row-gap) for listeners. `order` moves
+   the rail below the header; it stays first in the DOM because that is the
+   order mobile wants for the tab sequence. */
 .content {
   display: grid;
-  grid-template-columns: 400px minmax(0, 1fr);
-  gap: 24px;
+  grid-template-columns: 300px minmax(0, 1fr);
+  column-gap: 24px;
+  row-gap: 32px;
   align-items: start;
 }
 
 @media (max-width: 767px) {
   .page {
-    padding: 0 24px 48px;
+    /* clears the fixed signature top-left and the account button top-right */
+    padding: 72px 24px 48px;
     gap: 16px;
   }
 
+  /* A plain column: the card keeps its own flex layout and the rail follows it
+     as a horizontal strip, last before the footer. */
   .content {
-    grid-template-columns: minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 24px;
   }
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import Header from "@/components/Header";
+import SiteLogo from "@/components/SiteLogo";
+import Footer from "@/components/Footer";
 import AlbumOrderList from "@/components/edit/AlbumOrderList";
 import { getArtistAlbumsInOrder } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
@@ -37,12 +38,13 @@ export default async function AlbumOrderPage() {
 
   return (
     <div className={styles.page}>
-      <Header variant="compact" />
+      <SiteLogo />
       <main className={styles.content}>
         <h1 className={styles.title}>{m.albumOrder.title}</h1>
         <p className={styles.intro}>{m.albumOrder.intro}</p>
         <AlbumOrderList artistId={artistId} albums={albums} />
       </main>
+      <Footer />
     </div>
   );
 }

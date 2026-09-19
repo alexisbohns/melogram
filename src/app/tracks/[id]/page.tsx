@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Header from "@/components/Header";
+import SiteLogo from "@/components/SiteLogo";
+import Footer from "@/components/Footer";
 import AlbumAside from "@/components/AlbumAside";
 import PaletteScope from "@/components/PaletteScope";
 import Prose from "@/components/Prose";
@@ -49,7 +50,7 @@ export default async function TrackPage({ params }: Props) {
 
   return (
     <div className={styles.page}>
-      <Header variant="compact" />
+      <SiteLogo />
       <PaletteScope
         album={{
           id: album?.id,
@@ -71,6 +72,7 @@ export default async function TrackPage({ params }: Props) {
           </article>
         </div>
       </PaletteScope>
+      <Footer />
     </div>
   );
 }

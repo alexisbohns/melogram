@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import Header from "@/components/Header";
+import SiteLogo from "@/components/SiteLogo";
+import Footer from "@/components/Footer";
 import AlbumPlaylist from "@/components/AlbumPlaylist";
 import { getLikedTracks } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
@@ -25,7 +26,7 @@ export default async function LikesPage() {
 
   return (
     <div className={styles.page}>
-      <Header variant="compact" />
+      <SiteLogo />
       <main className={styles.content}>
         <h1 className={styles.title}>{m.likes.title}</h1>
         {tracks.length === 0 ? (
@@ -34,6 +35,7 @@ export default async function LikesPage() {
           <AlbumPlaylist tracks={tracks} variant="simple" />
         )}
       </main>
+      <Footer />
     </div>
   );
 }

@@ -1,0 +1,27 @@
+/* Composites over the dark mauve page background, like the home header:
+   the soft grey signature renders pink through color-dodge. */
+.logo {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+  z-index: 50;
+  display: block;
+  width: 110px;
+  mix-blend-mode: color-dodge;
+  transition: opacity 0.2s ease-out;
+}
+
+.logo img {
+  width: 100%;
+  height: auto;
+}
+
+.logo:hover {
+  opacity: 0.75;
+}
+
+@media (max-width: 767px) {
+  .logo {
+    width: 84px;
+  }
+}

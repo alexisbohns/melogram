@@ -100,35 +100,35 @@
   flex-shrink: 0;
 }
 
-/* ================= home variant ================= */
+/* ================= layout ================= */
 
 @media (min-width: 768px) {
-  .home {
+  .header {
     align-items: flex-start;
   }
 
-  .home .brand,
-  .home .body,
-  .home .social {
+  .brand,
+  .body,
+  .social {
     flex: 1 1 0;
     max-width: 400px;
   }
 
-  .home .composer {
+  .composer {
     width: 297px;
     height: 252px;
     max-width: 100%;
   }
 
-  .home .picture {
+  .picture {
     height: 237px;
   }
 
-  .home .logo {
+  .logo {
     width: 210px;
   }
 
-  .home .social {
+  .social {
     margin-left: auto;
     padding: 16px;
     flex-direction: column;
@@ -136,115 +136,59 @@
     gap: 16px;
   }
 
-  .home .bottomMenu {
+  .bottomMenu {
     display: none;
   }
 }
 
 @media (max-width: 767px) {
-  .home {
+  .header {
     flex-direction: column;
     gap: 0;
   }
 
-  .home .brand {
+  .brand {
     align-self: center;
   }
 
-  .home .composer {
+  .composer {
     width: 179px;
     height: 152px;
   }
 
-  .home .picture {
+  .picture {
     height: 143px;
   }
 
-  .home .logo {
+  .logo {
     width: 127px;
   }
 
-  .home .body {
+  .body {
     gap: 24px;
   }
 
-  .home .bodyMenu {
+  .bodyMenu {
     display: none;
   }
 
-  .home .social {
+  .social {
     padding: 16px 24px;
     overflow-x: auto;
     scrollbar-width: none;
   }
 
   /* Figma HomeMobile: icon before label in the horizontal scroll row */
-  .home .socialItem {
+  .socialItem {
     flex-direction: row-reverse;
   }
 
-  .home .social::-webkit-scrollbar {
+  .social::-webkit-scrollbar {
     display: none;
   }
 
-  .home .bottomMenu {
+  .bottomMenu {
     padding: 25px;
     border-top: 1px solid color-mix(in srgb, var(--header-fg) 10%, transparent);
-  }
-}
-
-/* ================= compact variant ================= */
-
-.compact {
-  align-items: center;
-  gap: 0;
-}
-
-.compact .composer {
-  width: 61px;
-  height: 52px;
-}
-
-.compact .picture {
-  height: 49px;
-}
-
-.compact .logo {
-  width: 43px;
-}
-
-.compact .body {
-  flex-direction: row;
-  align-items: baseline;
-  gap: 32px;
-  flex: 1;
-}
-
-.compact .social {
-  padding: 16px;
-}
-
-.compact .bio {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .compact .bodyMenu {
-    display: none;
-  }
-
-  .compact .body {
-    padding: 24px 16px;
-  }
-
-  /* Stack the social row below the logo + name instead of squeezing it
-     alongside them: let the header wrap and give social a full-width line. */
-  .compact {
-    flex-wrap: wrap;
-  }
-
-  .compact .social {
-    flex-basis: 100%;
-    padding: 0 16px 16px;
   }
 }

@@ -1,0 +1,73 @@
+/* Same compositing trick as the header (see Header.module.css): soft grey
+   content over the dark mauve background renders pink through color-dodge. */
+.footer {
+  mix-blend-mode: color-dodge;
+  color: var(--header-fg);
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid color-mix(in srgb, var(--header-fg) 10%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+/* Title and menu read as one block on the left; social sits opposite. */
+.identity {
+  display: flex;
+  align-items: baseline;
+  gap: 32px;
+}
+
+.brand {
+  font-family: var(--font-gloock), serif;
+  font-size: 24px;
+  line-height: 29px;
+}
+
+/* ---------- menu ---------- */
+
+.menu {
+  display: flex;
+  gap: 32px;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.menuActive {
+  font-weight: 700;
+}
+
+.menuItem {
+  font-weight: 400;
+  opacity: 0.8;
+  cursor: default;
+}
+
+/* ---------- social ---------- */
+
+.social {
+  display: flex;
+  gap: 16px;
+}
+
+.socialItem img {
+  width: 40px;
+  height: 40px;
+}
+
+@media (max-width: 767px) {
+  /* Everything stacks against the left edge: title, then menu, then social. */
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding-top: 32px;
+  }
+
+  .identity {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
