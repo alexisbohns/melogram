@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Pause, Play } from "lucide-react";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime } from "@/player/durations";
@@ -65,9 +66,12 @@ export default function StandaloneTrack({ track, queue }: Props) {
         </div>
 
         <div className={styles.heading}>
-          <span className={`${styles.name} ${active ? "shimmer" : ""}`}>
+          <Link
+            href={`/tracks/${track.track_id}`}
+            className={`${styles.name} ${active ? "shimmer" : ""}`}
+          >
             {track.track_name}
-          </span>
+          </Link>
           {track.album_name && (
             <span className={styles.album}>{track.album_name}</span>
           )}

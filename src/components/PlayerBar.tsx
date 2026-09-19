@@ -6,6 +6,7 @@ import {
   ChevronDown,
   Disc3,
   Mic,
+  Music,
   Pause,
   Play,
   Repeat,
@@ -283,6 +284,16 @@ export default function PlayerBar() {
                 <p className={styles.description}>{current.description}</p>
               )}
               <div className={styles.expandActions}>
+                {current?.id && (
+                  <Link
+                    href={`/tracks/${current.id}`}
+                    className={styles.expandButton}
+                    onClick={() => setExpanded(false)}
+                  >
+                    <Music size={16} strokeWidth={2} aria-hidden />
+                    {m.player.track}
+                  </Link>
+                )}
                 {current?.albumId && (
                   <Link
                     href={`/albums/${current.albumId}`}

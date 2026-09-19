@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Mic, Pause, Play } from "lucide-react";
 import { toPlayerTrack, usePlayer } from "@/player/PlayerProvider";
 import { formatTime } from "@/player/durations";
@@ -70,9 +71,12 @@ export default function AlbumTrack({
         )}
       </button>
 
-      <span className={`${styles.name} ${active ? "shimmer" : ""}`}>
+      <Link
+        href={`/tracks/${track.track_id}`}
+        className={`${styles.name} ${active ? "shimmer" : ""}`}
+      >
         {track.track_name}
-      </span>
+      </Link>
 
       <div className={styles.footer}>
         <span className={styles.time}>

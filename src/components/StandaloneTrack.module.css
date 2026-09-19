@@ -60,6 +60,13 @@
   font-size: 16px;
   font-weight: 500;
   line-height: 20px;
+  text-decoration: none;
+}
+
+.name:hover,
+.name:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* album name — same font props as the time */
