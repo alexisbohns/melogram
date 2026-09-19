@@ -1,0 +1,13 @@
+.iconButton {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-button);
+  color: var(--album-accent);
+  display: grid;
+  place-items: center;
+}
+
+.iconButton:disabled {
+  cursor: default;
+  opacity: 0.4;
+}

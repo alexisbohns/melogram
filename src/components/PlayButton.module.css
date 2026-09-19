@@ -1,0 +1,20 @@
+.play {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-button);
+  background: color-mix(in srgb, var(--album-accent) 10%, transparent);
+  color: var(--album-accent);
+  display: grid;
+  place-items: center;
+}
+
+.play:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.play[data-playing] {
+  background: var(--album-accent);
+  color: var(--album-light);
+}
